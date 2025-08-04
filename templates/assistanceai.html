@@ -7,12 +7,97 @@
 {% endblock %}
 
 {% block content%}
+<style>
+    /* Styles pour les écrans de bureau */
+@media (min-width: 768px) {
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  input[type="text"] {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 1rem;
+  }
+
+  button[type="submit"] {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .reponse-container {
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .reponse-container p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+}
+
+/* Styles pour les appareils mobiles */
+@media (max-width: 767px) {
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  input[type="text"] {
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  button[type="submit"] {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .reponse-container {
+    padding: 0 1rem;
+  }
+
+  .reponse-container p {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+}
+</style>
     <h2>Assistant IA</h2>
 
-    <!-- Formulaire pour entrer un prompt -->
+    <!-- Formulaire de saisi -->
     <form action="/assistant-ia" method="POST">
-        <label for="prompt">Posez votre question :</label><br>
-        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;">
+        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;" placeholder="Entrer votre prompt...">
         <button type="submit">Envoyer</button>
     </form>
   <!-- Affichage de la réponse -->
