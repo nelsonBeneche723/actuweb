@@ -3,7 +3,6 @@ flask
 requests
 dotenv
 google-generativeai
-random
 deep-translator
 collections
 pytz
@@ -12,3 +11,4 @@ numpy
 matplotlib
 lyricsgenius
 gunicorn
+
