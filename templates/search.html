@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+{% block title %} Recherche: {% if titre %} {{titre}}: {% endif %}Actu-web {% endblock %}
+
+{% block link %} {% endblock %}
+{{nom}}
+{% block content %}
+<style>
+   nav{background-color: #1e1e2f;}
+   footer{background-color: #1e1e2f;}
+
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 22px;
+    margin: 30px 0;
+    color: #f1f1f1;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 0 40px 60px;
+  }
+
+  .music-card {
+    background-color: #1f1f1f;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+  }
+
+  .music-card:hover {
+    transform: scale(1.03);
+  }
+
+  .music-card h3 {
+    margin: 10px 0;
+    font-size: 1.1rem;
+  }
+
+  .music-card p {
+    margin: 5px 0 15px;
+    font-size: 0.95rem;
+    color: #bbb;
+  }
+
+  .music-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background-color: #2a2a2a;
+  }
+
+  .btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 16px;
+    background-color: #ff4c60;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn:hover {
+    background-color: #e63a4c;
+  }
+  * Centrer le tableau */
+    .classement-table {
+        margin: 20px auto; /* Centre le tableau */
+        border-collapse: collapse;
+        width: 90%;
+        max-width: 1000px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Style des titres */
+    .table-trending thead {
+        background-color: #121212;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Espacement */
+    .table-trending th, .classement-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Effet hover sur les lignes */
+    .table-trending tbody tr:hover {
+        background-color: #1e1e2f;
+    }
+
+    /* Dernière ligne sans bord bas */
+    .table-trending tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+
+  .table-trending {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    margin: 40px auto;
+  }
+
+  .table-trending th,
+  .table-trending td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+  }
+
+  .table-trending img.song-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .btn-icon {
+    height: 24px;
+    width: 24px;
+    transition: transform 0.2s;
+  }
+
+  .btn-icon:hover {
+    transform: scale(1.2);
+  }
+
+  .hover-title {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .mini-player {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #1e1e1e;
+    padding: 5px;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  .hover-title:hover .mini-player {
+    display: block;
+  }
+
+  #global-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1e1e1e;
+    color: white;
+    padding: 10px 20px;
+    border-top: 2px solid #333;
+    display: none;
+    z-index: 1000;
+  }
+<!--responsive-->
+
+  @media screen and (max-width: 600px) {
+ .table-trending {
+    width: 100%;
+    font-size: 14px;
+    margin: 10px auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .table-trending th,
+  .table-trending td,
+  .classement-table th,
+  .classement-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .table-trending img.song-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 5px;
+  }
+
+  .btn-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  #global-player {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .table-wrapper,
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* pour iOS */
+  }
+
+
+}
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* pour un scroll fluide sur iOS */
+}
+
+@media (max-width: 600px) {
+  .table-trending {
+    width: 600px; /* largeur fixe si trop de colonnes */
+    font-size: 13px;
+  }
+}
+<!--header barre recherche-->
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000;
+    padding: 15px;
+}
+
+.header {
+  padding: 20px;
+  background-color: #1f1f1f;
+  text-align: center;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 600px;
+  margin: auto;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 12px 12px 40px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  background-color: #f1f1f1;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 18px;
+}
+
+.btn-search {
+  padding: 12px 20px;
+  border: none;
+  background-color: #ff4747;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-search:hover {
+  background-color: #e63b3b;
+}
+
+.error {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-align:center;
+}
+
+.error p {
+    margin-bottom: 8px;
+    color: white;
+        }
+
+</style>
+
+
+ <header class="header">
+     <form class="search-bar" action="/search" method="GET">
+         <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" name="query" placeholder="Rechercher par Artistes, Songs, Albums, Videos..">
+        </div>
+    <button class="btn-search" type="submit">Rechercher</button>
+  </form>
+    </header>
+
+ {% if query %}
+<h1 class="section-title">🎶 Résultats de la recherche</h1>
+<div class="table-wrapper">
+<table class="table-trending">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Covers</th>
+      <th>Artiste</th>
+      <th>Titre</th>
+      <th>Genre</th>
+<!--      <th>Durée</th>-->
+<!--      <th>Télécharger</th>-->
+    </tr>
+  </thead>
+  <tbody>
+
+    {% for musique in query %}
+    <tr class="song-row" data-audio="{{ musique.url }}" data-title="{{ musique.titre }}" data-artist="{{ musique.nom }}">
+      <td>{{loop.index}}</td>
+      <td><img src="{{ musique.image_url }}" class="song-img" alt="cover"></td>
+      <td class="hover-title">
+        {{ musique.titre }}
+        <div class="mini-player">
+          <audio src="{{ musique.url }}" controls preload="none"></audio>
+        </div>
+      </td>
+      <td>{{ musique.nom }}</td>
+      <td>{{musique.genre}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+        <p style="text-align:center; color:white; font-family: Arial, sans-serif;">📡 Cette chanson n'existe pas dans notre catalogue...</p>
+
+    {% endif %}
+</div>
+<!--Lecteur-->
+<div id="global-player">
+  <p id="now-playing"></p>
+  <audio id="main-audio" controls style="width: 100%;"></audio>
+</div>
+
+<script>
+
+  const rows = document.querySelectorAll(".song-row");
+  const mainAudio = document.getElementById("main-audio");
+  const globalPlayer = document.getElementById("global-player");
+  const nowPlaying = document.getElementById("now-playing");
+
+  rows.forEach(row => {
+    row.addEventListener("click", () => {
+      const audioSrc = row.getAttribute("data-audio");
+      const title = row.getAttribute("data-title");
+      const artist = row.getAttribute("data-artist");
+
+      mainAudio.src = audioSrc;
+      nowPlaying.textContent = `🎶 En lecture : ${title} - ${artist}`;
+      globalPlayer.style.display = "block";
+      mainAudio.play();
+    });
+  });
+
+</script>
+{% endblock %}

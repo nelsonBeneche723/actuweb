@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+
+{% block title %} 📺 {{nomtele}}: En direct {% endblock %}
+
+
+<!--Contenu de la page tv-->
+{% block content %}
+<div class="container">
+    <h2>📺 {{ nomtele }} - En direct</h2>
+  <div class="video-wrapper">
+        <video
+                id="my-video"
+                class="video-js vjs-default-skin"
+                width="640"
+                height="360"
+                preload="auto"
+                data-setup="{}"
+                controls>
+            <source
+                    src="{{channel_tv[0]}}"
+                    type="application/x-mpegURL">
+
+            Votre navigateur ne supporte pas la lecture vidéo en direct.
+        </video>
+  </div>
+
+  <h3>🔁 Chaînes recommandées</h3>
+    <div class="recommendations">
+        {% for chaine, urls in autres_chaines %}
+            <div class="channel-card">
+                <a href="{{url_for('lecturestreaming_tv', nomtele=chaine.replace(' ','-'))}}">
+                    {{ chaine }}
+                <img src="{{urls[1]}}" alt="image de chaine tv" style="height:40px;width:80px;">
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 30px auto; /* centre horizontalement */
+            display: flex;
+            justify-content: center; /* centre le contenu */
+            }
+
+        .recommendations {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .channel-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .channel-card:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .channel-card a {
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+        }
+
+
+      .error {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align:center;
+        }
+
+.error p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+
+</style>
+{% endblock %}

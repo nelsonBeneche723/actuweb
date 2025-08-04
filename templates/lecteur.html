@@ -1,0 +1,492 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ musique.titre }} - Lecture {% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/music.ico') }}" type="image/x-icon">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #121212;
+        color: #fff;
+        font-family: 'Segoe UI', sans-serif;
+        margin:0;
+        padding:0;
+        }
+
+    nav, footer {
+        background-color: #1e1e2f;
+    }
+
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 30px;
+    background-color: #121212;
+    color: #fff;
+}
+
+.recommendation-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px;
+}
+<!--media pour recommandations-->
+@media screen and (max-width: 600px) {
+  .song-item {
+    display: flex;
+    flex-direction: row; /* Garder horizontal */
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .song-item .album-cover {
+    width: 60px;
+    height: 60px;
+    margin: 0;
+    flex-shrink: 0;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .song-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .song-title {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .song-artist {
+    font-size: 0.9em;
+    color: #aaa;
+    margin: 4px 0 0 0;
+  }
+
+  .song-actions {
+    display: none; /* Optionnel : masquer sur mobile si tu veux simplifier */
+  }
+
+  .music-list h2 {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .album-item {
+    width: 48%;
+    margin-bottom: 10px;
+  }
+
+  .album-cover {
+    width: 100%;
+    height: auto;
+  }
+}
+
+
+<!--Media queries plus de contenus-->
+
+<!--player container-->
+
+.player-container {
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+img {
+    width: 100%;
+    max-width: 500px;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.titre-musique {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align:center;
+}
+
+.nom-artiste {
+    font-size: 1.1rem;
+    color: #aaa;
+    text-align:center;
+}
+
+.audio-controls audio {
+    width: 40%;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+
+.back-btn {
+    background: #3a3a3a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-top: 20px;
+    display: inline-block;
+    transition: 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #575757;
+    color:white;
+}
+
+
+
+
+/* Lyrics Styling */
+.lyrics-box {
+    background: #1f1f1f;
+    margin-top: 30px;
+    padding: 20px;
+    border-left: 4px solid #ff5e5e;
+    border-radius: 10px;
+}
+.lyrics-box h3 {
+    color: #ff5e5e;
+    margin-bottom: 10px;
+}
+.lyrics-content pre {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+    color: #eee;
+}
+
+/* Recommandations */
+.recommendations h2,
+.music-list h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 1.4rem;
+}
+
+
+
+.album-item {
+    width: 100%;
+    text-align: center;
+}
+
+.album-cover {
+    height: 120px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.song-title {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.song-artist {
+    font-size: 0.85em;
+    color: #aaa;
+}
+
+/* Plus de contenus */
+.song-item {
+    display: flex;
+    align-items: center;
+    background-color: #1e1e2f;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.song-item a {
+    display: flex;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+
+.song-item .album-cover {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.song-info {
+    flex-grow: 1;
+}
+
+.song-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+}
+
+
+    .album-item {
+        width: 110px;
+        text-align: center;
+    }
+
+    .album-cover {
+        height: 110px;
+        width: 100%;
+        background-size: cover;
+        background-position: center;
+        border-radius: 10px;
+        margin-bottom: 6px;
+    }
+
+    .album-item p {
+        font-size: 0.85em;
+        margin: 0;
+        color: #ccc;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .music-list h2 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .song-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        background-color: #1f1f1f;
+        padding: 10px;
+        border-radius: 10px;
+        transition: background 0.2s ease;
+        width: 100%;
+
+    }
+
+    .song-item:hover {
+        background-color: #2a2a2a;
+    }
+
+    .song-item .album-cover {
+        width: 60px;
+        height: 20px;
+        border-radius: 8px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+
+    .song-info {
+        flex-grow: 1;
+    }
+
+    .song-title {
+        font-weight: bold;
+        margin: 0;
+        font-size: 1em;
+    }
+
+    .song-artist {
+        font-size: 0.9em;
+        color: #aaa;
+    }
+
+    .song-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 0.9em;
+        color: white;
+    }
+
+    .song-actions i {
+        cursor: pointer;
+    }
+
+<!--    ajuste la couleur-->
+
+
+    .error {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align:center;
+        }
+
+.error p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+.lyrics-box {
+    background-color: #1f1f1f;
+    padding: 20px;
+    margin-top: 30px;
+    border-left: 4px solid #ff4081;
+    border-radius: 10px;
+}
+
+.lyrics-box h3 {
+    color: #ff4081;
+    margin-bottom: 15px;
+}
+
+.lyrics-content pre {
+    white-space: pre-wrap;
+    color: #eee;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+}
+
+    .lyrics-box {
+    position: relative;
+    background: #1f1f1f;
+    padding: 20px 30px;
+    margin: 40px 0;
+    border-radius: 10px;
+    border-left: 4px solid #ff4081;
+    border-right: 4px solid #ff4081;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    max-height: 400px; /* Limite la hauteur */
+}
+
+.lyrics-box::before,
+.lyrics-box::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 4px;
+    background: #ff4081;
+}
+
+.lyrics-box::before {
+    left: 0;
+}
+
+.lyrics-box::after {
+    right: 0;
+}
+
+.lyrics-content {
+    max-height: 300px; /* Ajuste selon besoin */
+    overflow-y: auto;
+    padding-right: 10px; /* espace pour la scrollbar */
+}
+
+.lyrics-content pre {
+    white-space: pre-wrap;
+    color: #eee;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+}
+.images-covers{text-align:center;}
+</style>
+
+
+    <!-- 🎵 PLAYER + PAROLES -->
+    <div class="images-covers">
+<!--        <a>SOny</a>-->
+        <img src="{{ musique.image_url }}" alt="Pochette {{ musique.titre }}">
+
+        <h2 class="titre-musique">{{ musique.titre }}</h2>
+        <p class="nom-artiste">{{ musique.nom }}</p>
+
+        <div class="audio-controls">
+            <audio controls>
+                <source src="{{ musique.url }}" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'audio.
+            </audio>
+        </div>
+
+        <div class="btns">
+            <a href="{{ url_for('musiques') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+</div>
+
+
+        {% if chanson %}
+        <div class="lyrics-box">
+            <h3><i class="fas fa-music"></i> Paroles</h3>
+            <div class="lyrics-content">
+                <pre>{{ chanson }}</pre>
+            </div>
+        </div>
+        {% endif %}
+
+
+    <!-- 🎧 RECOMMANDATIONS -->
+    <div class="recommendations">
+        <h2>🎧 Recommandé pour vous</h2>
+        {% if recommandations %}
+        <div class="recommendation-list">
+            {% for recommandation in recommandations %}
+            <div class="album-item">
+                <a href="{{ url_for('jouer_musique', musique_id=recommandation.id, slug=recommandation.titre|replace(' ','-')) }}">
+                    <div class="album-cover" style="background-image: url('{{ recommandation.image_url }}');"></div>
+                </a>
+                <p class="song-title">{{ recommandation.titre }}</p>
+                <p class="song-artist">{{ recommandation.artiste }}</p>
+            </div>
+            {% endfor %}
+        </div>
+              <!-- 🔥 PLUS DE CONTENUS -->
+    {% if plus_contenu_musique %}
+    <div class="music-list">
+        <h2>🔥 Plus de contenus dans {{ plus_contenu_musique[0].genre }}</h2>
+        {% for m in plus_contenu_musique %}
+        <div class="song-item">
+            <a href="{{ url_for('jouer_musique', musique_id=m.id, slug=m.titre|replace(' ','-')) }}">
+                <div class="album-cover" style="background-image: url('{{ m.image }}'); height:70px;width:70px;"></div>
+                <div class="song-info">
+                    <p class="song-title">{{ m.titre }}</p>
+                    <p class="song-artist">{{ m.nom }}</p>
+                </div>
+            </a>
+            <div class="song-actions">
+                <i class="far fa-heart"></i>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="error">
+        <p>Aucun contenu disponible.</p>
+    </div>
+    {% endif %}
+
+        </div>
+        {% else %}
+        <p class="no-data">Aucune recommandation disponible.</p>
+        {% endif %}
+
+
+
+{% endblock %}

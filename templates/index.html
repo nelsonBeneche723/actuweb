@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Actu Web: Politiques, Sports, Sante.. {% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/actuweb.ico') }}" type="image/x-icon">
+{% endblock %}
+
+
+{% block content %}
+<style>
+
+
+.error {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align:center;
+        }
+
+.error p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+    .suma{font-family:arial; text-align:center;}
+</style>
+
+
+        <h2>Actualités du monde</h2>
+  {% if articles %}
+            <div class="actualites-container">
+            {% for article in articles %}
+                <div class="article-card">
+                     <img src="{{article.image}}" alt="image de l'articles">
+                     <h3><a href="{{article.link}}" target="_blank">{{article.title}}</a></h3>
+                    <div class="suma"><a>{{article.summary|safe}}</a></div>
+                    <h4><a>Date de Publication: {{article.published}}</a></h4>
+                 </div>
+            {% endfor %}
+            </div>
+
+{% else %}
+    <div class="error">
+        <p>Aucune donnée disponible.</p>
+    </div>
+{% endif %}
+{% endblock %}

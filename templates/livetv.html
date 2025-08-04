@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %} LIVE TV :{% endblock %}
+
+{% block link %}
+{% endblock %}
+
+{% block content %}
+<style>
+
+    /* pour l'affichage articles*/
+.endirect-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 1em;
+}
+
+.endirect-card {
+    width: calc(20% - 20px);
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.endirect-card:hover {
+    transform: scale(1.05);
+}
+
+.endirect-card img {
+    width: 100%;
+    height: 70px;
+    object-fit: cover;
+}
+
+.endirect-card h3 {
+    font-size: 1em;
+    padding: 0.5em;
+}
+
+.endirect-card h4 {
+    font-size: 0.85em;
+    color: #444;
+    text-align: center;
+    margin: 10px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .endirect-card {
+        width: calc(33.33% - 20px); /* 3 par ligne */
+    }
+}
+@media (max-width: 768px) {
+    .endirect-card {
+        width: calc(50% - 20px); /* 2 par ligne */
+    }
+}
+@media (max-width: 480px) {
+    .endirect-card {
+        width: 100%; /* 1 par ligne */
+    }
+}
+
+</style>
+<!--Contenu de la page et ajouter les différentes chaines de television-->
+
+<!--<h2>📺 LIVE- Youtube</h2>-->
+<!--  <div class="endirect-container">-->
+<!--      {% for channel in channeltv %}-->
+<!--            <div class="endirect-card">-->
+<!--                 <h3> <img src="{{channel.images}}" alt="logo channel tv"> <a target="_blank">{{channel.nomtele}}</a></h3>-->
+<!--                <iframe width="281" height="183" src="{{channel.url}}"-->
+<!--        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"-->
+<!--        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>-->
+<!--                </iframe>-->
+<!--            </div>-->
+<!--      {% endfor %}-->
+
+<!--  </div>-->
+<h2 style="font-size: 1em;">📺Chaines -En direct</h2>
+<div class="endirect-container">
+     {% for channel in channeltv %}
+    <div class="endirect-card">
+        <a href ="{{url_for('lecturestreaming_tv', nomtele=channel.nomtele|replace(' ','-'))}}">
+            <img src="{{channel.images}}" alt="image de l'articles" style="height:150px;">
+
+        </a>
+        <h2 style="text-align:center; font-size: 1em;">{{channel.nomtele}}</h2>
+    </div>
+  {% endfor %}
+  </div>
+
+{% endblock %}

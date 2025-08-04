@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} Sciences: Actu Web  {% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/tech.ico') }}" type="image/x-icon">
+{% endblock %}
+
+<!--Contenus de la page sante-->
+{% block content %}
+<style>
+
+.error {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align:center;
+        }
+
+.error p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+</style>
+
+{% if sciences_ %}
+ <div class="actualites-container">
+      {% for science in sciences_ %}
+            <div class="article-card">
+                 <img src="{{science.image}}" alt="image de..{{science.title}}">
+                 <h3><a href="{{science.link}}" target="_blank">{{science.title}}</a></h3>
+                <div class="suma"><a>{{science.summary|safe}}</a></div>
+                <h4><a>Date de Publication: {{science.published}}</a></h4>
+            </div>
+      {% endfor %}
+  </div>
+{% else %}
+<div class="error">
+    <p>Erreur API</p>
+    <p>Aucune donnée disponible.</p>
+</div>
+{% endif %}
+
+{% endblock %}

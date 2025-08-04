@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Meteo du Jour{% endblock %}
+
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/meteo.ico') }}" type="image/x-icon">
+{% endblock %}
+
+
+{% block content %}
+    <style>
+        .meteo-container {
+            max-width: 800px;
+            margin: 10px auto; /* réduit l'espacement vertical */
+            padding: 20px;
+            background-color: #f5f7fa;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
+    }
+
+        .meteo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .meteo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .meteo-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .meteo-item h4 {
+            margin-bottom: 8px;
+            color: #555;
+        }
+.form-meteo{margin-top:25px;}
+    </style>
+
+    <hr/>
+<!--Barre de recherche-->
+<div class="form-meteo">
+    <form action="/meteo" method="GET" style="text-align: center; margin-bottom: 20px;">
+    <input type="text" name="ville" placeholder="Entrer un nom de ville ou pays" style="padding: 10px; width: 250px; border-radius: 8px; border: 1px solid #ccc;">
+    <button type="submit" style="padding: 10px 15px; border-radius: 8px; background-color: #007BFF; color: white; border: none;">Rechercher</button>
+    </form>
+</div>
+    <div class="meteo-container">
+        <div class="meteo-header">
+            {% if meteos %}
+            {% for meteo in meteos %}
+            <h2>Météo à {{meteo.ville}}</h2>
+            {% endfor %}
+            {% endif %}
+            <img src="https://cdn-icons-png.flaticon.com/512/1163/1163624.png" alt="icône météo" style="width: 50px;height: 50px;">
+        </div>
+        {% if meteos %}
+        {% for meteo in meteos %}
+        <div class="meteo-grid">
+            <div class="meteo-item">
+                <h4>Latitude</h4>
+                <p>{{ meteo.Latitude }}</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Longitude</h4>
+                <p>{{meteo.Longitude }}</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Température</h4>
+                <p> {{meteo.Temperature}}°C</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Humidité</h4>
+                <p>{{meteo.Humidite}}</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Conditions météo</h4>
+                <p>{{meteo.Conditions }}</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Vitesse du vent</h4>
+                <p>{{ meteo.Vitesse }} km/h</p>
+            </div>
+            <div class="meteo-item">
+                <h4>Direction du vent</h4>
+                <p>{{meteo.Direction}}</p>
+            </div>
+             <div class="meteo-item">
+                <h4>Pays</h4>
+                <p>{{meteo.Pays}}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Erreur API Météo : aucune donnée disponible.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

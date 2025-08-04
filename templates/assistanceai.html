@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Assistant {% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/ai_artificial_intelli.ico') }}" type="image/x-icon">
+{% endblock %}
+
+{% block content%}
+    <h2>Assistant IA</h2>
+
+    <!-- Formulaire pour entrer un prompt -->
+    <form action="/assistant-ia" method="POST">
+        <label for="prompt">Posez votre question :</label><br>
+        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;">
+        <button type="submit">Envoyer</button>
+    </form>
+  <!-- Affichage de la réponse -->
+    <div class="reponse-container">
+        {% for rep in reponses %}
+        <h2>Réponse de l'assistant IA :</h2>
+        <p>{{rep.reponse}}</p>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %} Stations Radios {% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/radio.ico') }}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+
+<style>
+ nav{background-color: #1e1e2f;;}
+ footer{background-color: #1e1e2f;}
+body{background-color:black;}
+
+.stations-container-rech {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.station-card-rech {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+    color:white;
+}
+
+.station-card-rech:hover {
+    transform: scale(1.03);
+}
+
+.station-card-rech img {
+    height: 70px;
+    width: 70px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.station-card-rech h3 {
+    font-size: 1.1em;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.station-card-rech audio {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.station-card-rech a {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.station-card-rech a:hover {
+    background-color: #0056b3;
+}
+
+
+.error {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align:center;
+        }
+
+.error p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+    #global-player {
+    position: sticky;
+    bottom: 0;
+    background: #1e1e1e;
+    padding: 10px;
+    color: white;
+    z-index: 999;
+}
+
+
+
+
+</style>
+
+
+<div class="radio-page">
+<!--    <h2>Radios en ligne</h2>-->
+
+    <!-- 🔍 Barre de recherche -->
+    <form action="/stations-radios" method="GET" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="stationradio" name="stationradio" class="champ" placeholder="Rechercher une station..." >
+        <button type="submit" style="padding: 10px 15px; border-radius: 8px; background-color: #007BFF; color: white; border: none;">Rechercher</button>
+    </form>
+
+    {% if 'recherchestat' in sections %}
+    <h2>Résultats de la recherche</h2>
+    {% if nomstations %}
+<div class="stations-container-rech">
+    {% for station in nomstations %}
+    <div class="station-card-rech">
+        <img src="{{ station.icon }}" alt="Logo de {{ station.name }}"  style="height:70px;width:70px;">
+        <h3>{{ station.name }}</h3>
+        <a href="#" class="play-station" data-url="{{ station.url }}" data-nom="{{ station.nom }}">Écouter</a>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="error">
+    <p>Aucune station trouvée pour cette recherche.</p>
+</div>
+{% endif %}
+{% endif %}
+
+{% if 'statdefaut' in sections %}
+<!--<h2>Stations locales</h2>-->
+<div class="stations-container">
+    {% for station in stat %}
+    <div class="station-card">
+        <img src="{{ url_for('static', filename=station.images) }}" alt="Logo de {{ station.nom }}"  style="height:70px;width:70px;">
+        <h3>{{ station.nom }}</h3>
+<!--        <audio controls>-->
+<!--            <source src="{{ station.url }}" type="audio/mp3">-->
+<!--            Votre navigateur ne supporte pas l'audio HTML5.-->
+<!--        </audio>-->
+        <a href="#" class="play-station" data-url="{{ station.url }}" data-nom="{{ station.nom }}">Écouter</a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+
+<!-- Lecteur audio global -->
+<div id="global-player">
+  <p id="now-playing"></p>
+  <audio id="main-audio" controls style="width: 100%;"></audio>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const player = document.getElementById('main-audio');
+    const nowPlaying = document.getElementById('now-playing');
+    const stationLinks = document.querySelectorAll('.play-station');
+
+    stationLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault(); // empêche d'ouvrir le lien
+
+            const streamUrl = this.dataset.url;
+            const stationName = this.dataset.nom;
+
+            player.src = streamUrl;
+            nowPlaying.textContent = "🎧 En lecture : " + stationName;
+            player.play();
+        });
+    });
+});
+
+
+<!--    document.addEventListener('DOMContentLoaded', function () {-->
+<!--    const player = document.getElementById('main-audio-search');-->
+<!--    const nowPlaying = document.getElementById('now-playing-search');-->
+<!--    const stationLinks = document.querySelectorAll('.play-station-search');-->
+
+<!--    stationLinks.forEach(link => {-->
+<!--        link.addEventListener('click', function (e) {-->
+<!--            e.preventDefault(); // empêche d'ouvrir le lien-->
+
+<!--            const streamUrl = this.dataset.url;-->
+<!--            const stationName = this.dataset.nom;-->
+
+<!--            player.src = streamUrl;-->
+<!--            nowPlaying.textContent = "🎧 En lecture : " + stationName;-->
+<!--            player.play();-->
+<!--        });-->
+<!--    });-->
+<!--});-->
+</script>
+
+{% endblock%}

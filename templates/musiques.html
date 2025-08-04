@@ -1,0 +1,572 @@
+
+{% extends 'base.html'%}
+
+{% block title %} Écoutez et téléchargez vos morceaux préférés.{% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/music.ico') }}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+    <style>
+nav{background-color: #1e1e2f;}
+footer{background-color: #1e1e2f;}
+
+.sidebar {
+    width: 250px;
+    height: 100vh; /* pleine hauteur */
+    overflow-y: auto;
+    background-color: #1e1e2f;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed; /* fixe à gauche */
+    top: 8%;
+
+}
+
+/* Scrollbar moderne */
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {m
+    background: #888;
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.sidebar h2 {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #ff4081;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.sidebar li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar li:hover {
+    color: #ff4081;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    padding-left: 5px;
+    transition: 0.3s ease;
+}
+
+body {
+    font-family: Arial,sans-serif;
+    background-color: #111;
+    color: white;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000;
+    padding: 15px;
+}
+
+.header {
+  padding: 20px;
+  background-color: #1f1f1f;
+  text-align: center;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 600px;
+  margin: auto;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 12px 12px 40px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  background-color: #f1f1f1;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 18px;
+}
+
+.btn-search {
+  padding: 12px 20px;
+  border: none;
+  background-color: #ff4747;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-search:hover {
+  background-color: #e63b3b;
+}
+
+
+
+.banner {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.banner img {
+    width: 200px;
+    border-radius: 10px;
+}
+
+.banner-text {
+    margin-left: 20px;
+}
+
+.hotlist {
+    padding: 20px;
+}
+
+.card-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+.card {
+    min-width: 150px;
+    background-color: #222;
+    padding: 50px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+
+}
+
+.card:hover {
+    background-color: #333;
+}
+
+
+.section-title {
+    font-size: 24px;
+    margin: 10px 0 10px;
+}
+
+
+/* pour l'affichage articles*/
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 1em;
+}
+
+.music-card {
+    width: calc(20% - 20px);
+    background-color: black;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.music-card:hover {
+    transform: scale(1.05);
+}
+
+.music-card  img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.music-card h3 {
+    font-size: 1em;
+    padding: 0.5em;
+
+}
+.music-card h3 a{ text-decoration:none; !important}
+
+@media screen and(max-width:600px){
+ *
+ {
+ color:red;
+ }
+
+ }
+/* Responsive */
+@media (max-width: 992px) {
+    .article-card {
+        width: calc(33.33% - 20px); /* 3 par ligne */
+    }
+}
+@media (max-width: 768px) {
+    .article-card {
+        width: calc(50% - 20px); /* 2 par ligne */
+    }
+}
+@media (max-width: 480px) {
+    .article-card {
+        width: 100%; /* 1 par ligne */
+    }
+}
+
+<!--Media-->
+@media (max-width: 600px) {
+    .card-grid {
+        display: block;
+        padding: 0 1rem;
+    }
+
+    .music-card {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        background-color: #1f1f1f;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .music-card img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .card-meta {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+    }
+
+    .limit-text {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .card-meta span {
+        font-size: 0.9rem;
+        color: #aaa;
+    }
+
+}
+
+
+ .error {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-align:center;
+}
+
+.error p {
+            margin-bottom: 8px;
+            color: white;
+        }
+
+.modal {
+    display:none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 30%;
+}
+.modal-content h3 {
+  color: black; /* bleu-violet élégant */
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+/* Champ texte */
+.modal-content input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+/* Boutons */
+.modal-content button {
+  background-color: #ff4747; /* #4CAF50; vert doux */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #45a049;
+}
+
+/* Bouton Fermer spécifique */
+.close-button {
+  background-color: #f44336; /* rouge doux */
+}
+
+.close-button:hover {
+  background-color: #e53935;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* ✅ Mobile responsive : petit écran <= 600px */
+@media screen and (max-width: 600px) {
+  .modal-content {
+    width: 95%;
+    margin-top: 30%;
+    padding: 25px;
+  }
+
+  .modal-content input[type="text"],
+  .modal-content button {
+        width: 90%;
+        font-size: 1rem;
+  }
+  input[type="text"] {
+    width: 100%;
+    max-width: 300px;
+        }
+
+
+
+
+    }
+
+    </style>
+
+<!--Sidebar-->
+<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+<div class="sidebar" id="mySidebar">
+        <h2>Music</h2>
+        <ul>
+            <li> <a href="{{url_for('musiques')}}"><span class="icon">🎵</span><strong>Home</strong></a></li>
+            <li> <a href="{{url_for('trendingsong')}}"><span class="icon">🔥</span>Trending</a></li>
+            <li> <a href="{{url_for('newtrack')}}"><span class="icon">🆕</span>New</a></li>
+            <li><span class="icon">🎤</span>Artists</li>
+            <li><span class="icon">📹</span>Videos</li>
+            <li><span class="icon">📋</span>Playlists</li>
+            <li><span class="icon">📊</span>Charts</li>
+            <li><span class="icon">🎶</span>Genres</li>
+        </ul>
+        <h2>Library</h2>
+        <ul>
+            <li><button onclick="openModal()">➕ Add Playlist</button></li>
+            <li><span class="icon">❤️</span>Favorites</li>
+        </ul>
+</div>
+
+ <header class="header">
+     <form class="search-bar" action="/search" method="GET">
+         <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" name="query" placeholder="Rechercher par Artistes, Songs, Albums, Videos..">
+        </div>
+    <button class="btn-search" type="submit">Rechercher</button>
+  </form>
+    </header>
+
+<!--modales-->
+
+<div id="modal" class="modal">
+  <div class="modal-content" style="text-align:center;">
+    <h3 style=gap:20px;">Créer une playlist</h3>
+    <input type="text" id="playlistName" style="width:100%;" placeholder="Nom de la playlist">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <button onclick="createPlaylist()">Créer</button>
+            <button class="close-button" onclick="closeModal()">Fermer</button>
+        </div>
+  </div>
+</div>
+
+
+
+
+{% if resultcompas %}
+<h2 class="section-title-music">Compas 🎤</h2>
+    <div class="grid-music">
+          {% for musique in resultcompas %}
+        <div class="music-carte">
+             <!-- Lien vers une page de lecture, ex: /musique/123 -->
+        <a href="{{ url_for('jouer_musique', musique_id=musique.id, slug=musique.titre|replace(' ','-'))}}">
+            <img src="{{musique.image}}" alt="{{musique.titre}}">
+        </a>
+            <div class="card-meta">
+                <p class="limit-text">{{musique.auteur}}</p>
+                <span>🎧 81.2k</span>
+            </div>
+        </div>
+      {%endfor%}
+    </div>
+
+    {% endif %}
+
+    {% if resultafro %}
+    <h2 class="section-title-music">AfroBeat</h2>
+         <div class="grid-music">
+          {% for musique in resultafro %}
+            <div class="music-carte">
+             <!-- Lien vers une page de lecture, ex: /musique/123 -->
+        <a href="{{ url_for('jouer_musique', musique_id=musique.id, slug=musique.titre) }}">
+            <img src="{{ musique.image }}" alt="{{musique.titre}}">
+        </a>
+             <div class="card-meta">
+                <p class="limit-text">{{musique.auteur}}</p>
+                <span>🎧 81.2k</span>
+            </div>
+        </div>
+      {%endfor%}
+    </div>
+   {% endif %}
+
+{% if resultevangelique %}
+    <h2 class="section-title-music">Evangeliques</h2>
+         <div class="grid-music">
+          {% for musique in resultevangelique %}
+            <div class="music-carte">
+             <!-- Lien vers une page de lecture, ex: /musique/123 -->
+        <a href="{{ url_for('jouer_musique', musique_id=musique.id, slug=musique.titre) }}">
+            <img src="{{ musique.image }}" alt="{{musique.titre}}">
+        </a>
+             <div class="card-meta">
+                <p class="limit-text">{{musique.auteur}}</p>
+                <span>🎧 81.2k</span>
+            </div>
+        </div>
+      {%endfor%}
+    </div>
+
+
+{% else %}
+<div class="error">
+    <p>📡 Verifier votre connexion à internet...</p>
+</div>
+    {% endif %}
+
+<script>
+<!--    Affichage menu-->
+function toggleSubMenu(event) {
+    event.preventDefault();
+    const submenu = event.target.nextElementSibling;
+    submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
+}
+
+function toggleSidebar() {
+   const sidebar = document.getElementById('mySidebar')
+   sidebar.classList.toggle('closed');
+}
+
+  function openModal() {
+        document.getElementById('modal').style.display = 'block';
+  }
+
+  function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+  }
+
+  function createPlaylist() {
+    const name = document.getElementById("playlistName").value.trim();
+    if (name === "") {
+      alert("Veuillez entrer un nom de playlist.");
+      return;
+    }
+
+    fetch("/add_playlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "nom=" + encodeURIComponent(name)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload(); // recharge la page après création
+      } else {
+        alert("Erreur lors de la création.");
+      }
+    });
+  }
+
+  // Fermer la modale si on clique en dehors
+  window.onclick = function(event) {
+    const modal = document.getElementById("modal");
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
+
+
+{% endblock %}

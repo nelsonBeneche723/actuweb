@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    {% block link %}{% endblock %}
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+<!--    Enlever l'option de faire copy/paste-->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Bloquer clic droit
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // Bloquer raccourcis clavier (Ctrl+S, Ctrl+C, etc.)
+    document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey && (e.key === 's' || e.key === 'c' || e.key === 'u' || e.key === 'v' || e.key === 'x')) ||
+            e.key === 'F12') {
+            e.preventDefault();
+        }
+    });
+});
+        //fonction pour afficher le menu nav pour les ecrans plus petit (600px)
+    function toggleMenu() {
+        const nav = document.getElementById("mainNav");
+        nav.classList.toggle("show");
+        }
+</script>
+
+
+</head>
+<body>
+<div class="menu-label">ACTU WEB <hr/><p>Politiques, sante, technologies, sports, musiques...</p></div>
+<!--Menu toggle-->
+<button id="menuToggle" class="menuToggle" onclick="toggleMenu()">☰</button>
+    <nav id="mainNav">
+        <ul>
+            <li><a href="/">Accueil</a></li>
+            <li><a href="/sports">Sports</a></li>
+            <li><a href="/meteo">Météo</a></li>
+            <li><a href="/stations-radios">Radios</a></li>
+            <li><a href="/live-tv/">TV</a></li>
+           <li><a href="/sante">Santé</a></li>
+            <li><a href="/sciences">Sciences</a></li>
+            <li><a href="/music">Musiques</a></li>
+            <li><a href="/assistant-ia">Gemini AI</a></li>
+        </ul>
+    </nav>
+<!--    </div>-->
+<!--Contenu-->
+
+
+    {% block content %} {% endblock %}
+
+<div id="offlineNotice" style="display:none; text-align:center; color:black; font-weight:bold; padding:10px;">
+    Connectez-vous à un réseau wifi ou activez-les données mobiles.
+</div>
+    {% include 'footer.html' %} <!--    Pied de page-->
+
+<script>
+window.addEventListener('load', ()=> {
+function updateOnlineStatus() {
+    const notice = document.getElementById('offlineNotice');
+    if (navigator.onLine) {
+        notice.style.display = 'none';
+        }
+    else {
+        notice.style.display = 'block';
+    }
+  }
+
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus(); //verifier au chargement
+});
+    //Pour changer la couleur de texte selon la page//
+    document.addEventListener("DOMContentLoaded", function(){
+    const path = window.location.pathname;
+    const notice = document.getElementById('offlineNotice');
+    if (!notice) return;
+    if (path.includes("musiques")){notice.style.color='white';}
+    else if (path.includes("search")) { notice.style.color='white'}
+
+    });
+</script>
+</body>
+</html>

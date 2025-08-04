@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %} Chansons Populaires..{% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/music.ico') }}" type="image/x-icon">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<style>
+   nav, footer {
+        background-color: #1e1e2f;
+    }
+  body {
+    background-color: #121212;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    margin: 30px 0;
+    color: #f1f1f1;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 0 40px 60px;
+  }
+
+  .music-card {
+    background-color: #1f1f1f;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+  }
+
+  .music-card:hover {
+    transform: scale(1.03);
+  }
+
+  .music-card h3 {
+    margin: 10px 0;
+    font-size: 1.1rem;
+  }
+
+  .music-card p {
+    margin: 5px 0 15px;
+    font-size: 0.95rem;
+    color: #bbb;
+  }
+
+  .music-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background-color: #2a2a2a;
+  }
+
+  .btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 16px;
+    background-color: #ff4c60;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn:hover {
+    background-color: #e63a4c;
+  }
+  * Centrer le tableau */
+    .classement-table {
+        margin: 20px auto; /* Centre le tableau */
+        border-collapse: collapse;
+        width: 90%;
+        max-width: 1000px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Style des titres */
+    .table-trending thead {
+        background-color: #121212;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Espacement */
+    .table-trending th, .classement-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Effet hover sur les lignes */
+    .table-trending tbody tr:hover {
+        background-color: #1e1e2f;
+    }
+
+    /* Dernière ligne sans bord bas */
+    .table-trending tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+
+  .table-trending {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    margin: 40px auto;
+  }
+
+  .table-trending th,
+  .table-trending td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+  }
+
+  .table-trending img.song-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .btn-icon {
+    height: 24px;
+    width: 24px;
+    transition: transform 0.2s;
+  }
+
+  .btn-icon:hover {
+    transform: scale(1.2);
+  }
+
+  .hover-title {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .mini-player {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #1e1e1e;
+    padding: 5px;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  .hover-title:hover .mini-player {
+    display: block;
+  }
+
+  #global-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1e1e1e;
+    color: white;
+    padding: 10px 20px;
+    border-top: 2px solid #333;
+    display: none;
+    z-index: 1000;
+  }
+
+<!--responsive-->
+
+  @media screen and (max-width: 600px) {
+ .table-trending {
+    width: 100%;
+    font-size: 14px;
+    margin: 10px auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .table-trending th,
+  .table-trending td,
+  .classement-table th,
+  .classement-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .table-trending img.song-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 5px;
+  }
+
+  .btn-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  #global-player {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .table-wrapper,
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* pour iOS */
+  }
+
+
+}
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* pour un scroll fluide sur iOS */
+}
+
+@media (max-width: 600px) {
+  .table-trending {
+    width: 600px; /* largeur fixe si trop de colonnes */
+    font-size: 13px;
+  }
+}
+</style>
+
+<!--tableau-->
+<h2 class="section-title">🎵 Trending Songs</h2>
+<div class="table-wrapper">
+<table class="table-trending">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th></th>
+      <th>Titre</th>
+      <th>Artiste</th>
+      <th>Durée</th>
+      <th>Télécharger</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for song in trending_songs %}
+    <tr class="song-row" data-audio="{{ song.Ecouter }}" data-title="{{ song.Titre }}" data-artist="{{ song.Artiste }}">
+      <td>{{ song.id }}</td>
+      <td><img src="{{ song.image }}" class="song-img" alt="cover"></td>
+      <td class="hover-title">
+        {{ song.Titre }}
+        <div class="mini-player">
+          <audio src="{{ song.Ecouter }}" controls preload="none"></audio>
+        </div>
+      </td>
+      <td>{{ song.Artiste }}</td>
+      <td>{{ song.duree }}</td>
+      <td>
+        <a href="{{ song.Telecharger }}" download>
+          <img src="{{ url_for('static', filename='images/download.png') }}" alt="Télécharger" class="btn-icon">
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<!-- Lecteur audio global -->
+<div id="global-player">
+  <p id="now-playing"></p>
+  <audio id="main-audio" controls style="width: 100%;"></audio>
+</div>
+
+
+
+<script>
+  const rows = document.querySelectorAll(".song-row");
+  const mainAudio = document.getElementById("main-audio");
+  const globalPlayer = document.getElementById("global-player");
+  const nowPlaying = document.getElementById("now-playing");
+
+  rows.forEach(row => {
+    row.addEventListener("click", () => {
+      const audioSrc = row.getAttribute("data-audio");
+      const title = row.getAttribute("data-title");
+      const artist = row.getAttribute("data-artist");
+
+      mainAudio.src = audioSrc;
+      nowPlaying.textContent = `🎶 En lecture : ${title} - ${artist}`;
+      globalPlayer.style.display = "block";
+      mainAudio.play();
+    });
+  });
+</script>
+
+
+{% endblock %}
