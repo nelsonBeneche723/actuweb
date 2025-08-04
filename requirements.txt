@@ -4,11 +4,11 @@ requests
 dotenv
 google-generativeai
 deep-translator
-collections
 pytz
 feedparser
 numpy
 matplotlib
 lyricsgenius
 gunicorn
+
 
