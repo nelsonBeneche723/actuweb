@@ -10,5 +10,3 @@ numpy
 matplotlib
 lyricsgenius
 gunicorn
-
-
