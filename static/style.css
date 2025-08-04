@@ -1,0 +1,608 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    color: #333;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* Reset */
+
+/* Barre de navigation */
+nav {
+    background-color: #004080;
+    padding: 1em;
+    width: 100%;
+
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+h2 {
+    color: #004080;
+    padding-left: 1em;
+}
+
+p, ul {
+    padding-left: 2em;
+}
+/* pour l'affichage articles*/
+.actualites-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 1em;
+}
+
+.article-card {
+    width: calc(20% - 20px);
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.article-card:hover {
+    transform: scale(1.05);
+}
+
+.article-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover; /* Rogne l'image pour remplir la grid sans la deformation*/
+}
+
+.article-card h3 {
+    font-size: 1em;
+    padding: 0.5em;
+
+}
+.article-card h3 a{ text-decoration:none; !important}
+.article-card h4 {
+    font-size: 0.85em;
+    color: #444;
+    text-align: center;
+    margin: 10px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .article-card {
+        width: calc(33.33% - 20px); /* 3 par ligne */
+    }
+}
+@media (max-width: 768px) {
+    .article-card {
+        width: calc(50% - 20px); /* 2 par ligne */
+    }
+}
+@media (max-width: 480px) {
+    .article-card {
+        width: 100%; /* 1 par ligne */
+    }
+}
+
+
+
+/*Pour la page stations*/
+
+.radio-page {
+    padding: 2em;
+    text-align: center;
+}
+
+#stationradio {
+    padding: 0.6em;
+    font-size: 1em;
+    width: 400px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.stations-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5em;
+}
+
+.station-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 200px;
+    padding: 1em;
+    transition: transform 0.2s;
+    background-color:yellow;
+}
+
+.station-card:hover {
+    transform: scale(1.05);
+    background-color: #2a2a2a;
+}
+
+.station-card h3 {
+    margin: 0.5em 0;
+    font-size: 1.1em;
+    color: #fff;
+}
+
+.station-card a {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 0.5em 1em;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 0.5em;
+}
+
+.station-card a:hover {
+    background-color: #0056b3;
+}
+/*Pied*/
+
+/* Sticky Footer */
+
+
+footer {
+    margin-top: auto;
+    background-color: #004080;
+    color: white;
+    text-align: center;
+    padding: 1.5em 1em;
+}
+
+.footer-container p {
+    margin: 0.5em 0;
+    font-size: 0.9em;
+}
+
+.footer-container a {
+    color: #cce6ff;
+    text-decoration: none;
+    margin: 0 0.5em;
+}
+
+.footer-container a:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    margin-top: 0.8em;
+}
+/*lecteur audio*/
+
+.stations-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.station-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.station-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.station-card h3 {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.station-card audio {
+    width: 100%;
+    margin-top: 15px;
+}
+/*scroller */
+
+.reponse-container {
+    max-height: 300px;  /* Hauteur maximum de la zone */
+    overflow-y: auto; /* active la barre de defilement(verticale)*/
+    border: 1px solid #ccc; /* Bordure fine grise */
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #f9f9f9; /*Couleur de fond plus douce*/
+}
+form {
+    margin-bottom: 20px;
+}
+input[type="text"] {
+    width: 70%;
+    padding: 8px;
+    margin-right: 10px;
+}
+button {
+    padding: 8px 16px;
+}
+
+
+/*sidebar*/
+
+.sidebar {
+    width: 220px;
+    background-color: #1e1e2f;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px; /* Pour séparer du contenu suivant */
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 15px 0;
+}
+
+.sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #333;
+}
+/*Sous Menus*/
+
+.submenu {
+    display: none;
+    list-style: none;
+    padding-left: 15px;
+}
+
+.submenu li a {
+    font-size: 14px;
+    padding: 8px;
+    display: block;
+    color: #ccc;
+}
+
+.sidebar ul li a:hover + .submenu,
+.sidebar ul li:hover .submenu {
+    display: block;
+}
+/*CSS Pour le bouton et cacher le sidebar*/
+/* Bouton menu */
+#toggleSidebar {
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    background-color: #1e1e2f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* Sidebar avec transition  (pour gérer le déplacement, largeur, hauteur, couleur, etc) */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    top: 90px;
+    left: 0;
+    background-color: #1e1e2f;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+/* Cacher la sidebar */
+.sidebar.closed {
+    transform: translateX(-100%);
+}
+
+
+
+/*scrollbar pour menu sidebar*/
+.sidebar {
+    width: 220px;
+    height: 100vh; /* toute la hauteur de l'écran */
+    position: fixed;
+    top: 90;
+    left: 0;
+    background-color: #1e1e2f;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto; /* active le scroll vertical */
+    scrollbar-width: thin; /* scroll fin pour Firefox */
+}
+
+/* Pour Webkit (Chrome, Edge, Safari) - optionnel pour personnaliser */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+
+body {
+    user-select: none;         /* empêche la sélection de texte */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+/*Sidebar pour base.html*/
+/* Style du bouton hamburger */
+#menuToggle {
+    display: none;
+    font-size: 1.8em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 1em;
+}
+
+
+/*Cacher le titre menu */
+.menu-label {
+    display: none;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 1em 0 0.5em 0;
+    color: #004080;
+}
+
+
+/* Afficher uniquement sur petit écran */
+/* Media screen pour les telephones mobiles*/
+@media screen and (max-width: 600px) {
+    * {
+        font-size: 16px;
+        }
+
+.card-meta .limit-text {font-size:12px;}
+.music-card a img{width:30px;height:30px;}
+
+    nav {
+        width: 100%;
+        overflow-x: auto; /* Active le scroll horizontal si besoin */
+    }
+
+    nav ul {
+        display: flex;
+        flex-direction: column;       /* Menu en colonne */
+        flex-wrap: nowrap;         /* Pas de retour à la ligne */
+        justify-content: flex-start;
+        gap: 0.5em;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        white-space: nowrap;       /* Empêche le retour à la ligne du texte */
+    }
+
+    nav ul li {
+        display: inline-block;
+    }
+
+    nav ul li a {
+        display: inline-block;
+        padding: 0.5em 1em;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    nav ul li a:hover {
+        text-decoration: underline;
+    }
+    /*afficher le div class='menu-label'*/
+    .menu-label
+    {
+        display:block;
+    }
+
+
+    .champ {
+        background-color:black;
+        max-width: 60%; /* Ajuster la valeur selon vos besoins */
+        color:white;
+    }
+
+    .station-card-rech h3 {
+         color: white;
+    }
+    .station-card h3 {
+        color:white;
+    }
+     #menuToggle {
+        display: block;
+        background-color:white;
+    }
+
+    nav#mainNav {
+        display: none;
+        background-color: #004080;
+        padding: 1em 0;
+    }
+
+    nav#mainNav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    nav#mainNav ul li {
+        text-align: center;
+    }
+
+    nav#mainNav ul li a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.5em;
+        display: block;
+    }
+
+    nav#mainNav.show {
+        display: block;
+    }
+    /* audio pour mobile*/
+    .audio-controls audio {
+        width:80% !important;
+    }
+        /* image pour mobile */
+   img {
+        width:100% !important;
+        }
+        .images-covers img { width:85% !important;}
+
+}
+
+
+
+/* ---------- Style général ---------- */
+.grid-music {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 colonnes desktop */
+  gap: 16px;
+  padding: 10px;
+}
+
+.music-carte {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  padding: 10px;
+  color: #f0f0f0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.music-carte:hover {
+  transform: scale(1.03);
+}
+
+.music-carte img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.card-meta {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.limit-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.section-title-music {
+  font-size: 1.6rem;
+  color: #fff;
+  margin: 20px 10px 10px;
+}
+.music-carte img {
+      width: 100%;
+      height: 180px; /* Hauteur fixe pour toutes les images */
+      object-fit: cover;
+      border-radius: 8px;
+}
+/* ---------- Responsive mobile ---------- */
+@media screen and (max-width: 600px) {
+  .grid-music {
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes mobile */
+    gap: 10px;
+    padding: 5px;
+  }
+
+  .section-title-music {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .music-carte {
+    padding: 8px;
+  }
+
+  .card-meta {
+    font-size: 0.85rem;
+  }
+
+  .limit-text {
+    font-size: 0.9rem;
+  }
+
+ .music-carte img {
+    height: 150px; /* Hauteur réduite sur petit écran */
+  }
+}
