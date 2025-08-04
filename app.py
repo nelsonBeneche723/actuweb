@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 import lyricsgenius
 # matplotlib.use('Agg')  # important pour les serveurs
-from flask_wtf.csrf import CSRFProtect
 import secrets
 
 # load_dotenv('/home/Beneche123/mysite/.env')
