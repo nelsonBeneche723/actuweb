@@ -406,12 +406,24 @@ body {
 .menu-label {
     display: none;
     text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
     margin: 1em 0 0.5em 0;
-    color: #004080;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    
+}
+.menu-label hr {
+  border: none;
+  border-top: 2px solid #ddd;
+  margin: 1rem 0;
 }
 
+.menu-label p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
 
 /* Afficher uniquement sur petit écran */
 /* Media screen pour les telephones mobiles*/
