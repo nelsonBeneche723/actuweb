@@ -25,7 +25,7 @@ import lyricsgenius
 
 # load_dotenv('/home/Beneche123/mysite/.env')
 load_dotenv()
-actuweb = Flask(__name__)
+app = Flask(__name__)
 # app.secret_key = secrets.token_hex(16)
 # csrf = CSRFProtect(app)
 # lien vers la base de donnees
@@ -1091,4 +1091,4 @@ def newmusic():
 
 # fonction principale
 if __name__ == '__main__':
-    actuweb.run(debug=True, port=5000)
+    app.run()
