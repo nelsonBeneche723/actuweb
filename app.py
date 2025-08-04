@@ -21,12 +21,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import lyricsgenius
-# matplotlib.use('Agg')  # important pour les serveurs
-import secrets
+
 
 # load_dotenv('/home/Beneche123/mysite/.env')
 load_dotenv()
-app = Flask(__name__)
+actuweb = Flask(__name__)
 # app.secret_key = secrets.token_hex(16)
 # csrf = CSRFProtect(app)
 # lien vers la base de donnees
@@ -1092,4 +1091,4 @@ def newmusic():
 
 # fonction principale
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    actuweb.run(debug=True, port=5000)
