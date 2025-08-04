@@ -181,7 +181,56 @@
     background: #eef2f3;
 }
 
- .suma{font-family:arial; text-align:center;}
+ .suma {
+    font-family:arial;
+    text-align:center;
+ }
+    /* Styles pour les appareils mobiles pour la page sports*/
+    /* Styles pour les appareils mobiles */
+@media (max-width: 767px) {
+  .classement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .classement-table th,
+  .classement-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .classement-table th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .classement-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .classement-table td:nth-child(2) {
+    max-width: 100px;
+  }
+
+  .classement-table td:nth-child(3),
+  .classement-table td:nth-child(4),
+  .classement-table td:nth-child(5),
+  .classement-table td:nth-child(6),
+  .classement-table td:nth-child(7),
+  .classement-table td:nth-child(8),
+  .classement-table td:nth-child(9),
+  .classement-table td:nth-child(10) {
+    display: none;
+  }
+}
 </style>
 
 

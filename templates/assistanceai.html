@@ -8,10 +8,11 @@
 
 {% block content%}
 <style>
+
     /* Styles pour les écrans de bureau */
 @media (min-width: 768px) {
   h2 {
-    font-size: 2rem;
+    font-size: 1rem;
     margin-bottom: 1rem;
   }
 
@@ -19,6 +20,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: 2rem;
+    margin-top: 2rem;
   }
 
   input[type="text"] {
@@ -40,7 +42,7 @@
   }
 
   .reponse-container {
-    max-width: 80%;
+    max-width: 800px;
     margin: 0 auto;
   }
 
@@ -53,7 +55,7 @@
 /* Styles pour les appareils mobiles */
 @media (max-width: 767px) {
   h2 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-bottom: 0.5rem;
   }
 
@@ -93,7 +95,7 @@
   }
 }
 </style>
-    <h2>Assistant IA</h2>
+<!--    <h2>Assistant IA</h2>-->
 
     <!-- Formulaire de saisi -->
     <form action="/assistant-ia" method="POST">
