@@ -59,46 +59,6 @@ def aff_stationradio():
     # renvoyer un message à l'utilisateur
     return stations
 
-
-def calendriermatchs():
-    API_KEY = os.getenv('api_key_sports')
-    url = 'https://api.football-data.org/v4/matches'
-    headers = {'X-Auth-Token': API_KEY}
-
-    response = requests.get(url, headers=headers)
-    resultat = []
-
-    if response.status_code == 200:
-        data = response.json()
-        matches = data.get('matches', [])
-        if matches:
-            # Regrouper par date, puis par compétition
-            grouped_matches = defaultdict(lambda: defaultdict(list))
-
-            for match in matches:
-                # Convertir date UTC vers local et extraire la date et l'heure
-                dt_utc = match['utcDate']
-                dt = datetime.fromisoformat(dt_utc.replace("Z", "+00:00"))
-                date_str = dt.strftime('%d %B %Y')   # ex: 26 avril 2025
-                time_str = dt.strftime('%H:%M')
-
-                competition = match['competition']['name']
-                home = match['homeTeam']['name']
-                away = match['awayTeam']['name']
-                grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
-
-            # ✅ Affichage
-            for date, comps in grouped_matches.items():
-                for comp, matchs in comps.items():
-                    for m in matchs:
-                        resultat.append({"date":date, 'competition':comp, 'match':m})
-            return resultat
-        else:
-            print("Aucun match disponible.")
-    else:
-        print(f"Erreur API : {response.status_code} — {response.text}")
-
-
 def classementchampionnat_france():
     competition_id = 'FL1'  # Ex: Ligue 1
     url = f'https://api.football-data.org/v4/competitions/{competition_id}/standings'
@@ -589,25 +549,63 @@ def afficherpluscontenu(id, genre):
     return resultrap
 
 
-# def recuperer_info_utilisateur():
-#     # ip = request.headers.get('X-Forwarded-For', request.remote_addr) # On récupère de l'adresse ip de hote
-#     # utilisation d'une autre methode de recuperation des donnees des visiteurs
-#     # ip = request.remote_addr
-#     ip = request.remote_addr
-#     user = request.remote_user
-#     # url = f"https://api.ipapi.com/{ip}?access_key={user}&hostname=1"
-#     url = f"https://ipinfo.io/{ip}/json"
-#     response = requests.get(url)  # on effectue une requete https afin de recuperer le pays hote
-#     data = response.json()  # transformer le resultat dans format json
-#     print(data)
-#     pays = data.get('country','inconnu')
-#
-#     # connection = sqlite3.connect('locationutilisateur.db')
-#     # cursor = connection.cursor()
-#     # cursor.execute('create table if not exists location(id integer primary key autoincrement,adresse_ip TEXT, pays TEXT)')
-#     # cursor.execute('insert into location(adresse_ip,pays) values(?,?)', (ip, pays))
-#     # connection.commit()
-#     # print("votre adresse ip: ,"+ip+","+data.get('country','inconnu')+"")?
+def recuperer_info_utilisateur():
+    # ip = request.headers.get('X-Forwarded-For', request.remote_addr) # On récupère de l'adresse ip de hote
+    # utilisation d'une autre methode de recuperation des donnees des visiteurs
+    # ip = request.remote_addr
+    ip = request.remote_addr
+    user = request.remote_user
+    # url = f"https://api.ipapi.com/{ip}?access_key={user}&hostname=1"
+    url = f"https://ipinfo.io/{ip}/json"
+    response = requests.get(url)  # on effectue une requete https afin de recuperer le pays hote
+    data = response.json()  # transformer le resultat dans format json
+    print(data)
+    pays = data.get('country','inconnu')
+
+    # connection = sqlite3.connect('locationutilisateur.db')
+    # cursor = connection.cursor()
+    # cursor.execute('create table if not exists location(id integer primary key autoincrement,adresse_ip TEXT, pays TEXT)')
+    # cursor.execute('insert into location(adresse_ip,pays) values(?,?)', (ip, pays))
+    # connection.commit()
+    # print("votre adresse ip: ,"+ip+","+data.get('country','inconnu')+"")?
+
+def calendriermatch():
+    API_KEY = os.getenv('api_key_sports')
+    url = 'https://api.football-data.org/v4/matches'
+    headers = {'X-Auth-Token': API_KEY}
+
+    response = requests.get(url, headers=headers)
+    resultat = []
+
+    if response.status_code == 200:
+        data = response.json()
+        matches = data.get('matches', [])
+        if matches:
+            # Regrouper par date, puis par compétition
+            grouped_matches = defaultdict(lambda: defaultdict(list))
+
+            for match in matches:
+                # Convertir date UTC vers local et extraire la date et l'heure
+                dt_utc = match['utcDate']
+                dt = datetime.fromisoformat(dt_utc.replace("Z", "+00:00"))
+                date_str = dt.strftime('%d %B %Y')   # ex: 26 avril 2025
+                time_str = dt.strftime('%H:%M')
+
+                competition = match['competition']['name']
+                home = match['homeTeam']['name']
+                away = match['awayTeam']['name']
+                grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
+
+            # ✅ Affichage
+            for date, comps in grouped_matches.items():
+                for comp, matchs in comps.items():
+                    for m in matchs:
+                        resultat.append({"date":date, 'competition':comp, 'match':m})
+            return resultat
+        else:
+            print("Aucun match disponible.")
+    else:
+        print(f"Erreur API : {response.status_code} — {response.text}")
 
 
 @app.route('/')
@@ -646,6 +644,7 @@ def accueil():
     return render_template('index.html', sections=['politique','radio'], stations=stations, articles=articles, pays=keyword,connection=connection)
 
     #
+
 
 @app.route('/stations-radios', methods=['GET'])
 def stationradio():    # Récupération des stations par défaut
@@ -756,23 +755,9 @@ def sportactualites():
     championnat = request.args.get('championnat')
     # Creer une variable vide
     data = ''
-    resultat = []
-    image_base64 = []
-    classementfrance = []
-    classementespagne = []
-    classementangleterre = []
-    classementitalie = []
-    classementallemagne = []
-    match_ligue1_auj = []
-    match_ligue1_dem = []
-    match_esp_auj = []
-    match_esp_dem = []
-    match_ang_auj = []
-    match_ang_dem = []
-    match_ita_auj = []
-    match_ita_dem = []
-    match_all_auj = []
-    match_all_dem = []
+    resultat ,image_base64,classementfrance, classementespagne, classementangleterre, classementitalie, classementallemagne = [],[],[],[],[],[],[]
+    match_ligue1_auj, match_ligue1_dem, match_esp_auj, match_esp_dem, match_ang_auj = [], [], [], [], []
+    match_ang_dem, match_ita_auj, match_ita_dem, match_all_auj, match_all_dem = [], [], [], [], []
     sportsactu = infos_sports()
     # # conditions
     if section == "classement" and championnat=="france":
@@ -798,8 +783,8 @@ def sportactualites():
     elif section == "score-en-direct":
         data = "Voici les scores en direct..."
     elif section == "calendrier-matchs":
-        data = "⚽ Calendrier des matches"
-        resultat = calendriermatchs()
+        data = "⚽ Calendrier des matchs"
+        resultat = calendriermatch()
     elif section == "infos-equipes":
         data = "Infos sur les équipes ici..."
     return render_template('sports.html', sportsactu=sportsactu, section=section, championnat=championnat, data=data, classementfrance=classementfrance,image=image_base64,
@@ -916,12 +901,27 @@ def newtrack():
                 new_songs.append({'id':id,'Titre': track['name'], "Artiste": track['artist_name'],
                                        "Ecouter": track['audio'],'duree':track['duration'],'image':track['album_image'],
                                        "Telecharger": track['audiodownload']})
+            # return new_songs
         else:
             print("Erreur lors de la récupération des données.")
     except Exception as e:
         print(f'Erreur API{e}')
     return render_template('new-song.html', new_songs=new_songs)
 
+@app.route('/music/news-artist')
+def newsartist():
+    news = []
+    traduction = GoogleTranslator(source='en', target='fr')
+    url = 'https://www.rollingstone.com/music/music-news/feed/'
+    feed_liberation = feedparser.parse(url)
+    contenu = feed_liberation.entries
+    for row in contenu:
+        if 'media_content' in row:
+            image = row.media_content[0]['url']
+        else:
+            image = None
+        news.append({"titre":row.title,"image-url":image, "published":row.published, 'description':traduction.translate(row.description), "lien":row.link})
+    return render_template('artist.html', news=news)
 
 @app.route('/sante')
 def infossante():
@@ -974,7 +974,7 @@ def infossciences():
     return render_template('sciences.html',sciences_=infos_sciences)
 
 
-@app.route('/live-tv/')
+@app.route('/live-tv')
 def livetv():
     chaines_tv_en_direct = {"tele eclair":['https://acwstream.com/hb/chaine04live/index.fmp4.m3u8','https://is3-ssl.mzstatic.com/image/thumb/Purple125/v4/29/46/dc/2946dcfb-3789-db1e-a9c6-ee87cda55bb3/source/256x256bb.jpg'],
                             "Tf1 series films":['https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/tf1plus/tf1-series-films.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8gorVJkAxI34pQBfwwgVdhKINXelYg6wLVQ&s'],
@@ -1084,11 +1084,9 @@ def searchmusic():
     return render_template('search.html', query=query_mus, titre=''.join(titre))
 
 
-@app.route('/new-music')
-def newmusic():
-    return ''
-
+# @app.route('/sports/calendrier-match')
 
 # fonction principale
 if __name__ == '__main__':
     app.run()
+
