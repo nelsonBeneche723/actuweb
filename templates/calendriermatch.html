@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if resultat %}
+<div class="calendrier-container">
+    {% for result_cal in resultat %}
+    <div class="match-result">
+        <p><strong>📅 {{ result_cal.date }}</strong></p>
+        <p><strong>🏆 {{ result_cal.competition }}</strong></p>
+        <p>🕘 {{ result_cal.match }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="error">
+    <p>Erreur API. Aucune donnée disponible.</p>
+</div>
+{% endif %}
+
+{% endblock %}

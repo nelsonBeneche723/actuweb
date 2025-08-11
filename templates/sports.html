@@ -269,8 +269,9 @@
         </li>
         <li><a href="/sports?section=score-en-direct">⚽ Score en direct</a></li>
         <li><a href="/sports?section=calendrier-matchs">🗓️ Calendrier des matchs</a></li>
-        <li><a href="/sports?section=infos-equipes">👥 Infos Equipes</a></li>
-
+        <li><a href="/sports?section=classement-buteurs">👥 Classement buteur(s)</a></li>
+        <li><a href="/sports?section=news">👥 News</a></li>
+        <li><a href="/sports?section=classement-buteurs">👥 Resultat(s) matchs</a></li>
     </ul>
 </div>
 
@@ -574,11 +575,11 @@
 <!-- AUCUN RESULTAT -->
 {% elif resultat %}
 <div class="calendrier-container">
-    {% for res in resultat %}
+    {% for result in resultat %}
     <div class="match-result">
-        <p><strong>📅 {{ res.date }}</strong></p>
-        <p><strong>🏆 {{ res.competition }}</strong></p>
-        <p>🕘 {{ res.match }}</p>
+        <p><strong>📅 {{ result.date }}</strong></p>
+        <p style><strong>🏆 {{ result.competition }}</strong></p>
+        <p>🕘 {{ result.match }}</p>
     </div>
     {% endfor %}
 </div>
