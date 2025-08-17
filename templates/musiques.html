@@ -401,9 +401,6 @@ body {
     max-width: 300px;
         }
 
-
-
-
     }
 
     </style>
@@ -411,16 +408,16 @@ body {
 <!--Sidebar-->
 <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 <div class="sidebar" id="mySidebar">
-        <h2>Music</h2>
+        <h2>Musique</h2>
         <ul>
-            <li> <a href="{{url_for('musiques')}}"><span class="icon">🎵</span><strong>Home</strong></a></li>
+            <li> <a href="{{url_for('musiques')}}"><span class="icon">🎵</span><strong>Accueil</strong></a></li>
             <li> <a href="{{url_for('trendingsong')}}"><span class="icon">🔥</span>Tendance</a></li>
-            <li> <a href="{{url_for('newtrack')}}"><span class="icon">🆕</span>Nouveau chanson</a></li>
-            <li> <a href="{{url_for('newsartist')}}"><span class="icon">🎤</span>Actualites </a></li>
-            <li><span class="icon">📹</span>Videos</li>
-            <li><span class="icon">📋</span>Playlists</li>
-            <li><span class="icon">📊</span>Charts</li>
-            <li><span class="icon">🎶</span>Genres</li>
+            <li> <a href="{{url_for('newtrack')}}"><span class="icon">🆕</span>Nouvelle chanson</a></li>
+            <li> <a href="{{url_for('newsartist')}}"><span class="icon">📰</span>Actualites </a></li>
+            <li><a href="{{url_for('playvideosyoutube')}}"><span class="videos">🎬</span>Vidéos</a></li>
+            <li><span class="icon">🎶 </span>Playlists</li>
+            <li><span class="icon">📊</span>Classements</li>
+            <li><span class="icon"> 🎧</span>Genres</li>
         </ul>
         <h2>Library</h2>
         <ul>

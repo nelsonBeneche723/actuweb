@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Scores en Direct{% endblock %}
+
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/sport.ico') }}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+<style>
+/* Conteneur principal */
+.scores-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Cartes de matchs */
+.match-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 280px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    font-family: Arial, sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.match-card p {
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+.match-card p strong {
+    font-size: 1.1rem;
+}
+
+/* Titre championnat */
+.championnat-title {
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #ff4081;
+    font-size: 1.3rem;
+}
+
+/* Responsive pour mobiles */
+@media (max-width: 767px) {
+    .match-card {
+        width: 90%;
+    }
+}
+</style>
+
+<h3 style="text-align:center; margin-top:20px;">⚽ Scores en Direct</h3>
+
+<div id ="scores">
+<!-- Premier League -->
+{% if resultat_mpl %}
+<h2 class="championnat-title">Premier League</h2>
+<div class="scores-container">
+    {% for match in resultat_mpl %}
+    <div class="match-card">
+        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
+        <p>Score : <strong>{{ match.score }}</strong></p>
+        <p>Status : En cours..</p>
+        <p>Minutes :{{match.minutes}}</p>
+        <p>🏆 {{ match.competition }} </p>
+        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Liga -->
+{% if resultat_mpd %}
+<h2 class="championnat-title">La Liga</h2>
+<div class="scores-container">
+    {% for match in resultat_mpd %}
+    <div class="match-card">
+        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
+        <p>Score : <strong>{{ match.score }}</strong></p>
+        <p>Status : En cours..</p>
+        <p>Minutes :{{match.minutes}}</p>
+        <p>🏆 {{ match.competition }} </p>
+        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Serie A -->
+{% if resultat_sa %}
+<h2 class="championnat-title">Serie A</h2>
+<div class="scores-container">
+    {% for match in resultat_sa %}
+    <div class="match-card">
+        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
+        <p>Score : <strong>{{ match.score }}</strong></p>
+       <p>Status : En cours..</p>
+        <p>Minutes :{{match.minutes}}</p>
+        <p>🏆 {{ match.competition }} </p>
+        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Ligue 1 -->
+{% if resultat_fl1 %}
+<h2 class="championnat-title">Ligue 1</h2>
+<div class="scores-container">
+    {% for match in resultat_fl1 %}
+    <div class="match-card">
+        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
+        <p>Score : <strong>{{ match.score }}</strong></p>
+        <p>Status : En cours..</p>
+        <p>Minutes :{{match.minutes}}</p>
+        <p>🏆 {{ match.competition }} </p>
+        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Bundesliga -->
+{% if resultat_bl1 %}
+<h2 class="championnat-title">Bundesliga</h2>
+<div class="scores-container">
+    {% for match in resultat_bl1 %}
+    <div class="match-card">
+        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
+        <p>Score : <strong>{{ match.score }}</strong></p>
+        <p>Status : En cours..</p>
+        <p>Minutes :{{match.minutes}}</p>
+        <p>🏆 {{ match.competition }} </p>
+        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+    </div>
+<script>
+    function chargerScores(){
+    fetch("/sports/score-en-direct").then(res=>res.json()).then(data=>{
+    let html =";
+    data.forEach(match=>{
+    html+=<p>match.home{match.score_home-match.score_away{match.away}
+    (${match.duration})</p>;
+    })
+    document.getElementById("scores").innerHTML=html;})
+    .catch(err=>console.error(err));}
+    //mise a jour
+    setInterval(chargerScores, 30000);
+    chargerScores();//Appel initial
+    }
+</script>
+{% endblock %}

@@ -267,11 +267,11 @@
                 <li><a href="/sports?section=classement&championnat=angleterre">🏴 Premier League (Angleterre)</a></li>
             </ul>
         </li>
-        <li><a href="/sports?section=score-en-direct">⚽ Score en direct</a></li>
+        <li><a href="/sports/score-en-direct">⚽ Score en direct</a></li>
         <li><a href="/sports?section=calendrier-matchs">🗓️ Calendrier des matchs</a></li>
         <li><a href="/sports?section=classement-buteurs">👥 Classement buteur(s)</a></li>
-        <li><a href="/sports?section=news">👥 News</a></li>
-        <li><a href="/sports?section=classement-buteurs">👥 Resultat(s) matchs</a></li>
+        <li><a href="{{url_for('sportactualites')}}">👥 News</a></li>
+        <li><a href="/sports/match-termine">👥 Resultat(s) matchs</a></li>
     </ul>
 </div>
 
@@ -583,6 +583,7 @@
     </div>
     {% endfor %}
 </div>
+
 {% elif sportsactu %}
   <div class="actualites-container">
       {% for sport in sportsactu %}
@@ -594,6 +595,7 @@
             </div>
       {% endfor %}
   </div>
+
 
 <!-- ERREUR -->
 {% else %}

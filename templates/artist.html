@@ -1,16 +1,15 @@
 {% extends 'base.html' %}
 {% block title %} Nouvelles sur les artistes | Actu web {% endblock %}
 
-
-<p>Artist</p>
 {% block content %}
 <style>
 /* Desktop styles */
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   grid-gap: 2rem;
   margin-bottom: 2rem;
+  padding:2rem;
 }
 
 .news-card {
@@ -91,6 +90,8 @@
   }
 }
 </style>
+
+
 <div class="news-grid">
   {% for new in news %}
     <div class="news-card">
@@ -98,14 +99,14 @@
             <img src="{{ new.image_url }}" alt="{{ new.titre }}">
         {% else %}
             <img src="https://cdn-images.dzcdn.net/images/artist/2ceac184bc846327f60c5b0d4247cc7a/500x500.jpg" alt="{{ new.titre }}">
-      {% endif %}
-    <div class="news-content">
-      <h3>{{ new.titre }}</h3>
-      <p>{{ new.description }}</p>
-      <a href="{{ new.lien }}" class="read-more">Lire la suite</a>
-      <p class="published-date">Publié le {{ new.published }}</p>
+        {% endif %}
+        <div class="news-content">
+          <h3>{{ new.titre }}</h3>
+          <p>{{ new.description }}</p>
+          <a href="{{ new.lien }}" class="read-more">Lire la suite</a>
+          <p class="published-date">Publié le {{new.published}}</p>
+        </div>
     </div>
-  </div>
   {% endfor %}
 </div>
 {% endblock %}
