@@ -1,7 +1,6 @@
 import datetime
 import time
 from pyradios import RadioBrowser
-from babel.dates import format_date
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import requests
