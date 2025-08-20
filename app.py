@@ -779,7 +779,7 @@ def matchsencours_ligue1():
 
 def matchtermine_pl():
 
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
 
@@ -791,11 +791,13 @@ def matchtermine_pl():
         for match in data['matches']:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
-
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
-
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+            py_tz = pytz.timezone('America/Port-au-Prince')
+            localdate = utc_date.astimezone(py_tz)
+            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -804,7 +806,7 @@ def matchtermine_pl():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': utc_date,
+                'date': localdate,
                 'competition': competition
             })
         return resultat_tpl
@@ -812,7 +814,7 @@ def matchtermine_pl():
         print("Erreur :")
 
 def matchtermine_liga():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/PD/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
 
@@ -824,11 +826,13 @@ def matchtermine_liga():
         for match in data['matches']:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
-
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
-
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+            py_tz = pytz.timezone('America/Port-au-Prince')
+            localdate = utc_date.astimezone(py_tz)
+            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -837,7 +841,7 @@ def matchtermine_liga():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': utc_date,
+                'date': localdate,
                 'competition': competition
             })
         return resultat_tlig
@@ -845,7 +849,7 @@ def matchtermine_liga():
         print("Erreur :")
 
 def matchtermine_seriea():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/SA/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
 
@@ -857,11 +861,13 @@ def matchtermine_seriea():
         for match in data['matches']:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
-
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
-
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+            py_tz = pytz.timezone('America/Port-au-Prince')
+            localdate = utc_date.astimezone(py_tz)
+            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -870,7 +876,7 @@ def matchtermine_seriea():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': utc_date,
+                'date': localdate,
                 'competition': competition
             })
         return resultat_tsa
@@ -878,7 +884,7 @@ def matchtermine_seriea():
         print("Erreur :")
 
 def matchtermine_ligue1():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/FL1/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
 
@@ -895,6 +901,10 @@ def matchtermine_ligue1():
             score_away = match['score']['fullTime']['away']
 
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+            py_tz = pytz.timezone('America/Port-au-Prince')
+            localdate = utc_date.astimezone(py_tz)
+            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -903,7 +913,7 @@ def matchtermine_ligue1():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': utc_date,
+                'date': localdate,
                 'competition': competition
             })
         return resultat_tlig1
@@ -911,7 +921,7 @@ def matchtermine_ligue1():
         print("Erreur :")
 
 def matchtermine_bundesliga():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/BL1/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
 
@@ -923,11 +933,13 @@ def matchtermine_bundesliga():
         for match in data['matches']:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
-
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
-
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+            py_tz = pytz.timezone('America/Port-au-Prince')
+            localdate = utc_date.astimezone(py_tz)
+            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -936,12 +948,13 @@ def matchtermine_bundesliga():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': utc_date,
+                'date': localdate,
                 'competition': competition
             })
         return resultat_tligb
     else:
         print("Erreur :")
+
 @app.route('/')
 def accueil():
     api_key = os.getenv('api_key_nouvelles')
@@ -1127,15 +1140,9 @@ def sportactualites():
 
 @app.route('/music')
 def musiques():
-    resultcompas = None
-    resultafro = None
-    resultevangelique = None
-    try:
-        resultcompas = affichermusique_genre('compas')
-        resultafro = affichermusique_genre('afrobeat')
-        resultevangelique = affichermusique_genre("evangelique")
-    except Exception as e:
-        print(f"Erreur: {e}")
+    resultcompas = affichermusique_genre('compas')
+    resultafro = affichermusique_genre('afrobeat')
+    resultevangelique = affichermusique_genre("evangelique")
     return render_template('musiques.html', resultcompas=resultcompas, resultafro=resultafro, resultevangelique=resultevangelique)
 
 @app.route('/sports/score-en-direct')
@@ -1464,6 +1471,5 @@ def searchmusic():
 
 # fonction principale
 if __name__ == '__main__':
-    app.run()
-
+    app.run(debug=True, use_reloader=True)
 
