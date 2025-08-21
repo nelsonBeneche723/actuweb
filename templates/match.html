@@ -94,7 +94,6 @@ section {
     <!-- Premier League -->
     <section>
         <h3>🏴 Premier League</h3>
-        {% if resultat_tpl %}
             {% for match in resultat_tpl %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
@@ -108,7 +107,6 @@ section {
     <!-- Liga -->
     <section>
         <h3>🇪🇸 La Liga</h3>
-        {% if resultat_tlig %}
             {% for match in resultat_tlig %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
@@ -123,7 +121,6 @@ section {
     <!-- Serie A -->
     <section>
         <h3>🇮🇹 Serie A</h3>
-        {% if resultat_tsa %}
             {% for match in resultat_tsa %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
@@ -138,7 +135,6 @@ section {
     <!-- Ligue 1 -->
     <section>
         <h3>🇫🇷 Ligue 1</h3>
-        {% if resultat_tlig1 %}
             {% for match in resultat_tlig1 %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
@@ -152,7 +148,6 @@ section {
     <!-- Bundesliga -->
     <section>
         <h3>🇩🇪 Bundesliga</h3>
-        {% if resultat_tligb %}
             {% for match in resultat_tligb %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
@@ -161,11 +156,9 @@ section {
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
-        {% else %}
-            <p style="text-align:center;">Aucun résultat disponible.</p>
-        {% endif %}
     </section>
 </div>
 {% endblock %}
+
 
 
