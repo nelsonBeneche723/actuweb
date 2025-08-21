@@ -572,246 +572,246 @@ def calendriermatch():
     API_KEY = os.getenv('api_key_sports')
     url = 'https://api.football-data.org/v4/matches'
     headers = {'X-Auth-Token': API_KEY}
-
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
     resultat = []
-
-    if response.status_code == 200:
-        data = response.json()
-        matches = data.get('matches', [])
-        if matches:
-            # Regrouper par date, puis par compétition
-            grouped_matches = defaultdict(lambda: defaultdict(list))
-
-            for match in matches:
-                # Convertir date UTC vers local et extraire la date et l'heure
-                dt_utc = match['utcDate']
-                dt = datetime.fromisoformat(dt_utc.replace("Z", "+00:00"))
-                date_str = dt.strftime('%d %B %Y')   # ex: 26 avril 2025
-                time_str = dt.strftime('%H:%M')
-
-                competition = match['competition']['name']
-                home = match['homeTeam']['name']
-                away = match['awayTeam']['name']
-                grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
-
-            # ✅ Affichage
-            for date, comps in grouped_matches.items():
-                for comp, matchs in comps.items():
-                    for m in matchs:
-                        resultat.append({"date":date, 'competition':comp, 'match':m})
-            return resultat
-        else:
-            print("Aucun match disponible.")
-    else:
-        print(f"Erreur API : {response.status_code} — {response.text}")
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            matches = data.get('matches', [])
+            if matches:
+                # Regrouper par date, puis par compétition
+                grouped_matches = defaultdict(lambda: defaultdict(list))
+                # parcourir les matches
+                for match in matches:
+                    # Convertir date UTC vers local et extraire la date et l'heure
+                    dt_utc = match['utcDate']
+                    dt = datetime.fromisoformat(dt_utc.replace("Z", "+00:00"))
+                    date_str = dt.strftime('%d %B %Y')   # ex: 26 avril 2025
+                    time_str = dt.strftime('%H:%M')
+                    # competitions (nom competition, domicile, a l'exterieur)
+                    competition = match['competition']['name']
+                    home = match['homeTeam']['name']
+                    away = match['awayTeam']['name']
+                    grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
+                return resultat, None
+            else:
+                print("Aucun match disponible.")
+    except Exception as e:
+        return None, str(e)
 
 def matchsencours_premierleague():
     API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/PL/matches?status=IN_PLAY'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
     resultat_mpl = []
+    data = response.json()
     # verifier l'api renvoie une response(ok)
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            # scores equipe dehors, equipe domicile
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            # date
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            status = match['status']  # SCHEDULED, FINISHED, e`tc.
-            competition = match['competition']['name']
-            minutes = match['score']['duration']
-            # ajouter les resultats dans une liste contenant un dictionnaire
-            resultat_mpl.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': utc_date,
-                'competition': competition,
-                'minutes': minutes
-            })
-        # print(resultat_mpl)
-        return resultat_mpl
-    else:
-        print("Erreur API:",)
+    try:
+        if response.status_code == 200:
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                # scores equipe dehors, equipe domicile
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                # date
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                status = match['status']  # SCHEDULED, FINISHED, e`tc.
+                competition = match['competition']['name']
+                minutes = match['score']['duration']
+                # ajouter les resultats dans une liste contenant un dictionnaire
+                resultat_mpl.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': utc_date,
+                    'competition': competition,
+                    'minutes': minutes
+                })
+            return resultat_mpl, None
+    except Exception as e:
+        return None, str(e)
 
 def matchsencours_liga():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/PD/matches?status=IN_PLAY'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
     resultat_mpd = []
     # verifier l'api renvoie une response(ok)
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            # scores equipe dehors, equipe domicile
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            # date
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            status = match['status']  # SCHEDULED, FINISHED, e`tc.
-            competition = match['competition']['name']
-            minutes = match['score']['duration']
-            # ajouter les resultats dans une liste contenant un dictionnaire
-            resultat_mpd.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': utc_date,
-                'competition': competition,
-                'minutes': minutes
-            })
-        return resultat_mpd
-    else:
-        print("Erreur :", response.status_code, response.text)
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                # scores equipe dehors, equipe domicile
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                # date
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                status = match['status']  # SCHEDULED, FINISHED, e`tc.
+                competition = match['competition']['name']
+                minutes = match['score']['duration']
+                # ajouter les resultats dans une liste contenant un dictionnaire
+                resultat_mpd.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': utc_date,
+                    'competition': competition,
+                    'minutes': minutes
+                })
+            return resultat_mpd, None
+    except Exception as e:
+        return None, str(e)
 
 def matchsencours_seriea():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/SA/matches?status=IN_PLAY'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     resultat_msa = []
-    # verifier l'api renvoie une response(ok)
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            # scores equipe dehors, equipe domicile
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            # date
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            status = match['status']  # SCHEDULED, FINISHED, e`tc.
-            competition = match['competition']['name']
-            minutes = match['score']['duration']
-            # ajouter les resultats dans une liste contenant un dictionnaire
-            resultat_msa.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': utc_date,
-                'competition': competition,
-                'minutes': minutes
-            })
-        return resultat_msa
-    else:
-        print("Erreur :", response.status_code, response.text)
+    try:
+        # verifier l'api renvoie une response(ok)
+        if response.status_code == 200:
+            data = response.json()
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                # scores equipe dehors, equipe domicile
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                # date
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                status = match['status']  # SCHEDULED, FINISHED, e`tc.
+                competition = match['competition']['name']
+                minutes = match['score']['duration']
+                # ajouter les resultats dans une liste contenant un dictionnaire
+                resultat_msa.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': utc_date,
+                    'competition': competition,
+                    'minutes': minutes
+                })
+            return resultat_msa, None
+    except Exception as e:
+        return None, str(e)
 
 def matchsencours_bundesliga():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/BL1/matches?status=IN_PLAY'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
     resultat_mbl1 = []
     # verifier l'api renvoie une response(ok)
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            # scores equipe dehors, equipe domicile
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            # date
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            status = match['status']  # SCHEDULED, FINISHED, e`tc.
-            competition = match['competition']['name']
-            minutes = match['score']['duration']
-            # ajouter les resultats dans une liste contenant un dictionnaire
-            resultat_mbl1.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': utc_date,
-                'competition': competition,
-                'minutes': minutes
-            })
-        return resultat_mbl1
-    else:
-        print("Erreur :", response.status_code, response.text)
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                # scores equipe dehors, equipe domicile
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                # date
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                status = match['status']  # SCHEDULED, FINISHED, e`tc.
+                competition = match['competition']['name']
+                minutes = match['score']['duration']
+                # ajouter les resultats dans une liste contenant un dictionnaire
+                resultat_mbl1.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': utc_date,
+                    'competition': competition,
+                    'minutes': minutes
+                })
+            return resultat_mbl1, None
+    except Exception as e:
+        return None, str(e)
 
 def matchsencours_ligue1():
-    API_KEY = '0dceee736fbb4e52a8fb909175f99d07'  # Remplace par ta vraie clé API
+    API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/FL1/matches?status=IN_PLAY'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     resultat_mfl1 = []
     # verifier l'api renvoie une response(ok)
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            # scores équipe dehors, équipe domicile
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            # date
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            status = match['status']  # SCHEDULED, FINISHED, e`tc.
-            competition = match['competition']['name']
-            minutes = match['score']['duration']
-            # ajouter les résultats dans une liste contenant un dictionnaire
-            resultat_mfl1.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': utc_date,
-                'competition': competition,
-                'minutes': minutes
-            })
-        return resultat_mfl1
-    else:
-        print("Erreur :", response.status_code, response.text)
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                # scores équipe dehors, équipe domicile
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                # date
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                status = match['status']  # SCHEDULED, FINISHED, e`tc.
+                competition = match['competition']['name']
+                minutes = match['score']['duration']
+                # ajouter les résultats dans une liste contenant un dictionnaire
+                resultat_mfl1.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': utc_date,
+                    'competition': competition,
+                    'minutes': minutes
+                })
+            return resultat_mfl1, None
+    except Exception as e:
+        return None, str(e)
 
-def matchtermine_pl():
-
+def matchtermine(championnat):
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
-    url = 'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
+    url = f'https://api.football-data.org/v4/competitions/{championnat}/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
-
     response = requests.get(url, headers=headers)
-    resultat_tpl = []
-
-    if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            score_home = match['score']['fullTime']['home']
-            score_away = match['score']['fullTime']['away']
-            utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-            utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
-            py_tz = pytz.timezone('America/Port-au-Prince')
-            localdate = utc_date.astimezone(py_tz)
-            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
-            status = match['status']  # SCHEDULED, FINISHED, etc.
-            competition = match['competition']['name']
-
-            resultat_tpl.append({
-                'home': home_team,
-                'away': away_team,
-                'score': f"{score_home} - {score_away}",
-                'status': status,
-                'date': localdate,
-                'competition': competition
-            })
-        return resultat_tpl
-    else:
-        print("Erreur :")
+    response.raise_for_status()
+    resultat = []
+    data = response.json()
+    try:
+        if response.status_code == 200:
+            for match in data.get('matches', []):
+                home_team = match['homeTeam']['name']
+                away_team = match['awayTeam']['name']
+                score_home = match['score']['fullTime']['home']
+                score_away = match['score']['fullTime']['away']
+                utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = utc_date.astimezone(py_tz)
+                localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+                status = match['status']  # SCHEDULED, FINISHED, etc.
+                competition = match['competition']['name']
+                # dictionnaire de donnees
+                resultat.append({
+                    'home': home_team,
+                    'away': away_team,
+                    'score': f"{score_home} - {score_away}",
+                    'status': status,
+                    'date': localdate,
+                    'competition': competition
+                })
+            return resultat, None
+    except Exception as e:
+        return None, str(e)
 
 def matchtermine_liga():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
@@ -919,6 +919,30 @@ def matchtermine_ligue1():
         return resultat_tlig1
     else:
         print("Erreur :")
+
+def recupererscorejoueur(championnat):
+    API_KEY = os.getenv('api_key_sports')
+    headers = {'X-Auth-Token': API_KEY}
+    url = f'https://api.football-data.org/v4/competitions/{championnat}/scorers'
+    response = requests.get(url, headers=headers)
+    resultat = []
+    try:
+        if response.status_code == 200:
+            data = response.json()
+            for scorer in data['scorers']:
+                player_name = scorer['player']['name']
+                team_name = scorer['team']['name']
+                goals = scorer['goals']
+                # dictionnaire de donnees du resultat
+                resultat.append({
+                    'player_name': player_name,
+                    'team_name': team_name,
+                    'goals': goals
+                })
+        return resultat
+    except Exception as e:
+        print(f"Erreur API{e}")
+
 
 def matchtermine_bundesliga():
     API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
@@ -1147,14 +1171,19 @@ def musiques():
 
 @app.route('/sports/score-en-direct')
 def matchsencours():
-    resultat_mpl = matchsencours_premierleague()
-    resultat_sa = matchsencours_seriea()
-    resultat_fl1 = matchsencours_ligue1()
-    resultat_bl1 = matchsencours_bundesliga()
-    resultat_mpd = matchsencours_liga()
-    return render_template('score.html', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
-                    resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
+    resultat_mpl, resultat_sa, resultat_fl1, resultat_mpd, resultat_bl1 = None, None, None, None, None
 
+    try:
+        resultat_mpl = matchsencours_premierleague()
+        resultat_sa = matchsencours_seriea()
+        resultat_fl1 = matchsencours_ligue1()
+        resultat_bl1 = matchsencours_bundesliga()
+        resultat_mpd = matchsencours_liga()
+    except Exception as e:
+        print('erreur')
+
+    return render_template('score.html', section='championnat', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
+                           resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
 # ✅ Route AJAX pour afficher l'heure
 @app.route('/heure')
 def heure_actuelle():
@@ -1173,15 +1202,37 @@ def heure_actuelle():
     return jsonify({"heure": dth})
 
 @app.route('/sports/match-termine')
-def matchtermine():
-    resultat_tpl = matchtermine_pl()
-    resultat_tlig = matchtermine_liga()
-    resultat_tsa = matchtermine_seriea()
-    resultat_tlig1 = matchtermine_ligue1()
-    resultat_tligb = matchtermine_bundesliga()
-    return render_template('match.html', resultat_tpl=resultat_tpl,
-                           resultat_tlig=resultat_tlig, resultat_tsa=resultat_tsa,
-                           resultat_tlig1=resultat_tlig1, resultat_tligb=resultat_tligb)
+def matchtermineEnd():
+    resultat_tpl, resultat_tsa, resultat_tlig, resultat_tlig1, resultat_tligb = None, None, None, None, None
+    try:
+        resultat_tpl = matchtermine('PL')
+        resultat_tlig = matchtermine("PD")
+        resultat_tsa = matchtermine('SA')
+        resultat_tlig1 = matchtermine("FL1")
+        resultat_tligb = matchtermine("BL1")
+
+    except Exception as e:
+        print('Pas de donnees..')
+    return render_template("match.html",
+                           resultat_tpl=resultat_tpl,
+                           resultat_tlig=resultat_tlig,
+                           resultat_tsa=resultat_tsa,
+                           resultat_tlig1=resultat_tlig1,
+                           resultat_tligb=resultat_tligb)
+
+@app.route('/sports/classement-buteurs')
+def recuperertousbuteurs():
+    buteurs_pl, buteurs_sa, buteurs_fl1, buteurs_pd, buteurs_bl1=None,None,None,None,None
+    try:
+        buteurs_pl = recupererscorejoueur('PL')
+        buteurs_sa = recupererscorejoueur('SA')
+        buteurs_pd = recupererscorejoueur('PD')
+        buteurs_fl1 = recupererscorejoueur('FL1')
+        buteurs_bl1 = recupererscorejoueur('BL1')
+    except Exception as e:
+        print('erreur')
+    return render_template('classementbuteur.html', buteurs_pl= buteurs_pl,buteurs_pd=buteurs_pd, buteurs_sa=buteurs_sa,
+                                                               buteurs_bl1=buteurs_bl1, buteurs_fl1=buteurs_fl1)
 
 @app.route('/music/<int:musique_id>/<slug>/')
 def jouer_musique(musique_id, slug):
@@ -1230,7 +1281,6 @@ def jouer_musique(musique_id, slug):
 
     return render_template('lecteur.html', musique=resultatmusique, recommandations=recommandations,
                            plus_contenu_musique=plus_contenu_musique, chanson=paroles)
-
 
 @app.route('/music/trending-songs')
 def trendingsong():
