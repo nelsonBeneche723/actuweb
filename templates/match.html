@@ -4,9 +4,7 @@
 
 {% block content %}
 
-
 <style>
-    <style>
 .matchs-termines {
     max-width: 900px;
     margin: 0 auto;
@@ -100,13 +98,13 @@ section {
             {% for match in resultat_tpl %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
-                <p>Status : Terminés</p>
+                <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
-            <p>Aucun résultat disponible.</p>
+            <p style="text-align:center;">Aucun résultat disponible.</p>
         {% endif %}
     </section>
 
@@ -117,13 +115,13 @@ section {
             {% for match in resultat_tlig %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
-                <p>Status : Terminés</p>
+                <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
-            <p>Aucun résultat disponible.</p>
+              <p style="text-align:center;">Aucun résultat disponible.</p>
         {% endif %}
     </section>
 
@@ -134,13 +132,13 @@ section {
             {% for match in resultat_tsa %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
-               <p>Status : Terminés</p>
+               <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
-            <p>Aucun résultat disponible.</p>
+            <p style="text-align:center;">Aucun résultat disponible.</p>
         {% endif %}
     </section>
 
@@ -151,13 +149,13 @@ section {
             {% for match in resultat_tlig1 %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
-               <p>Status : Terminés</p>
+               <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
-            <p>Aucun résultat disponible.</p>
+            <p style="text-align:center;">Aucun résultat disponible.</p>
         {% endif %}
     </section>
 
@@ -168,14 +166,15 @@ section {
             {% for match in resultat_tligb %}
             <div class="match-item">
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
-                <p>Status : Terminés</p>
+                <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
                 <p>📅 {{ match.date }} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
-            <p>Aucun résultat disponible.</p>
+            <p style="text-align:center;">Aucun résultat disponible.</p>
         {% endif %}
     </section>
 </div>
 {% endblock %}
+

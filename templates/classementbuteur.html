@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Classement des buteurs -->
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+<h1>Classement des buteurs</h1>
+    <h2>Premier League</h2>
+    <table>
+        <tr>
+            <th>Joueur</th>
+            <th>Club</th>
+            <th>Buts</th>
+        </tr>
+        {% for joueur in buteurs_pl %}
+        <tr>
+            <td>{{ joueur.player_name }}</td>
+            <td>{{ joueur.team_name }}</td>
+            <td>{{ joueur.goals }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Serie A</h2>
+    <table>
+        <tr>
+            <th>Joueur</th>
+            <th>Club</th>
+            <th>Buts</th>
+        </tr>
+        {% for joueur in buteurs_sa %}
+        <tr>
+            <td>{{ joueur.player_name }}</td>
+            <td>{{ joueur.team_name }}</td>
+            <td>{{ joueur.goals }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>La Liga</h2>
+    <table>
+        <tr>
+            <th>Joueur</th>
+            <th>Club</th>
+            <th>Buts</th>
+        </tr>
+        {% for joueur in buteurs_pd %}
+        <tr>
+            <td>{{ joueur.player_name }}</td>
+            <td>{{ joueur.team_name }}</td>
+            <td>{{ joueur.goals }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Ligue 1</h2>
+    <table>
+        <tr>
+            <th>Joueur</th>
+            <th>Club</th>
+            <th>Buts</th>
+        </tr>
+        {% for joueur in buteurs_fl1 %}
+        <tr>
+            <td>{{ joueur.player_name }}</td>
+            <td>{{ joueur.team_name }}</td>
+            <td>{{ joueur.goals }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Bundesliga</h2>
+    <table>
+        <tr>
+            <th>Joueur</th>
+            <th>Club</th>
+            <th>Buts</th>
+        </tr>
+        {% for joueur in buteurs_bl1 %}
+        <tr>
+           <td>{{ joueur.player_name }}</td>
+            <td>{{ joueur.team_name }}</td>
+            <td>{{ joueur.goals }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

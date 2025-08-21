@@ -50,7 +50,7 @@
     font-family: 'Poppins', sans-serif;
     margin-top: 30px;
     margin-bottom: 15px;
-    color: #ff4081;
+    color: #f3f3f3;
     font-size: 1.3rem;
 }
 
@@ -64,110 +64,149 @@
 
 <h3 style="text-align:center; margin-top:20px;">⚽ Scores en Direct</h3>
 
-<div id ="scores">
-<!-- Premier League -->
-{% if resultat_mpl %}
-<h2 class="championnat-title">Premier League</h2>
-<div class="scores-container">
-    {% for match in resultat_mpl %}
-    <div class="match-card">
-        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
-        <p>Score : <strong>{{ match.score }}</strong></p>
-        <p>Status : En cours..</p>
-        <p>Minutes :{{match.minutes}}</p>
-        <p>🏆 {{ match.competition }} </p>
-        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
+<div id="scores">
+  <!-- Premier League -->
+  <div class="championnat">
+    <h2 class="championnat-title">Premier League</h2>
+    {% if resultat_mpl %}
+      <div class="scores-container">
+        {% for match in resultat_mpl %}
+          <div class="match-card">
+            <h3>{{ match.home }} vs {{ match.away }}</h3>
+            <p>Score : {{ match.score }}</p>
+            <p>En cours...</p>
+            <p>Minutes : {{ match.minutes }}</p>
+            <p>🏆 {{ match.competition }}</p>
+            <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="text-align:center;">Désolé, aucune donnée de match de la Liga n'est disponible pour le moment.</p>
+    {% endif %}
+  </div>
+
+  <div class="championnat">
+    <h2 class="championnat-title">La Liga</h2>
+{% if resultat_mpd%}
+      <div class="scores-container">
+        {% for match in resultat_mpd %}
+          <div class="match-card">
+            <h3>{{ match.home }} vs {{ match.away }}</h3>
+            <p>Score : {{ match.score }}</p>
+            <p>En cours...</p>
+            <p>Minutes : {{ match.minutes }}</p>
+            <p>🏆 {{ match.competition }}</p>
+            <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align:center;">Désolé, aucune donnée de match de la Liga n'est disponible pour le moment.</p>
+    {% endif %}
+  </div>
+
+  <!-- Serie A -->
+  <div class="championnat">
+    <h2 class="championnat-title">Serie A</h2>
+    {% if resultat_sa %}
+      <div class="scores-container">
+        {% for match in resultat_sa %}
+          <div class="match-card">
+            <h3>{{ match.home }} vs {{ match.away }}</h3>
+            <p>Score : {{ match.score }}</p>
+            <p>En cours...</p>
+            <p>Minutes : {{ match.minutes }}</p>
+            <p>🏆 {{ match.competition }}</p>
+            <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align:center;">Désolé, aucune donnée de match de la Serie A n'est disponible pour le moment.</p>
+    {% endif %}
+  </div>
+
+  <!-- Ligue 1 -->
+  <div class="championnat">
+    <h2 class="championnat-title">Ligue 1</h2>
+    {% if resultat_fl1 %}
+      <div class="scores-container">
+        {% for match in resultat_fl1 %}
+          <div class="match-card">
+            <h3>{{ match.home }} vs {{ match.away }}</h3>
+            <p>Score : {{ match.score }}</p>
+            <p>En cours...</p>
+            <p>Minutes : {{ match.minutes }}</p>
+            <p>🏆 {{ match.competition }}</p>
+            <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align:center;">Désolé, aucune donnée de match de la Ligue 1 n'est disponible pour le moment.</p>
+    {% endif %}
+  </div>
+
+  <!-- Bundesliga -->
+  <div class="championnat">
+    <h2 class="championnat-title">Bundesliga</h2>
+    {% if resultat_bl1 %}
+      <div class="scores-container">
+        {% for match in resultat_bl1 %}
+          <div class="match-card">
+            <h3>{{ match.home }} vs {{ match.away }}</h3>
+            <p>Score : {{ match.score }}</p>
+            <p>En cours...</p>
+            <p>Minutes : {{ match.minutes }}</p>
+            <p>🏆 {{ match.competition }}</p>
+            <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align:center;">Désolé, aucune donnée de match de la Bundesliga n'est disponible pour le moment.</p>
+    {% endif %}
+  </div>
 </div>
-{% endif %}
 
-<!-- Liga -->
-{% if resultat_mpd %}
-<h2 class="championnat-title">La Liga</h2>
-<div class="scores-container">
-    {% for match in resultat_mpd %}
-    <div class="match-card">
-        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
-        <p>Score : <strong>{{ match.score }}</strong></p>
-        <p>Status : En cours..</p>
-        <p>Minutes :{{match.minutes}}</p>
-        <p>🏆 {{ match.competition }} </p>
-        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
 
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- Serie A -->
-{% if resultat_sa %}
-<h2 class="championnat-title">Serie A</h2>
-<div class="scores-container">
-    {% for match in resultat_sa %}
-    <div class="match-card">
-        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
-        <p>Score : <strong>{{ match.score }}</strong></p>
-       <p>Status : En cours..</p>
-        <p>Minutes :{{match.minutes}}</p>
-        <p>🏆 {{ match.competition }} </p>
-        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
-
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- Ligue 1 -->
-{% if resultat_fl1 %}
-<h2 class="championnat-title">Ligue 1</h2>
-<div class="scores-container">
-    {% for match in resultat_fl1 %}
-    <div class="match-card">
-        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
-        <p>Score : <strong>{{ match.score }}</strong></p>
-        <p>Status : En cours..</p>
-        <p>Minutes :{{match.minutes}}</p>
-        <p>🏆 {{ match.competition }} </p>
-        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
-
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- Bundesliga -->
-{% if resultat_bl1 %}
-<h2 class="championnat-title">Bundesliga</h2>
-<div class="scores-container">
-    {% for match in resultat_bl1 %}
-    <div class="match-card">
-        <p><strong>{{ match.home }}</strong> vs <strong>{{ match.away }}</strong></p>
-        <p>Score : <strong>{{ match.score }}</strong></p>
-        <p>Status : En cours..</p>
-        <p>Minutes :{{match.minutes}}</p>
-        <p>🏆 {{ match.competition }} </p>
-        <p>📅 {{ match.date }} Heure Port-au-Prince</p>
-
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-    </div>
 <script>
-    function chargerScores(){
-    fetch("/sports/score-en-direct").then(res=>res.json()).then(data=>{
-    let html =";
-    data.forEach(match=>{
-    html+=<p>match.home{match.score_home-match.score_away{match.away}
-    (${match.duration})</p>;
-    })
-    document.getElementById("scores").innerHTML=html;})
-    .catch(err=>console.error(err));}
-    //mise a jour
-    setInterval(chargerScores, 30000);
-    chargerScores();//Appel initial
-    }
+           async function fetchScores() {
+            try {
+                // 👉 Appel à ton endpoint Flask (exemple : /api/live-matches)
+                let response = await fetch("/sports/score-en-direct");
+                let data = await response.json();
+
+                let container = document.getElementById("live-matches");
+                container.innerHTML = ""; // reset avant update
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p>Aucun match en direct pour le moment</p>";
+                    return;
+                }
+
+                data.forEach(match => {
+                    let card = `
+                        <div class="match-card">
+                            <div class="teams">${match.home} vs ${match.away}</div>
+                            <div class="score">${match.score}</div>
+                            <div class="minute">${match.status === "IN_PLAY" ? match.minute : match.status}</div>
+                            <div class="competition">${match.competition}</div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error("Erreur de chargement des scores :", error);
+            }
+        }
+
+        // 🔄 Rafraîchir toutes les 30 secondes
+        setInterval(fetchScores, 30000);
+
+        // Charger au premier affichage
+        fetchScores();
+
 </script>
 {% endblock %}
