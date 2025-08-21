@@ -68,7 +68,6 @@
   <!-- Premier League -->
   <div class="championnat">
     <h2 class="championnat-title">Premier League</h2>
-    {% if resultat_mpl %}
       <div class="scores-container">
         {% for match in resultat_mpl %}
           <div class="match-card">
@@ -81,14 +80,11 @@
           </div>
         {% endfor %}
       </div>
-      {% else %}
-      <p style="text-align:center;">Désolé, aucune donnée de match de la Liga n'est disponible pour le moment.</p>
-    {% endif %}
+    
   </div>
 
   <div class="championnat">
     <h2 class="championnat-title">La Liga</h2>
-{% if resultat_mpd%}
       <div class="scores-container">
         {% for match in resultat_mpd %}
           <div class="match-card">
@@ -101,15 +97,11 @@
           </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p style="text-align:center;">Désolé, aucune donnée de match de la Liga n'est disponible pour le moment.</p>
-    {% endif %}
   </div>
 
   <!-- Serie A -->
   <div class="championnat">
     <h2 class="championnat-title">Serie A</h2>
-    {% if resultat_sa %}
       <div class="scores-container">
         {% for match in resultat_sa %}
           <div class="match-card">
@@ -122,15 +114,11 @@
           </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p style="text-align:center;">Désolé, aucune donnée de match de la Serie A n'est disponible pour le moment.</p>
-    {% endif %}
   </div>
 
   <!-- Ligue 1 -->
   <div class="championnat">
     <h2 class="championnat-title">Ligue 1</h2>
-    {% if resultat_fl1 %}
       <div class="scores-container">
         {% for match in resultat_fl1 %}
           <div class="match-card">
@@ -143,15 +131,11 @@
           </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p style="text-align:center;">Désolé, aucune donnée de match de la Ligue 1 n'est disponible pour le moment.</p>
-    {% endif %}
   </div>
 
   <!-- Bundesliga -->
   <div class="championnat">
-    <h2 class="championnat-title">Bundesliga</h2>
-    {% if resultat_bl1 %}
+    <h2 class="championnat-title"> </h2>
       <div class="scores-container">
         {% for match in resultat_bl1 %}
           <div class="match-card">
@@ -164,9 +148,6 @@
           </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p style="text-align:center;">Désolé, aucune donnée de match de la Bundesliga n'est disponible pour le moment.</p>
-    {% endif %}
   </div>
 </div>
 
@@ -210,3 +191,4 @@
 
 </script>
 {% endblock %}
+
