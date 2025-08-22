@@ -584,11 +584,17 @@ def calendriermatch():
                 grouped_matches = defaultdict(lambda: defaultdict(list))
                 # parcourir les matches
                 for match in matches:
-                    # Convertir date UTC vers local et extraire la date et l'heure
-                    dt_utc = match['utcDate']
-                    dt = datetime.fromisoformat(dt_utc.replace("Z", "+00:00"))
-                    date_str = dt.strftime('%d %B %Y')   # ex: 26 avril 2025
-                    time_str = dt.strftime('%H:%M')
+                    # Convertir date UTC en heure Port au Prince et extraire la date et l'heure
+                    dt_utc = match['utcDate'] # format date: 2021-09-09T19:01:00Z
+                    date_formate = datetime.strptime(dt_utc, '%Y-%m-%dT%H:%M:%SZ')
+                    py_tz = pytz.timezone('America/Port-au-Prince')
+                    dt = date_formate.astimezone(py_tz)
+                    date_d = (dt - timedelta(hours=4))
+                    date_str = date_d.strftime('%d %B %Y')   # ex: 26 April 2025
+                    # changer la valeur du mois en francais
+                    traduc = GoogleTranslator(source='en', target='fr')
+                    date_str = traduc.translate(date_str)
+                    time_str = date_d.strftime('%H:%M')
                     # competitions (nom competition, domicile, a l'exterieur)
                     competition = match['competition']['name']
                     home = match['homeTeam']['name']
@@ -799,11 +805,18 @@ def matchtermine_pl():
                 away_team = match['awayTeam']['name']
                 score_home = match['score']['fullTime']['home']
                 score_away = match['score']['fullTime']['away']
+
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
                 utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = utc_date.astimezone(py_tz)
-                localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.strftime('%d %B %Y')
+                # convertir par exemple august=aout
+                traduc_date =  GoogleTranslator(source='en', target='fr')
+                date_f = traduc_date.translate(date)
+                heure = localdate.strftime('%H:%M')
+
                 status = match['status']  # SCHEDULED, FINISHED, etc.
                 competition = match['competition']['name']
                 # dictionnaire de donnees
@@ -812,7 +825,8 @@ def matchtermine_pl():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': localdate,
+                    'date': date_f,
+                    'heure': heure,
                     'competition': competition
                 })
             return resultat_tpl
@@ -823,7 +837,6 @@ def matchtermine_liga():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/PD/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
-
     response = requests.get(url, headers=headers)
     resultat_tlig = []
 
@@ -835,10 +848,17 @@ def matchtermine_liga():
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+            localdate = localdate - timedelta(hours=4)
+            date = localdate.strftime('%d %B %Y')
+            # convertir par exemple august=aout
+            traduc_date = GoogleTranslator(source='en', target='fr')
+            date_f = traduc_date.translate(date)
+            heure = localdate.strftime('%H:%M')
+
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -847,7 +867,8 @@ def matchtermine_liga():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': localdate,
+                'date': date_f,
+                'heure': heure,
                 'competition': competition
             })
         return resultat_tlig
@@ -870,10 +891,16 @@ def matchtermine_seriea():
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+            localdate = localdate - timedelta(hours=4)
+            date = localdate.strftime('%d %B %Y')
+            # convertir par exemple august=aout
+            traduc_date = GoogleTranslator(source='en', target='fr')
+            date_f = traduc_date.translate(date)
+            heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -882,7 +909,8 @@ def matchtermine_seriea():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': localdate,
+                'date': date_f,
+                'heure': heure,
                 'competition': competition
             })
         return resultat_tsa
@@ -910,7 +938,12 @@ def matchtermine_ligue1():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+            localdate = localdate - timedelta(hours=4)
+            date = localdate.strftime('%d %B %Y')
+            # convertir par exemple august=aout
+            traduc_date = GoogleTranslator(source='en', target='fr')
+            date_f = traduc_date.translate(date)
+            heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -919,7 +952,8 @@ def matchtermine_ligue1():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': localdate,
+                'date': date_f,
+                'heure': heure,
                 'competition': competition
             })
         return resultat_tlig1
@@ -969,7 +1003,12 @@ def matchtermine_bundesliga():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = (localdate - timedelta(hours=4)).strftime('%d-%m-%Y %H:%M')
+            localdate = localdate - timedelta(hours=4)
+            date = localdate.strftime('%d %B %Y')
+            # convertir par exemple august=aout
+            traduc_date = GoogleTranslator(source='en', target='fr')
+            date_f = traduc_date.translate(date)
+            heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
 
@@ -978,7 +1017,8 @@ def matchtermine_bundesliga():
                 'away': away_team,
                 'score': f"{score_home} - {score_away}",
                 'status': status,
-                'date': localdate,
+                'date': date_f,
+                "heure": heure,
                 'competition': competition
             })
         return resultat_tligb
