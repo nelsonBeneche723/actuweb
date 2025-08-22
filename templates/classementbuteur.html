@@ -85,81 +85,110 @@ section h2 {
     <h2>Premier League</h2>
     <table>
         <tr>
+            <th>#</th>
             <th>Joueur</th>
             <th>Club</th>
             <th>Buts</th>
         </tr>
+        {% if buteurs_pl %}
         {% for joueur in buteurs_pl %}
         <tr>
+            <td>{{loop.index}}</td>
             <td>{{ joueur.player_name }}</td>
             <td>{{ joueur.team_name }}</td>
             <td>{{ joueur.goals }}</td>
         </tr>
         {% endfor %}
     </table>
+     {% else %}
+            <p style="text-align:center;">Aucun résultat disponible.</p>
+        {% endif %}
 
     <h2>Serie A</h2>
     <table>
         <tr>
+            <th>#</th>
             <th>Joueur</th>
             <th>Club</th>
             <th>Buts</th>
         </tr>
+        {% if buteurs_sa%}
         {% for joueur in buteurs_sa %}
         <tr>
+            <td>{{loop.index}}</td>
             <td>{{ joueur.player_name }}</td>
             <td>{{ joueur.team_name }}</td>
             <td>{{ joueur.goals }}</td>
         </tr>
         {% endfor %}
     </table>
+     {% else %}
+            <p style="text-align:center;">Aucun résultat disponible.</p>
+        {% endif %}
 
     <h2>La Liga</h2>
     <table>
         <tr>
+            <th>#</th>
             <th>Joueur</th>
             <th>Club</th>
             <th>Buts</th>
         </tr>
+        {% if buteurs_pd %}
         {% for joueur in buteurs_pd %}
         <tr>
+            <td>{{loop.index}}</td>
             <td>{{ joueur.player_name }}</td>
             <td>{{ joueur.team_name }}</td>
             <td>{{ joueur.goals }}</td>
         </tr>
         {% endfor %}
     </table>
+     {% else %}
+            <p style="text-align:center;">Aucun résultat disponible.</p>
+        {% endif %}
 
     <h2>Ligue 1</h2>
     <table>
         <tr>
+            <th>#</th>
             <th>Joueur</th>
             <th>Club</th>
             <th>Buts</th>
         </tr>
+        {% if buteurs_fl1%}
         {% for joueur in buteurs_fl1 %}
         <tr>
+            <td>{{loop.index}}</td>
             <td>{{ joueur.player_name }}</td>
             <td>{{ joueur.team_name }}</td>
             <td>{{ joueur.goals }}</td>
         </tr>
         {% endfor %}
     </table>
+ {% else %}
+            <p style="text-align:center;">Aucun résultat disponible.</p>
+        {% endif %}
 
     <h2>Bundesliga</h2>
     <table>
         <tr>
+            <th>#</th>
             <th>Joueur</th>
             <th>Club</th>
             <th>Buts</th>
         </tr>
+        {% if buteurs_bl1 %}
         {% for joueur in buteurs_bl1 %}
         <tr>
+            <td>{{loop.index}}</td>
            <td>{{ joueur.player_name }}</td>
             <td>{{ joueur.team_name }}</td>
             <td>{{ joueur.goals }}</td>
         </tr>
         {% endfor %}
     </table>
-
+        {% else %}
+            <p style="text-align:center;">Aucun résultat disponible.</p>
+        {% endif %}
 {% endblock %}

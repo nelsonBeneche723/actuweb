@@ -5,15 +5,31 @@
 {% block content %}
 
 <style>
-.matchs-termines {
+/* Styles généraux */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
     background-color: #f5f5f5;
-    padding: 20px;
 }
 
+.matchs-termines {
+    padding: 40px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+    font-weight: 500;
+}
+
+/* Styles de la grille des matchs */
 .match-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-gap: 20px;
+    grid-gap: 30px;
 }
 
 .match-item {
@@ -31,7 +47,7 @@
 
 .match-item p {
     margin: 5px 0;
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
 }
 
@@ -51,9 +67,37 @@
     color: #999;
 }
 
-@media (max-width: 600px) {
+/* Styles responsives */
+@media (max-width: 1024px) {
+    .match-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .matchs-termines {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
     .match-container {
         grid-template-columns: repeat(2, 1fr);
+        grid-gap: 20px;
+    }
+
+    .match-item {
+        padding: 16px;
+    }
+
+    .match-item p {
+        font-size: 14px;
+    }
+
+    .match-item p:first-child {
+        font-size: 16px;
     }
 }
 </style>
@@ -70,7 +114,8 @@
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
                 <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
-                <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+                <p>📅 {{ match.date }} </p>
+                <p>{{match.heure}} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
@@ -87,7 +132,8 @@
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
                 <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
-                <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+                <p>📅 {{ match.date }} </p>
+                <p>{{match.heure}} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
@@ -104,7 +150,8 @@
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
                 <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
-                <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+                 <p>📅 {{ match.date }} </p>
+                <p>{{match.heure}} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
@@ -121,7 +168,8 @@
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
                 <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
-                <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+                 <p>📅 {{ match.date }} </p>
+                <p>{{match.heure}} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
@@ -138,7 +186,8 @@
                 <p><strong>{{ match.home }}</strong> {{ match.score }} <strong>{{ match.away }}</strong></p>
                 <p>Match Terminé</p>
                 <p>🏆 {{ match.competition }} </p>
-                <p>📅 {{ match.date }} Heure Port-au-Prince</p>
+                <p>📅 {{ match.date }} </p>
+                <p>{{match.heure}} Heure Port-au-Prince</p>
             </div>
             {% endfor %}
         {% else %}
