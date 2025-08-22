@@ -594,7 +594,12 @@ def calendriermatch():
                     home = match['homeTeam']['name']
                     away = match['awayTeam']['name']
                     grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
-                return resultat, None
+                    # ✅ Affichage
+                for date, comps in grouped_matches.items():
+                    for comp, matchs in comps.items():
+                        for m in matchs:
+                            resultat.append({"date": date, 'competition': comp, 'match': m})
+                return resultat
             else:
                 print("Aucun match disponible.")
     except Exception as e:
@@ -632,7 +637,7 @@ def matchsencours_premierleague():
                     'competition': competition,
                     'minutes': minutes
                 })
-            return resultat_mpl, None
+            return resultat_mpl
     except Exception as e:
         return None, str(e)
 
@@ -668,7 +673,7 @@ def matchsencours_liga():
                     'competition': competition,
                     'minutes': minutes
                 })
-            return resultat_mpd, None
+            return resultat_mpd
     except Exception as e:
         return None, str(e)
 
@@ -703,7 +708,7 @@ def matchsencours_seriea():
                     'competition': competition,
                     'minutes': minutes
                 })
-            return resultat_msa, None
+            return resultat_msa
     except Exception as e:
         return None, str(e)
 
@@ -739,7 +744,7 @@ def matchsencours_bundesliga():
                     'competition': competition,
                     'minutes': minutes
                 })
-            return resultat_mbl1, None
+            return resultat_mbl1
     except Exception as e:
         return None, str(e)
 
@@ -774,17 +779,18 @@ def matchsencours_ligue1():
                     'competition': competition,
                     'minutes': minutes
                 })
-            return resultat_mfl1, None
+            return resultat_mfl1
+
     except Exception as e:
         return None, str(e)
 
-def matchtermine(championnat):
+def matchtermine_pl():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
-    url = f'https://api.football-data.org/v4/competitions/{championnat}/matches?status=FINISHED'
+    url = f'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    resultat = []
+    resultat_tpl = []
     data = response.json()
     try:
         if response.status_code == 200:
@@ -801,7 +807,7 @@ def matchtermine(championnat):
                 status = match['status']  # SCHEDULED, FINISHED, etc.
                 competition = match['competition']['name']
                 # dictionnaire de donnees
-                resultat.append({
+                resultat_tpl.append({
                     'home': home_team,
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
@@ -809,7 +815,7 @@ def matchtermine(championnat):
                     'date': localdate,
                     'competition': competition
                 })
-            return resultat, None
+            return resultat_tpl
     except Exception as e:
         return None, str(e)
 
@@ -1172,7 +1178,6 @@ def musiques():
 @app.route('/sports/score-en-direct')
 def matchsencours():
     resultat_mpl, resultat_sa, resultat_fl1, resultat_mpd, resultat_bl1 = None, None, None, None, None
-
     try:
         resultat_mpl = matchsencours_premierleague()
         resultat_sa = matchsencours_seriea()
@@ -1181,7 +1186,6 @@ def matchsencours():
         resultat_mpd = matchsencours_liga()
     except Exception as e:
         print('erreur')
-
     return render_template('score.html', section='championnat', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
                            resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
 # ✅ Route AJAX pour afficher l'heure
@@ -1205,20 +1209,17 @@ def heure_actuelle():
 def matchtermineEnd():
     resultat_tpl, resultat_tsa, resultat_tlig, resultat_tlig1, resultat_tligb = None, None, None, None, None
     try:
-        resultat_tpl = matchtermine('PL')
-        resultat_tlig = matchtermine("PD")
-        resultat_tsa = matchtermine('SA')
-        resultat_tlig1 = matchtermine("FL1")
-        resultat_tligb = matchtermine("BL1")
-
+        resultat_tpl = matchtermine_pl()
+        resultat_tlig = matchtermine_liga()
+        resultat_tsa = matchtermine_seriea()
+        resultat_tlig1 = matchtermine_ligue1()
+        resultat_tligb = matchtermine_bundesliga()
     except Exception as e:
         print('Pas de donnees..')
-    return render_template("match.html",
-                           resultat_tpl=resultat_tpl,
-                           resultat_tlig=resultat_tlig,
-                           resultat_tsa=resultat_tsa,
-                           resultat_tlig1=resultat_tlig1,
-                           resultat_tligb=resultat_tligb)
+    return render_template("match.html", resultat_tpl=resultat_tpl,
+                           resultat_tlig=resultat_tlig, resultat_tsa=resultat_tsa,
+                           resultat_tlig1=resultat_tlig1, resultat_tligb=resultat_tligb)
+
 
 @app.route('/sports/classement-buteurs')
 def recuperertousbuteurs():
