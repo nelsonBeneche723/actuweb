@@ -1429,7 +1429,6 @@ def playvideosyoutube():
             videosyoutube.append({"id": video['id'],"titre": video['snippet']['title'],
                                   'artiste':video['snippet']['channelTitle'],"vues": video['statistics'].get('viewCount', 'N/A')
                                   })
-        return videosyoutube
     except Exception as e:
         print(f'erreur {str(e)}')
     return render_template('videosyoutube.html', videosyoutube=videosyoutube)
@@ -1574,4 +1573,5 @@ def searchmusic():
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
+
 
