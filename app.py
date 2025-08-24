@@ -21,14 +21,10 @@ import matplotlib.pyplot as plt
 import matplotlib
 import lyricsgenius
 from googleapiclient.discovery import build
-
-# load_dotenv('/home/Beneche123/mysite/.env')
+from babel.dates import format_date
 load_dotenv()
 app = Flask(__name__)
-# app.secret_key = secrets.token_hex(16)
-# csrf = CSRFProtect(app)
-# lien vers la base de donnees
-# lien_database = '/home/Beneche123/mysite/nbinfo_music.db'
+
 lien_database = 'musique_bunny.db'
 
 
@@ -480,7 +476,6 @@ def infos_sports():
     except Exception as e:
         print(f'Erreur API Sports...{e}')
 
-
 def affichermusique_genre(genre):
     resultcompas = []
     connection = sqlite3.connect(lien_database)
@@ -491,7 +486,6 @@ def affichermusique_genre(genre):
         resultcompas.append({'id': row[0],'titre': row[5], 'auteur': row[5],'musique':row[4], 'image': row[6]})
     print("d'accord: musiques compas", resultcompas)
     return resultcompas
-
 
 def affichermusique_afrobeat():
     genre = 'afrobeat'
@@ -505,7 +499,6 @@ def affichermusique_afrobeat():
     print("Affichage: Musiques Afrobeat")
     return resultafro
 
-
 def affichermusique_evangelique():
     genre = 'evangelique'
     resultafro = []
@@ -517,7 +510,6 @@ def affichermusique_evangelique():
         resultafro.append({'id': row[0],'titre': row[5], 'auteur': row[5],'musique':row[4], 'image': row[6]})
     print("d'accord: musiques evangeliques..")
     return resultafro
-
 
 def affichermusique_rap():
     genre = 'rap'
@@ -547,7 +539,6 @@ def afficherpluscontenu(id, genre):
     print("Affichage: Musiques Afrobeat...")
     return resultrap
 
-
 def recuperer_info_utilisateur():
     # ip = request.headers.get('X-Forwarded-For', request.remote_addr) # On récupère de l'adresse ip de hote
     # utilisation d'une autre methode de recuperation des donnees des visiteurs
@@ -572,7 +563,7 @@ def calendriermatch():
     API_KEY = os.getenv('api_key_sports')
     url = 'https://api.football-data.org/v4/matches'
     headers = {'X-Auth-Token': API_KEY}
-    response = requests.get(url, headers=headers, timeout=10)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     resultat = []
     try:
@@ -588,23 +579,22 @@ def calendriermatch():
                     dt_utc = match['utcDate'] # format date: 2021-09-09T19:01:00Z
                     date_formate = datetime.strptime(dt_utc, '%Y-%m-%dT%H:%M:%SZ')
                     py_tz = pytz.timezone('America/Port-au-Prince')
-                    dt = date_formate.astimezone(py_tz)
-                    date_d = (dt - timedelta(hours=4))
-                    date_str = date_d.strftime('%d %B %Y')   # ex: 26 April 2025
-                    # changer la valeur du mois en francais
-                    traduc = GoogleTranslator(source='en', target='fr')
-                    date_str = traduc.translate(date_str)
-                    time_str = date_d.strftime('%H:%M')
-                    # competitions (nom competition, domicile, a l'exterieur)
+                    localdate = date_formate.astimezone(py_tz)
+                    localdate = localdate - timedelta(hours=4)
+                    date = localdate.date()
+                    # convertir par exemple august=aout
+                    date_f = format_date(date, format='d MMMM y', locale='fr')
+                    time_str = localdate.time().strftime('%H:%M')
+                    # competitions (nom competition, domicile, a l'extérieur)
                     competition = match['competition']['name']
                     home = match['homeTeam']['name']
                     away = match['awayTeam']['name']
-                    grouped_matches[date_str][competition].append(f"{time_str} — {home} vs {away}")
+                    grouped_matches[date_f][competition].append(f"{time_str} — {home} vs {away}")
                     # ✅ Affichage
-                for date, comps in grouped_matches.items():
+                for date_f, comps in grouped_matches.items():
                     for comp, matchs in comps.items():
                         for m in matchs:
-                            resultat.append({"date": date, 'competition': comp, 'match': m})
+                            resultat.append({"date": f"{date_f}", 'competition': comp, 'match': m})
                 return resultat
             else:
                 print("Aucun match disponible.")
@@ -630,6 +620,14 @@ def matchsencours_premierleague():
                 score_away = match['score']['fullTime']['away']
                 # date
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.date()
+                # convertir par exemple august=aout
+                date_f = format_date(date, format='d MMMM y', locale='fr')
+                heure_utc = localdate.time().strftime('%H:%M')
                 status = match['status']  # SCHEDULED, FINISHED, e`tc.
                 competition = match['competition']['name']
                 minutes = match['score']['duration']
@@ -639,7 +637,7 @@ def matchsencours_premierleague():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': utc_date,
+                    'date': f"{date_f}/{heure_utc}",
                     'competition': competition,
                     'minutes': minutes
                 })
@@ -666,6 +664,14 @@ def matchsencours_liga():
                 score_away = match['score']['fullTime']['away']
                 # date
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.date()
+                # convertir par exemple august=aout
+                date_f = format_date(date, format='d MMMM y', locale='fr')
+                heure_utc = localdate.time().strftime('%H:%M')
                 status = match['status']  # SCHEDULED, FINISHED, e`tc.
                 competition = match['competition']['name']
                 minutes = match['score']['duration']
@@ -675,7 +681,7 @@ def matchsencours_liga():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': utc_date,
+                    'date': f'{date_f}/{heure_utc}',
                     'competition': competition,
                     'minutes': minutes
                 })
@@ -701,6 +707,14 @@ def matchsencours_seriea():
                 score_away = match['score']['fullTime']['away']
                 # date
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.date()
+                # convertir par exemple august=aout
+                date_f = format_date(date, format='d MMMM y', locale='fr')
+                heure_utc = localdate.time().strftime('%H:%M')
                 status = match['status']  # SCHEDULED, FINISHED, e`tc.
                 competition = match['competition']['name']
                 minutes = match['score']['duration']
@@ -710,7 +724,7 @@ def matchsencours_seriea():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': utc_date,
+                    'date': f'{date_f}/{heure_utc}',
                     'competition': competition,
                     'minutes': minutes
                 })
@@ -737,6 +751,14 @@ def matchsencours_bundesliga():
                 score_away = match['score']['fullTime']['away']
                 # date
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.date()
+                # convertir par exemple august=aout
+                date_f = format_date(date, format='d MMMM y', locale='fr')
+                heure_utc = localdate.time().strftime('%H:%M')
                 status = match['status']  # SCHEDULED, FINISHED, e`tc.
                 competition = match['competition']['name']
                 minutes = match['score']['duration']
@@ -746,7 +768,7 @@ def matchsencours_bundesliga():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': utc_date,
+                    'date': f'{date_f}/{heure_utc}',
                     'competition': competition,
                     'minutes': minutes
                 })
@@ -772,6 +794,14 @@ def matchsencours_ligue1():
                 score_away = match['score']['fullTime']['away']
                 # date
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
+                date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
+                py_tz = pytz.timezone('America/Port-au-Prince')
+                localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
+                date = localdate.date()
+                # convertir par exemple august=aout
+                date_f = format_date(date, format='d MMMM y', locale='fr')
+                heure_utc = localdate.time().strftime('%H:%M')
                 status = match['status']  # SCHEDULED, FINISHED, e`tc.
                 competition = match['competition']['name']
                 minutes = match['score']['duration']
@@ -781,7 +811,7 @@ def matchsencours_ligue1():
                     'away': away_team,
                     'score': f"{score_home} - {score_away}",
                     'status': status,
-                    'date': utc_date,
+                    'date': f'{date_f}/{heure_utc}',
                     'competition': competition,
                     'minutes': minutes
                 })
@@ -795,11 +825,10 @@ def matchtermine_pl():
     url = f'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
     response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    resultat_tpl = []
     data = response.json()
     try:
         if response.status_code == 200:
+            resultat_tpl = []
             for match in data.get('matches', []):
                 home_team = match['homeTeam']['name']
                 away_team = match['awayTeam']['name']
@@ -811,12 +840,10 @@ def matchtermine_pl():
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = utc_date.astimezone(py_tz)
                 localdate = localdate - timedelta(hours=4)
-                date = localdate.strftime('%d %B %Y')
+                date = localdate.date()
                 # convertir par exemple august=aout
-                traduc_date =  GoogleTranslator(source='en', target='fr')
-                date_f = traduc_date.translate(date)
+                date_f = format_date(date, format='d MMMM y', locale='fr')
                 heure = localdate.strftime('%H:%M')
-
                 status = match['status']  # SCHEDULED, FINISHED, etc.
                 competition = match['competition']['name']
                 # dictionnaire de donnees
@@ -830,8 +857,11 @@ def matchtermine_pl():
                     'competition': competition
                 })
             return resultat_tpl
+        else:
+            print('echec')
+
     except Exception as e:
-        return None, str(e)
+        print("Erreur :")
 
 def matchtermine_liga():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
@@ -853,10 +883,9 @@ def matchtermine_liga():
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
             localdate = localdate - timedelta(hours=4)
-            date = localdate.strftime('%d %B %Y')
+            date = localdate.date()
             # convertir par exemple august=aout
-            traduc_date = GoogleTranslator(source='en', target='fr')
-            date_f = traduc_date.translate(date)
+            date_f = format_date(date, format='d MMMM y', locale='fr')
             heure = localdate.strftime('%H:%M')
 
             status = match['status']  # SCHEDULED, FINISHED, etc.
@@ -879,7 +908,6 @@ def matchtermine_seriea():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/SA/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
-
     response = requests.get(url, headers=headers)
     resultat_tsa = []
 
@@ -896,10 +924,10 @@ def matchtermine_seriea():
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
             localdate = localdate - timedelta(hours=4)
-            date = localdate.strftime('%d %B %Y')
+            date = localdate.date()
             # convertir par exemple august=aout
-            traduc_date = GoogleTranslator(source='en', target='fr')
-            date_f = traduc_date.translate(date)
+            date_f = format_date(date, format='d MMMM y', locale='fr')
+
             heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
@@ -921,7 +949,6 @@ def matchtermine_ligue1():
     API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/FL1/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
-
     response = requests.get(url, headers=headers)
     resultat_tlig1 = []
 
@@ -939,10 +966,9 @@ def matchtermine_ligue1():
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
             localdate = localdate - timedelta(hours=4)
-            date = localdate.strftime('%d %B %Y')
+            date = localdate.date()
             # convertir par exemple august=aout
-            traduc_date = GoogleTranslator(source='en', target='fr')
-            date_f = traduc_date.translate(date)
+            date_f = format_date(date, format='d MMMM y', locale='fr')
             heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
@@ -979,19 +1005,18 @@ def recupererscorejoueur(championnat):
                     'team_name': team_name,
                     'goals': goals
                 })
-        return resultat
+            return resultat
+        else:
+            print('Erreur de reponse')
     except Exception as e:
         print(f"Erreur API{e}")
-
 
 def matchtermine_bundesliga():
     API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/BL1/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
-
     response = requests.get(url, headers=headers)
     resultat_tligb = []
-
     if response.status_code == 200:
         data = response.json()
         for match in data['matches']:
@@ -1004,14 +1029,13 @@ def matchtermine_bundesliga():
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
             localdate = localdate - timedelta(hours=4)
-            date = localdate.strftime('%d %B %Y')
+            date = localdate.date()
             # convertir par exemple august=aout
-            traduc_date = GoogleTranslator(source='en', target='fr')
-            date_f = traduc_date.translate(date)
+            date_f = format_date(date, format='d MMMM y', locale='fr')
             heure = localdate.strftime('%H:%M')
             status = match['status']  # SCHEDULED, FINISHED, etc.
             competition = match['competition']['name']
-
+            # ajouter le resultat
             resultat_tligb.append({
                 'home': home_team,
                 'away': away_team,
@@ -1090,7 +1114,6 @@ def stationradio():    # Récupération des stations par défaut
 
     return render_template('stationradio.html',sections=sections,stat=stat, nomstations=nomstations)
 
-
 @app.route('/assistant-ia', methods=['GET','POST'])
 def assistanceai():
     genai.configure(api_key=os.getenv('GEMINI_APIKEY'))
@@ -1110,7 +1133,6 @@ def assistanceai():
             reponses.append({'reponse': f"Erreur : {str(e)}"})
 
     return render_template('assistanceai.html', reponses=reponses)
-
 
 @app.route('/meteo', methods=['GET','POST'])
 def affichermeteo():
@@ -1156,6 +1178,26 @@ def affichermeteo():
 
     return render_template('meteo.html', meteos=meteos)
 
+@app.route('/music')
+def musiques():
+    resultcompas = affichermusique_genre('compas')
+    resultafro = affichermusique_genre('afrobeat')
+    resultevangelique = affichermusique_genre("evangelique")
+    return render_template('musiques.html', resultcompas=resultcompas, resultafro=resultafro, resultevangelique=resultevangelique)
+
+@app.route('/sports/score-en-direct')
+def matchsencours():
+    resultat_mpl, resultat_sa, resultat_fl1, resultat_mpd, resultat_bl1 = None, None, None, None, None
+    try:
+        resultat_mpl = matchsencours_premierleague()
+        resultat_sa = matchsencours_seriea()
+        resultat_fl1 = matchsencours_ligue1()
+        resultat_bl1 = matchsencours_bundesliga()
+        resultat_mpd = matchsencours_liga()
+    except Exception as e:
+        print('erreur')
+    return render_template('score.html', section='championnat', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
+                           resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
 
 @app.route('/sports')
 def sportactualites():
@@ -1189,14 +1231,6 @@ def sportactualites():
         data = f'Classement du championnat {championnat}'
         classementallemagne, image_base64 = classementchampionnat_allemagne()
         match_all_auj, match_all_dem = calendrier_allemagne()
-    # elif section == "score-en-direct":
-    #     section = "score-en-direct"
-    #     resultat_mpl = matchsencours_premierleague()
-    #     print(resultat_mpl)
-        # resultat_mpd = matchsencours_liga()
-        # resultat_msa = matchsencours_seriea()
-        # resultat_mbl1 = matchsencours_bundesliga()
-        # resultat_mfl1 = matchsencours_ligue1()
     elif section == "calendrier-matchs":
         data = "⚽ Calendrier des matchs"
         resultat = calendriermatch()
@@ -1208,26 +1242,6 @@ def sportactualites():
                            match_ita_auj=match_ita_auj, match_ita_dem=match_ita_dem, classementallemagne=classementallemagne,match_all_auj=match_all_auj, match_all_dem=match_all_dem,
                            resultat=resultat, section=section, resultat_mpl=resultat_mpl)
 
-@app.route('/music')
-def musiques():
-    resultcompas = affichermusique_genre('compas')
-    resultafro = affichermusique_genre('afrobeat')
-    resultevangelique = affichermusique_genre("evangelique")
-    return render_template('musiques.html', resultcompas=resultcompas, resultafro=resultafro, resultevangelique=resultevangelique)
-
-@app.route('/sports/score-en-direct')
-def matchsencours():
-    resultat_mpl, resultat_sa, resultat_fl1, resultat_mpd, resultat_bl1 = None, None, None, None, None
-    try:
-        resultat_mpl = matchsencours_premierleague()
-        resultat_sa = matchsencours_seriea()
-        resultat_fl1 = matchsencours_ligue1()
-        resultat_bl1 = matchsencours_bundesliga()
-        resultat_mpd = matchsencours_liga()
-    except Exception as e:
-        print('erreur')
-    return render_template('score.html', section='championnat', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
-                           resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
 # ✅ Route AJAX pour afficher l'heure
 @app.route('/heure')
 def heure_actuelle():
@@ -1255,11 +1269,10 @@ def matchtermineEnd():
         resultat_tlig1 = matchtermine_ligue1()
         resultat_tligb = matchtermine_bundesliga()
     except Exception as e:
-        print('Pas de donnees..')
+        print(f'Pas de donnees..{str(e)}')
     return render_template("match.html", resultat_tpl=resultat_tpl,
                            resultat_tlig=resultat_tlig, resultat_tsa=resultat_tsa,
                            resultat_tlig1=resultat_tlig1, resultat_tligb=resultat_tligb)
-
 
 @app.route('/sports/classement-buteurs')
 def recuperertousbuteurs():
@@ -1412,15 +1425,13 @@ def playvideosyoutube():
     videosyoutube = []
     # Afficher les informations sur les vidéos le plus populaire sur youtube
     try:
-        if response.status_code==200:
-            for video in response['items']:
-                    videosyoutube.append({"id": video['id'],"titre": video['snippet']['title'],'artiste':video['snippet']['channelTitle'],
-                                          "vues": video['statistics'].get('viewCount', 'N/A')
-                                          })
-        else:
-            print('erreur lors de la recuperation de donnees..')
+        for video in response['items']:
+            videosyoutube.append({"id": video['id'],"titre": video['snippet']['title'],
+                                  'artiste':video['snippet']['channelTitle'],"vues": video['statistics'].get('viewCount', 'N/A')
+                                  })
+        return videosyoutube
     except Exception as e:
-        print(f'erreur API {e}')
+        print(f'erreur {str(e)}')
     return render_template('videosyoutube.html', videosyoutube=videosyoutube)
 
 @app.route('/sciences')
