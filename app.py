@@ -22,11 +22,11 @@ import matplotlib
 import lyricsgenius
 from googleapiclient.discovery import build
 from babel.dates import format_date
+
 load_dotenv()
 app = Flask(__name__)
-
+app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
-
 
 def aff_stationradio():
     # Dictionnaire avec des flux de radio et des images
@@ -822,14 +822,15 @@ def matchsencours_ligue1():
 
 def matchtermine_pl():
     API_KEY = os.getenv('api_key_sports') # Remplace par ta vraie clé API
-    url = f'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
+    url = 'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
     response = requests.get(url, headers=headers)
     data = response.json()
     try:
         if response.status_code == 200:
             resultat_tpl = []
-            for match in data.get('matches', []):
+            derniers = sorted(data['matches'], key=lambda x:x['utcDate'], reverse=True)[:10]
+            for match in derniers:
                 home_team = match['homeTeam']['name']
                 away_team = match['awayTeam']['name']
                 score_home = match['score']['fullTime']['home']
@@ -868,11 +869,11 @@ def matchtermine_liga():
     url = 'https://api.football-data.org/v4/competitions/PD/matches?status=FINISHED'
     headers = {'X-Auth-Token': API_KEY}
     response = requests.get(url, headers=headers)
+    data = response.json()
     resultat_tlig = []
-
+    derniers = sorted(data['matches'], key=lambda x: x['utcDate'], reverse=True)[:10]
     if response.status_code == 200:
-        data = response.json()
-        for match in data['matches']:
+        for match in derniers:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
             score_home = match['score']['fullTime']['home']
@@ -913,7 +914,8 @@ def matchtermine_seriea():
 
     if response.status_code == 200:
         data = response.json()
-        for match in data['matches']:
+        derniers = sorted(data['matches'], key=lambda x: x['utcDate'], reverse=True)[:10]
+        for match in derniers:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
             score_home = match['score']['fullTime']['home']
@@ -954,7 +956,8 @@ def matchtermine_ligue1():
 
     if response.status_code == 200:
         data = response.json()
-        for match in data['matches']:
+        derniers = sorted(data['matches'], key=lambda x: x['utcDate'], reverse=True)[:10]
+        for match in derniers:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
 
@@ -1019,7 +1022,8 @@ def matchtermine_bundesliga():
     resultat_tligb = []
     if response.status_code == 200:
         data = response.json()
-        for match in data['matches']:
+        derniers = sorted(data['matches'], key=lambda x: x['utcDate'], reverse=True)[:10]
+        for match in derniers:
             home_team = match['homeTeam']['name']
             away_team = match['awayTeam']['name']
             score_home = match['score']['fullTime']['home']
@@ -1499,7 +1503,6 @@ def livetv():
     # transmettre les donnees du tv vers la page livetv.html
     return render_template('livetv.html', channeltv=tv)
 
-
 @app.route('/watch-tv/<nomtele>')
 def lecturestreaming_tv(nomtele):
     chaines_tv_en_direct = {"tele eclair":['https://acwstream.com/hb/chaine04live/index.fmp4.m3u8','https://is3-ssl.mzstatic.com/image/thumb/Purple125/v4/29/46/dc/2946dcfb-3789-db1e-a9c6-ee87cda55bb3/source/256x256bb.jpg'],
@@ -1538,7 +1541,6 @@ def lecturestreaming_tv(nomtele):
     print(urltele)
     return render_template('watchtv.html', channel_tv=urltele, nomtele=str(nomtele).replace('-', ' '), autres_chaines=recommandations)
 
-
 @app.route('/search', methods=['POST','GET'])
 def searchmusic():
     query_mus = []
@@ -1573,5 +1575,4 @@ def searchmusic():
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
-
 
