@@ -580,7 +580,7 @@ def calendriermatch():
                     date_formate = datetime.strptime(dt_utc, '%Y-%m-%dT%H:%M:%SZ')
                     py_tz = pytz.timezone('America/Port-au-Prince')
                     localdate = date_formate.astimezone(py_tz)
-                    localdate = localdate - timedelta(hours=4)
+                    localdate = localdate + timedelta(hours=4)
                     date = localdate.date()
                     # convertir par exemple august=aout
                     date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -623,7 +623,7 @@ def matchsencours_premierleague():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -667,7 +667,7 @@ def matchsencours_liga():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -710,7 +710,7 @@ def matchsencours_seriea():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -754,7 +754,7 @@ def matchsencours_bundesliga():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -797,7 +797,7 @@ def matchsencours_ligue1():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -840,7 +840,7 @@ def matchtermine_pl():
                 utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = utc_date.astimezone(py_tz)
-                localdate = localdate - timedelta(hours=4)
+                localdate = localdate + timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -883,7 +883,7 @@ def matchtermine_liga():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = localdate - timedelta(hours=4)
+            localdate = localdate + timedelta(hours=4)
             date = localdate.date()
             # convertir par exemple august=aout
             date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -925,7 +925,7 @@ def matchtermine_seriea():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = localdate - timedelta(hours=4)
+            localdate = localdate + timedelta(hours=4)
             date = localdate.date()
             # convertir par exemple august=aout
             date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -968,7 +968,7 @@ def matchtermine_ligue1():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = localdate - timedelta(hours=4)
+            localdate = localdate + timedelta(hours=4)
             date = localdate.date()
             # convertir par exemple august=aout
             date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -1032,7 +1032,7 @@ def matchtermine_bundesliga():
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
-            localdate = localdate - timedelta(hours=4)
+            localdate = localdate + timedelta(hours=4)
             date = localdate.date()
             # convertir par exemple august=aout
             date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -1575,4 +1575,5 @@ def searchmusic():
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
+
 
