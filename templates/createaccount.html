@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title%} Creation de compte | Actu Web {% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="register-container">
+      <h1>Créer un compte 🎶</h1>
+
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+      <form method="POST" action="">
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur :</label>
+          <input type="text" id="username" name="username" placeholder="Ex: fan_de_compas" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email :</label>
+          <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe :</label>
+          <input type="password" id="password" name="password" placeholder="********" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password">Confirmer le mot de passe :</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="********" required>
+        </div>
+
+        <button type="submit" class="btn">Créer un compte</button>
+      </form>
+
+      <div class="already-account">
+        <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

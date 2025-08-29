@@ -408,6 +408,10 @@ body {
 <!--Sidebar-->
 <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 <div class="sidebar" id="mySidebar">
+<!--    afficher le nom de session utilisateur-->
+    {% if 'user' in session %}
+        <h2>Bienvenue, {{ session['user'] }} !</h2>
+    {% endif %}
         <h2>Musique</h2>
         <ul>
             <li> <a href="{{url_for('musiques')}}"><span class="icon">🎵</span><strong>Accueil</strong></a></li>
@@ -558,7 +562,7 @@ function toggleSidebar() {
 
   // Fermer la modale si on clique en dehors
   window.onclick = function(event) {
-    const modal = document.getElementById("modal");
+    const modal = document.getElementById("modal"); //recuperation de l'id//
     if (event.target === modal) {
       modal.style.display = "none";
     }
