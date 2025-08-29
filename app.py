@@ -1,7 +1,7 @@
 import datetime
 import time
 from pyradios import RadioBrowser
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import os
 import requests
 from dotenv import load_dotenv  # Pour lire les fichiers de type (. env)
@@ -25,6 +25,8 @@ from babel.dates import format_date
 
 load_dotenv()
 app = Flask(__name__)
+# Generer un cle secret
+app.secret_key = 'tudoismefaire'
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
 
@@ -622,6 +624,7 @@ def matchsencours_premierleague():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -665,6 +668,7 @@ def matchsencours_liga():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -707,6 +711,7 @@ def matchsencours_seriea():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -750,6 +755,7 @@ def matchsencours_bundesliga():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -792,6 +798,7 @@ def matchsencours_ligue1():
                 date_ = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
                 localdate = date_.astimezone(py_tz)
+                localdate = localdate - timedelta(hours=4)
                 date = localdate.date()
                 # convertir par exemple august=aout
                 date_f = format_date(date, format='d MMMM y', locale='fr')
@@ -829,7 +836,7 @@ def matchtermine_pl():
                 away_team = match['awayTeam']['name']
                 score_home = match['score']['fullTime']['home']
                 score_away = match['score']['fullTime']['away']
-
+                # converti les dates
                 utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
                 utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
                 py_tz = pytz.timezone('America/Port-au-Prince')
@@ -872,7 +879,7 @@ def matchtermine_liga():
             score_home = match['score']['fullTime']['home']
             score_away = match['score']['fullTime']['away']
             utc_date = match['utcDate']  # format : 2025-08-07T18:00:00Z
-
+            # converti les dates
             utc_date = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
             py_tz = pytz.timezone('America/Port-au-Prince')
             localdate = utc_date.astimezone(py_tz)
@@ -1558,11 +1565,39 @@ def searchmusic():
             query_mus = "Échec de connexion à internet"
     return render_template('search.html', query=query_mus, titre=''.join(titre))
 
-
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    users = {"admin":"password"}
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username in users and users[username] == password:
+            session['user'] = username
+            return redirect(url_for('musiques'))
+        else:
+            return render_template('login.html', error='Identifiants incorrects')
+    return render_template('login.html')
 # @app.route('/sports/calendrier-match')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
+@app.route('/create-account')
+def showpageaccount():
+    return render_template('createaccount.html')
+# @app.route('/lecteurmusique', methods=['GET', 'POST'])
+# def lecteurmusique():
+#     if 'user' not in session:
+#         return redirect(url_for('login'))
+#
+#     if request.method == 'POST':
+#         comment = request.form['comment']
+#         comments.append({'user': session['user'], 'comment': comment})
+#     return render_template('lecteurmusique.html', comments=comments)
 
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
-
 
