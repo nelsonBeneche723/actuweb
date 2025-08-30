@@ -1597,6 +1597,11 @@ def showpageaccount():
 #         comments.append({'user': session['user'], 'comment': comment})
 #     return render_template('lecteurmusique.html', comments=comments)
 
+# pour ajouter l'annee dans le pied de page
+@app.context_processor
+def inject_year():
+    return {"year": datetime.now().year}
+
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
