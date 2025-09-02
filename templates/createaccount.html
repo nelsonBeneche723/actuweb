@@ -141,7 +141,7 @@
         <p class="error">{{ error }}</p>
       {% endif %}
 
-      <form method="POST" action="">
+      <form method="POST" action="/createaccount">
         <div class="form-group">
           <label for="username">Nom d'utilisateur :</label>
           <input type="text" id="username" name="username" placeholder="Ex: fan_de_compas" required>
@@ -164,10 +164,29 @@
 
         <button type="submit" class="btn">Créer un compte</button>
       </form>
-
+      {% with messages = get_flashed_messages (with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <p style="color:green;" class="info">{{category}} {{ message }}</p>
+          {% endfor %}
+      {% endif %}
+      {% endwith %}
       <div class="already-account">
         <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
       </div>
     </div>
   </div>
+
+<script>
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirm_password');
+
+  confirmPasswordInput.addEventListener('input', () => {
+    if (passwordInput.value !== confirmPasswordInput.value) {
+      confirmPasswordInput.setCustomValidity("Les mots de passe ne correspondent pas.");
+    } else {
+      confirmPasswordInput.setCustomValidity('');
+    }
+  });
+</script>
 {% endblock %}
