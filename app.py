@@ -1,7 +1,7 @@
 import datetime
 import time
 from pyradios import RadioBrowser
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 import os
 import requests
 from dotenv import load_dotenv  # Pour lire les fichiers de type (. env)
@@ -1049,6 +1049,20 @@ def matchtermine_bundesliga():
     else:
         print("Erreur :")
 
+def verifiernomutilisateur(nomutilisateur):
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select * from utilisateurs where nomutilisateur=?",(nomutilisateur,))
+    result = req.fetchone()
+    return result
+
+def verifieremail(email):
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select * from utilisateurs where email=?", (email,))
+    result = req.fetchone()
+    return result
+
 @app.route('/')
 def accueil():
     api_key = os.getenv('api_key_nouvelles')
@@ -1324,6 +1338,7 @@ def jouer_musique(musique_id, slug):
 
     try:
         genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
+        #
         result = genius.search_song(musique['titre'], musique['nom'])
         if result and result.lyrics:
             paroles = result.lyrics
@@ -1569,16 +1584,51 @@ def searchmusic():
 def login():
     users = {"admin":"password"}
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username in users and users[username] == password:
-            session['user'] = username
+        nomutilisateur = request.form.get('username')
+        motpasse = request.form.get('password')
+        connection = sqlite3.connect('musique_bunny.db')
+        cursor = connection.cursor()
+        req = cursor.execute("select * from utilisateurs where nomutilisateur=? and motpasse=?",
+                       (nomutilisateur, motpasse))
+        result = req.fetchone()
+        print(result)
+        if result is not None:
+            session['user'] = result[1]
+            # envoyer un mail à l'utilisateur a chaque fois, il est connecte
+            # methode mail()
             return redirect(url_for('musiques'))
         else:
             return render_template('login.html', error='Identifiants incorrects')
     return render_template('login.html')
 # @app.route('/sports/calendrier-match')
 
+@app.route('/createaccount', methods=['GET','POST'])
+def creationcompte():
+    if request.method == 'POST':
+        nomutilisateur = request.form.get('username')
+        email = request.form.get('email')
+        if verifiernomutilisateur(nomutilisateur) is not None:
+            return render_template('createaccount.html', error="Le nom d'utilisateur est dejà utilisé.")
+        elif verifieremail(email) is not None:
+            return render_template('createaccount.html', error="L'adresse email est dejà utilisé.")
+        # sinon
+        else:
+            motpasse = request.form.get('confirm_password')
+            date = datetime.now() # date du jour
+            d = date.date() # date du jour au format (01 sept 2025)
+            date_format_fr = format_date(d, format='d MMMM y', locale='fr')
+            connection = sqlite3.connect('musique_bunny.db')
+            cursor = connection.cursor()
+            cursor.execute("insert into utilisateurs (nomutilisateur,email,motpasse,datecreation) values (?,?,?,?)",
+                                 (nomutilisateur, email,motpasse,date_format_fr))
+            connection.commit()
+            session['user'] = nomutilisateur # session de l'utilisateur
+            info = 'creation de compte reussie'
+            # envoyer un email pour indiquer que le compte a ete cree
+            flash("Votre compte a été crée avec succès...", "success")
+            return redirect(url_for('musiques'))
+    else:
+        return render_template('createaccount.html', error='Verifier si tous les champs sont bien remplies.')
 @app.route('/logout')
 def logout():
     session.pop('user', None)
