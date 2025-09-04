@@ -2,24 +2,27 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box; /*pour ajouter des marges a gauche et a droite*/
 }
 
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
     color: #333;
+    font-size:14px;
 }
+
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
+
 /* Reset */
 
 /* Barre de navigation */
 nav {
-    background-color: #004080;
+    background: #2c3e50;
     padding: 1em;
     width: 100%;
 
@@ -177,28 +180,45 @@ p, ul {
 
 /* Sticky Footer */
 
-
 footer {
-    margin-top: auto;
-    background-color: #004080;
-    color: white;
-    text-align: center;
-    padding: 1.5em 1em;
+  background: #2c3e50;
+  color: #fff;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.footer-container h2 {
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #f1c40f;
 }
 
 .footer-container p {
-    margin: 0.5em 0;
-    font-size: 0.9em;
+  max-width: 700px;
+  margin: 0 auto 15px auto;
+  line-height: 1.6;
+  font-size: 15px;
 }
 
-.footer-container a {
-    color: #cce6ff;
-    text-decoration: none;
-    margin: 0 0.5em;
+.social-links {
+  margin: 15px 0;
 }
 
-.footer-container a:hover {
-    text-decoration: underline;
+.social-links a {
+  margin: 0 10px;
+  color: #f1c40f;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+.copy {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #bdc3c7;
 }
 
 .social-links {
