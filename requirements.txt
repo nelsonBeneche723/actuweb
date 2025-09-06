@@ -10,5 +10,6 @@ numpy
 matplotlib
 lyricsgenius
 google-api-python-client
-gunicorn
 flask-mail
+babel
+gunicorn
