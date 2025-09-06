@@ -12,7 +12,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 import pytz  # converti l'heure selon la timezone defini
 import feedparser  # pour utiliser des flux rss pour les donnees sur le web
-# import datetime
 import sqlite3
 import io
 import base64
@@ -20,15 +19,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import lyricsgenius
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build # pour les videos youtube
 from babel.dates import format_date
+from flask_mail import Mail, Message
+import hashlib
 
 load_dotenv()
 app = Flask(__name__)
-# Generer un cle secret
+
+# Générer un clé secret
 app.secret_key = 'tudoismefaire'
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
+
+# configuration de l'envoi de notification par email
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'notificationsactuwebmedia@gmail.com'
+app.config['MAIL_PASSWORD'] = 'nktkerkborxlrmlu'
+app.config['MAIL_DEFAULT_SENDER'] = ['actuwebmedia.it.com', 'notificationsactuwebmedia@gmail.com']
+
+mail = Mail(app) # instance de mail
+
+def envoyer_email(email):
+    msg = Message('Notification', recipients=[email])
+    msg.body = ('Bienvenue sur actuwebmedia, \n votre compte a été crée avec succès, \n'
+                'maintenant tu peux laisser votre commentaire sur notre site.')
+    mail.send(msg)
+    return 'Email envoyé'
 
 def aff_stationradio():
     # Dictionnaire avec des flux de radio et des images
@@ -486,7 +506,7 @@ def affichermusique_genre(genre):
     connection.commit()
     for row in cursor.fetchall():
         resultcompas.append({'id': row[0],'titre': row[5], 'auteur': row[5],'musique':row[4], 'image': row[6]})
-    print("d'accord: musiques compas", resultcompas)
+    print("d'accord: musiques compas")
     return resultcompas
 
 def affichermusique_afrobeat():
@@ -1340,7 +1360,7 @@ def jouer_musique(musique_id, slug):
         genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
         #
         result = genius.search_song(musique['titre'], musique['nom'])
-        if result and result.lyrics:
+        if result:
             paroles = result.lyrics
         else:
             paroles = "Paroles pas encore disponibles"
@@ -1614,6 +1634,7 @@ def creationcompte():
         # sinon
         else:
             motpasse = request.form.get('confirm_password')
+            motpasse = hashlib.sha256(motpasse.encode()).hexdigest()
             date = datetime.now() # date du jour
             d = date.date() # date du jour au format (01 sept 2025)
             date_format_fr = format_date(d, format='d MMMM y', locale='fr')
@@ -1623,8 +1644,11 @@ def creationcompte():
                                  (nomutilisateur, email,motpasse,date_format_fr))
             connection.commit()
             session['user'] = nomutilisateur # session de l'utilisateur
-            info = 'creation de compte reussie'
-            # envoyer un email pour indiquer que le compte a ete cree
+            # envoyer un email
+            msg = Message('Notification', recipients=[email])
+            msg.body = (f'Bienvenue {nomutilisateur},\nvotre compte a été crée avec succès, \n'
+                        'maintenant vous pouvez laisser votre commentaire sur https://actuwebmedia.it.com')
+            mail.send(msg) # methode qui renvoi l'email
             flash("Votre compte a été crée avec succès...", "success")
             return redirect(url_for('musiques'))
     else:
