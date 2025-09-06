@@ -188,5 +188,9 @@
       confirmPasswordInput.setCustomValidity('');
     }
   });
+
+  setTimeout(function(){
+      window.location.href="{{url_for('creationcompte')}}";}, 30000)
+      ;
 </script>
 {% endblock %}
