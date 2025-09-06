@@ -4,12 +4,10 @@ requests
 python-dotenv
 google-generativeai
 deep-translator
-pytz
-feedparser
+pytz feedparser
 numpy
 matplotlib
 lyricsgenius
 google-api-python-client
-babel
 gunicorn
-
+flask-mail
