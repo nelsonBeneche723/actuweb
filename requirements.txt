@@ -4,7 +4,8 @@ requests
 python-dotenv
 google-generativeai
 deep-translator
-pytz feedparser
+pytz
+feedparser
 numpy
 matplotlib
 lyricsgenius
