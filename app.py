@@ -39,16 +39,62 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'notificationsactuwebmedia@gmail.com'
 app.config['MAIL_PASSWORD'] = 'nktkerkborxlrmlu'
-app.config['MAIL_DEFAULT_SENDER'] = ['actuwebmedia.it.com', 'notificationsactuwebmedia@gmail.com']
+app.config['MAIL_DEFAULT_SENDER'] = ['💻actuwebmedia.it.com', 'notificationsactuwebmedia@gmail.com']
 
 mail = Mail(app) # instance de mail
 
 def envoyer_email(email):
     msg = Message('Notification', recipients=[email])
-    msg.body = ('Bienvenue sur actuwebmedia, \n votre compte a été crée avec succès, \n'
+    msg.body = ('Bienvenue sur actuwebmedia, \n\n votre compte a été crée avec succès, \n\n'
                 'maintenant tu peux laisser votre commentaire sur notre site.')
     mail.send(msg)
     return 'Email envoyé'
+
+def jouer_musique_aprescommentaires(musique_id, titre):
+    conn = sqlite3.connect(lien_database)
+    conn.row_factory = sqlite3.Row  # accès par nom de colonne
+    cur = conn.cursor()
+    # Recherche du titre avec slug transformé
+    titre_recherche = titre.replace('-', ' ')
+    cur.execute("SELECT * FROM musiques WHERE id=? AND titre LIKE ?", (musique_id, titre_recherche))
+    musique = cur.fetchone()
+    if not musique:
+        return '<p style="text-align:center;">Musique introuvable ou erreur du serveur..</p>', 404
+    resultatmusique = {
+        'id': musique['id'],
+        'nom': musique['nom'],
+        'url': musique['url'],
+        'titre': musique['titre'],
+        'image_url': musique['image_url'],
+        'taille': musique['taille'],
+        'date_modification': musique['date_modification'],
+        'genre': musique['genre']
+    }
+    # Recommandations par artiste ou genre
+    id = musique['id']
+    genre = musique['genre']
+    req = cur.execute('Select * from musiques where id !=? and genre=? order by random() limit 12', (id, genre))
+    recommandations = req.fetchall()
+    # Plus de contenu selon le style de musique (Rap)
+    plus_contenu_musique = afficherpluscontenu(id, genre)
+    conn.close()
+    # récupérer les paroles pour cette chanson
+    # Valeur par défaut
+    paroles = "Paroles pas encore disponibles"
+
+    try:
+        genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
+        #
+        result = genius.search_song(musique['titre'], musique['nom'])
+        if result:
+            paroles = result.lyrics
+        else:
+            paroles = "Paroles pas encore disponibles"
+    except Exception as e:
+        print(f"Erreur de connexion : {e}")
+        paroles = "Problème de connexion. Veuillez réessayer."
+
+    return resultatmusique,  recommandations, plus_contenu_musique, paroles
 
 def aff_stationradio():
     # Dictionnaire avec des flux de radio et des images
@@ -1083,6 +1129,28 @@ def verifieremail(email):
     result = req.fetchone()
     return result
 
+def inserercommentaire(id_utilisateurs,id_musiques,commentaire,date):
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    cursor.execute("insert into commentaires (id_utilisateurs,id_musiques,commentaire,date) values (?,?,?,?)",
+                   (id_utilisateurs,id_musiques,commentaire,date))
+    connection.commit()
+    print('insertion reussie..')
+    connection.close()
+
+def affichercommentaires(id_musiques):
+    affcommentaire = []
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select u.nomutilisateur, c.id_utilisateurs, c.id_musiques, c.commentaire ,"
+                         " c.date from commentaires c, utilisateurs u "
+                         "where u.id = c.id_utilisateurs and c.id_musiques=? ORDER by c.id DESC limit 20", (id_musiques,))
+    connection.commit()
+    result = req.fetchall()
+    for row in result:
+        affcommentaire.append({'nomutilisateur':row[0], 'id_utilisateurs': row[1], 'commentaires': row[3], 'date': row[4]})
+    return affcommentaire
+
 @app.route('/')
 def accueil():
     api_key = os.getenv('api_key_nouvelles')
@@ -1324,7 +1392,6 @@ def recuperertousbuteurs():
 
 @app.route('/music/<int:musique_id>/<slug>/')
 def jouer_musique(musique_id, slug):
-
     conn = sqlite3.connect(lien_database)
     conn.row_factory = sqlite3.Row  # accès par nom de colonne
     cur = conn.cursor()
@@ -1346,6 +1413,7 @@ def jouer_musique(musique_id, slug):
     }
     # Recommandations par artiste ou genre
     id = musique['id']
+    id_musiques = musique['id']
     genre = musique['genre']
     req = cur.execute('Select * from musiques where id !=? and genre=? order by random() limit 12', (id, genre))
     recommandations = req.fetchall()
@@ -1355,7 +1423,8 @@ def jouer_musique(musique_id, slug):
     # récupérer les paroles pour cette chanson
     # Valeur par défaut
     paroles = "Paroles pas encore disponibles"
-
+    # Afficher les commentaires
+    affcommentaires = affichercommentaires(id_musiques)
     try:
         genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
         #
@@ -1369,7 +1438,7 @@ def jouer_musique(musique_id, slug):
         paroles = "Problème de connexion. Veuillez réessayer."
 
     return render_template('lecteur.html', musique=resultatmusique, recommandations=recommandations,
-                           plus_contenu_musique=plus_contenu_musique, chanson=paroles)
+                           plus_contenu_musique=plus_contenu_musique, chanson=paroles,  affcommentaires= affcommentaires)
 
 @app.route('/music/trending-songs')
 def trendingsong():
@@ -1606,6 +1675,7 @@ def login():
     if request.method == 'POST':
         nomutilisateur = request.form.get('username')
         motpasse = request.form.get('password')
+        motpasse = hashlib.sha256(motpasse.encode()).hexdigest()
         connection = sqlite3.connect('musique_bunny.db')
         cursor = connection.cursor()
         req = cursor.execute("select * from utilisateurs where nomutilisateur=? and motpasse=?",
@@ -1634,7 +1704,7 @@ def creationcompte():
         # sinon
         else:
             motpasse = request.form.get('confirm_password')
-            motpasse = hashlib.sha256(motpasse.encode()).hexdigest()
+            motpasse = hashlib.sha256(motpasse.encode()).hexdigest() # encrypter le mot de passe
             date = datetime.now() # date du jour
             d = date.date() # date du jour au format (01 sept 2025)
             date_format_fr = format_date(d, format='d MMMM y', locale='fr')
@@ -1644,7 +1714,7 @@ def creationcompte():
                                  (nomutilisateur, email,motpasse,date_format_fr))
             connection.commit()
             session['user'] = nomutilisateur # session de l'utilisateur
-            # envoyer un email
+            # envoyer un email de bienvenue a l'utilisateur
             msg = Message('Notification', recipients=[email])
             msg.body = (f'Bienvenue {nomutilisateur},\nvotre compte a été crée avec succès, \n'
                         'maintenant vous pouvez laisser votre commentaire sur https://actuwebmedia.it.com')
@@ -1653,6 +1723,7 @@ def creationcompte():
             return redirect(url_for('musiques'))
     else:
         return render_template('createaccount.html', error='Verifier si tous les champs sont bien remplies.')
+
 @app.route('/logout')
 def logout():
     session.pop('user', None)
@@ -1661,22 +1732,83 @@ def logout():
 @app.route('/create-account')
 def showpageaccount():
     return render_template('createaccount.html')
-# @app.route('/lecteurmusique', methods=['GET', 'POST'])
-# def lecteurmusique():
-#     if 'user' not in session:
-#         return redirect(url_for('login'))
-#
-#     if request.method == 'POST':
-#         comment = request.form['comment']
-#         comments.append({'user': session['user'], 'comment': comment})
-#     return render_template('lecteurmusique.html', comments=comments)
 
-# pour ajouter l'annee dans le pied de page
+@app.route('/music/<int:musique_id>/<titre>/', methods=['GET', 'POST'])
+def ajoutercommentaire(musique_id, titre):
+    commentaires = []
+    resultatmusique = []
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        commentaire = request.form.get('comment')
+        # user
+        nomutilisateur = session['user']
+        connection = sqlite3.connect('musique_bunny.db')
+        cursor = connection.cursor()
+        req = cursor.execute("select id from utilisateurs where nomutilisateur=?",(nomutilisateur,))
+        result = req.fetchone()
+        id_utilisateurs = result[0] # recuperer l'id user
+        conn = sqlite3.connect(lien_database)
+        conn.row_factory = sqlite3.Row  # accès par nom de colonne
+        cur = conn.cursor()
+        # Recherche du titre avec slug transformé
+        titre_recherche = titre.replace('-', ' ')
+        cur.execute("SELECT * FROM musiques WHERE id=? AND titre LIKE ?", (musique_id, titre_recherche))
+        musique = cur.fetchone()
+        if not musique:
+            return '<p style="text-align:center;">Musique introuvable ou erreur du serveur..</p>', 404
+        resultatmusique = {
+            'id': musique['id'],
+            'nom': musique['nom'],
+            'url': musique['url'],
+            'titre': musique['titre'],
+            'image_url': musique['image_url'],
+            'taille': musique['taille'],
+            'date_modification': musique['date_modification'],
+            'genre': musique['genre']
+        }
+        # Recommandations par artiste ou genre
+        id = musique['id']
+        genre = musique['genre']
+        req = cur.execute('Select * from musiques where id !=? and genre=? order by random() limit 12', (id, genre))
+        recommandations = req.fetchall()
+        # Plus de contenu selon le style de musique (Rap)
+        plus_contenu_musique = afficherpluscontenu(id, genre)
+        conn.close()
+        # récupérer les paroles pour cette chanson
+        # Valeur par défaut
+        paroles = "Paroles pas encore disponibles"
+        # Afficher les commentaires
+        id_musiques = musique['id']
+        affcommentaires = affichercommentaires(id_musiques) # methode affichage de commentaires
+        # date du jour
+        dat = datetime.now()
+        date = dat.strftime('%d-%m-%Y %H:%M') # changer le format en date et heure
+        try:
+            genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
+            #
+            result = genius.search_song(musique['titre'], musique['nom'])
+            if result:
+                paroles = result.lyrics
+            else:
+                paroles = "Paroles pas encore disponibles"
+        except Exception as e:
+            print(f"Erreur de connexion : {e}")
+            paroles = "Problème de connexion. Veuillez réessayer."
+
+        commentaires.append({'nomutilisateur': session['user'], 'commentaires': commentaire, 'date': date}) # pour afficher de votre dernier commentaire
+        inserercommentaire(id_utilisateurs, id_musiques, commentaire, date) # insertion de commentaire dans une base
+        return render_template('lecteur.html', commentaires=commentaires, affcommentaires=affcommentaires, musique=resultatmusique, recommandations=recommandations,
+                           plus_contenu_musique=plus_contenu_musique, chanson=paroles)
+    else:
+        print('commentaire non envoye..')
+
+# pour ajouter l'année dans le pied de page
 @app.context_processor
 def inject_year():
     return {"year": datetime.now().year}
 
 # fonction principale
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)
+    app.run(debug=True, use_reloader=True, port=5001)
 
