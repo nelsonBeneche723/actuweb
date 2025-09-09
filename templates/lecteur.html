@@ -475,20 +475,6 @@ img {
     padding: 10px 20px;
   }
 }
-
-.comments-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.comments-list li {
-  background-color: #f1f1f1;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
 /* Styles pour les écrans mobiles */
 @media (max-width: 767px) {
   .comment-form {
@@ -506,6 +492,40 @@ img {
         max-width: 100%;
       }
     }
+
+    .comments-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.comments-list li {
+  background-color: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.comments-list .comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.comments-list .user {
+  font-weight: bold;
+}
+
+.comments-list .date {
+  font-size: 14px;
+  color: #888;
+}
+
+.comments-list .comment-content {
+  line-height: 1.5;
+}
 
 </style>
 
@@ -545,9 +565,9 @@ img {
         {% endif %}
 
     <div class="comments-section">
-        <h2>Commentaires</h2>
       {% if 'user' in session %}
-        <form class="comment-form" method="post" action="/login">
+
+        <form class="comment-form" method="post" action="{{url_for('ajoutercommentaire', musique_id=musique.id,titre=musique.titre|replace(' ','-')) }}">
             <label for="comment">Ajouter un commentaire :</label>
             <textarea name="comment" id="comment" rows="5" cols="70" required></textarea>
             <button type="submit">Envoyer</button>
@@ -555,13 +575,34 @@ img {
         {% else %}
         <p>Vous devez vous <a href="{{ url_for('login') }}">connecter</a> pour ajouter un commentaire.</p>
         {% endif %}
-
-        <ul class="comments-list">
-            {% for comment in comments %}
-            <li>{{ comment.user }} : {{ comment.comment }}</li>
-            {% endfor %}
-        </ul>
     </div>
+
+    <h3>Commentaires</h3>
+       <ul class="comments-list">
+    {% for commentaire in commentaires %}
+  <li>
+    <div class="comment-header">
+      <div class="user"> 👤 {{ commentaire.nomutilisateur }}</div>
+    </div>
+    <div class="comment-content">{{ commentaire.commentaires }}</div>
+       <div class="date">Date: {{commentaire.date}}</div>
+  </li>
+  {% endfor %}
+</ul>
+
+ <ul class="comments-list">
+    {% for commentaire in affcommentaires %}
+  <li>
+    <div class="comment-header">
+      <div class="user"> 👤 {{ commentaire.nomutilisateur }}</div>
+    </div>
+    <div class="comment-content">{{ commentaire.commentaires }}</div>
+       <div class="date">Date: {{commentaire.date}}</div>
+  </li>
+  {% endfor %}
+</ul>
+
+
     <a href="{{ url_for('logout') }}">Se déconnecter</a>
 
 
