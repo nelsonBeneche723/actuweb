@@ -45,8 +45,12 @@ mail = Mail(app) # instance de mail
 
 def envoyer_email(email):
     msg = Message('Notification', recipients=[email])
-    msg.body = ('Bienvenue sur actuwebmedia, \n\n votre compte a été crée avec succès, \n\n'
-                'maintenant tu peux laisser votre commentaire sur notre site.')
+    msg.body = ("Cher nouvel utilisateur,Nous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.\n"
+                "\nNous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique. "
+                "\nVous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme."
+                "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
+                "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
+                "\n\nCordialement, L'équipe actuwebmedia")
     mail.send(msg)
     return 'Email envoyé'
 
@@ -1415,6 +1419,7 @@ def jouer_musique(musique_id, slug):
     id = musique['id']
     id_musiques = musique['id']
     genre = musique['genre']
+    url_m = musique['url']
     req = cur.execute('Select * from musiques where id !=? and genre=? order by random() limit 12', (id, genre))
     recommandations = req.fetchall()
     # Plus de contenu selon le style de musique (Rap)
@@ -1426,16 +1431,16 @@ def jouer_musique(musique_id, slug):
     # Afficher les commentaires
     affcommentaires = affichercommentaires(id_musiques)
     try:
-        genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
-        #
-        result = genius.search_song(musique['titre'], musique['nom'])
-        if result:
-            paroles = result.lyrics
-        else:
-            paroles = "Paroles pas encore disponibles"
+        url = 'https://api.audd.io/'
+        # files = {'file':open('ed_sheeran.mp3','rb')}
+        params = {'url': url_m, 'api_token': os.getenv('api_audd'), 'return': 'lyrics, apple_music, spotify'}
+        response = requests.get(url, params=params)
+        data = response.json()
+        paroles = data['result']['lyrics']['lyrics']
+        print(paroles)
     except Exception as e:
         print(f"Erreur de connexion : {e}")
-        paroles = "Problème de connexion. Veuillez réessayer."
+        paroles = "Paroles pas encore disponibles..."
 
     return render_template('lecteur.html', musique=resultatmusique, recommandations=recommandations,
                            plus_contenu_musique=plus_contenu_musique, chanson=paroles,  affcommentaires= affcommentaires)
@@ -1716,8 +1721,13 @@ def creationcompte():
             session['user'] = nomutilisateur # session de l'utilisateur
             # envoyer un email de bienvenue a l'utilisateur
             msg = Message('Notification', recipients=[email])
-            msg.body = (f'Bienvenue {nomutilisateur},\nvotre compte a été crée avec succès, \n'
-                        'maintenant vous pouvez laisser votre commentaire sur https://actuwebmedia.it.com')
+            msg.body = (
+                "Cher nouvel utilisateur , Nous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.\n"
+                "\nNous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique."
+                "\nVous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme."
+                "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
+                "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
+                "\n\nCordialement, L'équipe actuwebmedia..")
             mail.send(msg) # methode qui renvoi l'email
             flash("Votre compte a été crée avec succès...", "success")
             return redirect(url_for('musiques'))
@@ -1770,6 +1780,7 @@ def ajoutercommentaire(musique_id, titre):
         # Recommandations par artiste ou genre
         id = musique['id']
         genre = musique['genre']
+        url_m = musique['url']
         req = cur.execute('Select * from musiques where id !=? and genre=? order by random() limit 12', (id, genre))
         recommandations = req.fetchall()
         # Plus de contenu selon le style de musique (Rap)
@@ -1785,18 +1796,18 @@ def ajoutercommentaire(musique_id, titre):
         dat = datetime.now()
         date = dat.strftime('%d-%m-%Y %H:%M') # changer le format en date et heure
         try:
-            genius = lyricsgenius.Genius(os.getenv('api_key_genius'), timeout=10)
-            #
-            result = genius.search_song(musique['titre'], musique['nom'])
-            if result:
-                paroles = result.lyrics
-            else:
-                paroles = "Paroles pas encore disponibles"
+            url = 'https://api.audd.io/'
+            # files = {'file':open('ed_sheeran.mp3','rb')}
+            params = {'url': url_m, 'api_token': os.getenv('api_audd'),'return': 'lyrics, apple_music, spotify'}
+            response = requests.get(url, params=params)
+            data = response.json()
+            paroles = data['result']['lyrics']['lyrics']
+            print(paroles)
         except Exception as e:
             print(f"Erreur de connexion : {e}")
-            paroles = "Problème de connexion. Veuillez réessayer."
+            paroles = "Paroles pas encore disponibles..."
 
-        commentaires.append({'nomutilisateur': session['user'], 'commentaires': commentaire, 'date': date}) # pour afficher de votre dernier commentaire
+        commentaires.append({'nomutilisateur': session['user'], 'commentaires': commentaire, 'date': date}) # pour afficher le dernier commentaire
         inserercommentaire(id_utilisateurs, id_musiques, commentaire, date) # insertion de commentaire dans une base
         return render_template('lecteur.html', commentaires=commentaires, affcommentaires=affcommentaires, musique=resultatmusique, recommandations=recommandations,
                            plus_contenu_musique=plus_contenu_musique, chanson=paroles)
@@ -1810,5 +1821,5 @@ def inject_year():
 
 # fonction principale
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True, port=5001)
+    app.run(debug=True, use_reloader=True, port=5002)
 
