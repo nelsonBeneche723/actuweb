@@ -1659,7 +1659,7 @@ def searchmusic():
             # connection a la base
             connection = sqlite3.connect(lien_database)
             cursor = connection.cursor()
-            reqn = cursor.execute("Select * from musiques where lower(titre) like lower (?)", (query, ))
+            reqn = cursor.execute("Select * from musiques where lower(titre) like lower (?) or lower(nom) like lower (?)", (query, query))
             connection.commit()
             if reqn !=0:
                 for row in reqn.fetchall():
@@ -1728,7 +1728,7 @@ def creationcompte():
                 "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
                 "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
                 "\n\nCordialement, L'équipe actuwebmedia..")
-            mail.send(msg) # methode qui renvoi l'email
+            # mail.send(msg) # methode qui renvoi l'email
             flash("Votre compte a été crée avec succès...", "success")
             return redirect(url_for('musiques'))
     else:
