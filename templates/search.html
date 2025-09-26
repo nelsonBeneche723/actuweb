@@ -313,6 +313,13 @@ body {
     margin-bottom: 8px;
     color: white;
         }
+    .no-results {
+    text-align:center;
+    color:white;
+    font-size:14px;
+    font-family: Arial, sans-serif;
+     margin-bottom:345px;
+     }
 
 </style>
 
@@ -361,8 +368,12 @@ body {
   </tbody>
 </table>
 {% else %}
-        <p style="text-align:center; color:white; font-family: Arial, sans-serif;">📡 Cette chanson n'existe pas dans notre catalogue...</p>
 
+ <div class="no-results">
+    <p>Désolé, cette chanson n'est pas dans notre catalogue.</p>
+    <p>Nous travaillons sans cesse pour enrichir notre collection.</p>
+    <p>N'hésitez pas à nous suggérer de nouvelles musiques !</p>
+ </div>
     {% endif %}
 </div>
 <!--Lecteur-->
