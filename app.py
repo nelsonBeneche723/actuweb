@@ -1712,26 +1712,43 @@ def creationcompte():
             session['user'] = nomutilisateur # session de l'utilisateur
             flash("Votre compte a été crée avec succès...", "success")
             # envoyer un email de bienvenue a l'utilisateur
+            htmlcontent = f"""
+            <html>
+            <body>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8w6m9T4Wlh8Gc4V-KzL00UHs9qax0cvwbog&s" style="height:220px; width:100%;"/>
+            <p>
+            Bienvenue sur <strong style="color:GREEN;font-size:14px;">Actuweb media</strong>
+            </p>
+                <p style="color:#333;background-color:black;">
+                            Nous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.<br/>.
+                            <br/>Nous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique.
+                            <br/>Vous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme.
+                            <br/>N'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
+                            <br/>Si vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute.
+                            <br/><br/>Cordialement, L'équipe actuwebmedia..
+                            <br/>
+                            </p>
+                            <a href="https://www.actuwebmedia.it.com/unsubscribe?email="{email}"> Se désabonner </a>
+
+            </body>
+            </html>
+            """
             # create mail object
             mail = mt.Mail(
             sender = mt.Address(email="info@actuwebmedia.it.com", name="notifications"),
             to = [mt.Address(email=email)],
             subject="Message de Bienvenue",
-            text = "Bienvenue, \nNous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.\n"
-                        "\nNous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique."
-                        "\nVous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme."
-                        "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
-                        "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
-                        "\n\nCordialement, L'équipe actuwebmedia..",
+            text = "Bienvenue",
+            html = htmlcontent
         )
 
             # create client and send
             client = mt.MailtrapClient(token=os.getenv('api_mailtrap'))
             if client:
                 client.send(mail)
-                print("envoye..")
+                print("Envoyé...")
             else:
-                print('echec..')
+                print('échec...')
             # mail.send(msg) # methode qui renvoi l'email
             return redirect(url_for('musiques'))
     else:
