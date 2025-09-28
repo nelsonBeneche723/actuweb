@@ -23,6 +23,7 @@ from googleapiclient.discovery import build # pour les videos youtube
 from babel.dates import format_date
 from flask_mail import Mail, Message
 import hashlib
+import mailtrap as mt
 
 load_dotenv()
 app = Flask(__name__)
@@ -32,16 +33,6 @@ app.secret_key = 'tudoismefaire'
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
 
-# configuration de l'envoi de notification par email
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'notificationsactuwebmedia@gmail.com'
-app.config['MAIL_PASSWORD'] = 'nktkerkborxlrmlu'
-app.config['MAIL_DEFAULT_SENDER'] = ['💻actuwebmedia.it.com', 'notificationsactuwebmedia@gmail.com']
-
-mail = Mail(app) # instance de mail
 
 def envoyer_email(email):
     msg = Message('Notification', recipients=[email])
@@ -51,7 +42,7 @@ def envoyer_email(email):
                 "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
                 "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
                 "\n\nCordialement, L'équipe actuwebmedia")
-    mail.send(msg)
+    # mail.send(msg)
     return 'Email envoyé'
 
 def jouer_musique_aprescommentaires(musique_id, titre):
@@ -1719,17 +1710,29 @@ def creationcompte():
                                  (nomutilisateur, email,motpasse,date_format_fr))
             connection.commit()
             session['user'] = nomutilisateur # session de l'utilisateur
-            # envoyer un email de bienvenue a l'utilisateur
-            msg = Message('Notification', recipients=[email])
-            msg.body = (
-                "Cher nouvel utilisateur , Nous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.\n"
-                "\nNous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique."
-                "\nVous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme."
-                "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
-                "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
-                "\n\nCordialement, L'équipe actuwebmedia..")
-            # mail.send(msg) # methode qui renvoi l'email
             flash("Votre compte a été crée avec succès...", "success")
+            # envoyer un email de bienvenue a l'utilisateur
+            # create mail object
+            mail = mt.Mail(
+            sender = mt.Address(email="info@actuwebmedia.it.com", name="notifications"),
+            to = [mt.Address(email=email)],
+            subject="Message de Bienvenue",
+            text = "Bienvenue, \nNous vous remercions d'avoir créé un compte sur notre site web actuwebmedia.\n"
+                        "\nNous sommes ravis de vous accueillir au sein de notre communauté de passionnés de musique."
+                        "\nVous pouvez désormais laisser vos commentaires et avis sur les différentes musiques présentes sur notre plateforme."
+                        "\nN'hésitez pas à nous faire part de vos impressions et de vos coups de cœur. Votre feedback nous est précieux pour enrichir notre catalogue musical."
+                        "\nSi vous avez la moindre question, n'hésitez pas à nous contacter. Nous restons à votre écoute."
+                        "\n\nCordialement, L'équipe actuwebmedia..",
+        )
+
+            # create client and send
+            client = mt.MailtrapClient(token=os.getenv('api_mailtrap'))
+            if client:
+                client.send(mail)
+                print("envoye..")
+            else:
+                print('echec..')
+            # mail.send(msg) # methode qui renvoi l'email
             return redirect(url_for('musiques'))
     else:
         return render_template('createaccount.html', error='Verifier si tous les champs sont bien remplies.')

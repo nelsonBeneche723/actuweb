@@ -12,4 +12,5 @@ lyricsgenius
 google-api-python-client
 flask-mail
 babel
+mailtrap
 gunicorn
