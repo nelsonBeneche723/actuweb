@@ -1812,6 +1812,10 @@ def ajoutercommentaire(musique_id, titre):
         # Afficher les commentaires
         id_musiques = musique['id']
         affcommentaires = affichercommentaires(id_musiques) # methode affichage de commentaires
+        # Convertir chaque Row en dictionnaire
+        affcommentaires_list = [dict(c) for c in affcommentaires]
+        # Exemple pour recommandations
+        recommandations_list = [dict(r) for r in recommandations]
         # date du jour
         dat = datetime.now()
         date = dat.strftime('%d-%m-%Y %H:%M') # changer le format en date et heure
@@ -1829,8 +1833,13 @@ def ajoutercommentaire(musique_id, titre):
 
         commentaires.append({'nomutilisateur': session['user'], 'commentaires': commentaire, 'date': date}) # pour afficher le dernier commentaire
         inserercommentaire(id_utilisateurs, id_musiques, commentaire, date) # insertion de commentaire dans une base
-        return render_template('lecteur.html', commentaires=commentaires, affcommentaires=affcommentaires, musique=resultatmusique, recommandations=recommandations,
-                           plus_contenu_musique=plus_contenu_musique, chanson=paroles)
+        return jsonify({'message': 'Commentaire ajouté avec succès!',
+                        'commentaires':commentaires, 'affcommentaires':affcommentaires_list,
+                        'musique' : resultatmusique, 'recommandations': recommandations_list,
+                      'plus_contenu_musique':plus_contenu_musique, 'chanson':paroles
+                        })
+        # return render_template('lecteur.html', commentaires=commentaires, affcommentaires=affcommentaires, musique=resultatmusique, recommandations=recommandations,
+        #                    plus_contenu_musique=plus_contenu_musique, chanson=paroles)
     else:
         print('commentaire non envoye..')
 
