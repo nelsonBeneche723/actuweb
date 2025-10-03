@@ -527,6 +527,20 @@ img {
   line-height: 1.5;
 }
 
+#commentMessage {
+    display: none; /* caché par défaut */
+    background: linear-gradient(135deg, #6a11cb, #2575fc); /* dégradé moderne violet → bleu */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px; /* coins arrondis */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* ombre légère */
+    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 10px;
+    transition: all 0.3s ease-in-out; /* animation douce pour apparaitre/disparaitre */
+    text-align: center;
+}
+
 </style>
 
     {% if 'user' in session %}
@@ -567,11 +581,13 @@ img {
     <div class="comments-section">
       {% if 'user' in session %}
 
-        <form class="comment-form" method="post" action="{{url_for('ajoutercommentaire', musique_id=musique.id,titre=musique.titre|replace(' ','-')) }}">
+        <form id="commentForm" class="comment-form" method="post" action="{{url_for('ajoutercommentaire', musique_id=musique.id,titre=musique.titre|replace(' ','-')) }}">
             <label for="comment">Ajouter un commentaire :</label>
             <textarea name="comment" id="comment" rows="5" cols="70" required></textarea>
             <button type="submit">Envoyer</button>
+            <p id="commentMessage" style="display: none;">Votre commentaire a été ajouté !</p>
         </form>
+
         {% else %}
         <p>Vous devez vous <a href="{{ url_for('login') }}">connecter</a> pour ajouter un commentaire.</p>
         {% endif %}
@@ -596,7 +612,7 @@ img {
     <div class="comment-header">
       <div class="user"> 👤 {{ commentaire.nomutilisateur }}</div>
     </div>
-    <div class="comment-content">{{ commentaire.commentaires }}</div>
+    <div class="comment-content" id="commentaires-content">{{ commentaire.commentaires }}</div>
        <div class="date">Date: {{commentaire.date}}</div>
   </li>
   {% endfor %}
@@ -651,6 +667,73 @@ img {
         {% else %}
         <p class="no-data">Aucune recommandation disponible.</p>
         {% endif %}
+
+<script>
+
+document.getElementById('commentForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    // Recuperer les commentaires de l'utilisateur
+    const comment = document.getElementById('comment').value;
+    const url = this.action; // l'URL du form Flask
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'comment=' + encodeURIComponent(comment)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Message de succès
+            const message = document.getElementById('commentMessage');
+            message.textContent = data.message;
+            message.style.display = 'block';
+
+            // Efface la liste avant de ré-afficher
+            const commentsContainer = document.querySelector('.comments-list');
+            commentsContainer.innerHTML = "";
+
+            // Afficher les anciens commentaires (affcommentaires)
+            data.affcommentaires.forEach(c => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="comment-header">
+                        <div class="user">👤 ${c.nomutilisateur}</div>
+                    </div>
+                    <div class="comment-content">${c.commentaires}</div>
+                    <div class="date">Date: ${c.date}</div>
+                `;
+                commentsContainer.appendChild(li);
+            });
+
+            // Ajouter le nouveau commentaire en premier
+            data.commentaires.forEach(c => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="comment-header">
+                        <div class="user">👤 ${c.nomutilisateur}</div>
+                    </div>
+                    <div class="comment-content">${c.commentaires}</div>
+                    <div class="date">Date: ${c.date}</div>
+                `;
+                commentsContainer.prepend(li);
+            });
+
+            // Réinitialiser le textarea
+            document.getElementById('comment').value = '';
+        } else {
+            console.error("Erreur côté serveur:", data.error);
+        }
+    } catch (err) {
+        console.error("Erreur JS:", err);
+    }
+});
+</script>
+
 
 
 
