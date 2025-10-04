@@ -692,8 +692,11 @@ document.getElementById('commentForm').addEventListener('submit', async function
             const message = document.getElementById('commentMessage');
             message.textContent = data.message;
             message.style.display = 'block';
-
-            // Efface la liste avant de ré-afficher
+            //Disparaitre le message
+            setTimeout(function(){
+            document.getElementById('commentMessage').style.display="none";}, 1000
+            );
+            // Efface la liste avant d'afficher à nouveau
             const commentsContainer = document.querySelector('.comments-list');
             commentsContainer.innerHTML = "";
 
@@ -725,6 +728,7 @@ document.getElementById('commentForm').addEventListener('submit', async function
 
             // Réinitialiser le textarea
             document.getElementById('comment').value = '';
+            document.getElementById('commentMessage').value = '';
         } else {
             console.error("Erreur côté serveur:", data.error);
         }
@@ -733,8 +737,5 @@ document.getElementById('commentForm').addEventListener('submit', async function
     }
 });
 </script>
-
-
-
 
 {% endblock %}
