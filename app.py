@@ -1130,7 +1130,7 @@ def inserercommentaire(id_utilisateurs,id_musiques,commentaire,date):
     cursor.execute("insert into commentaires (id_utilisateurs,id_musiques,commentaire,date) values (?,?,?,?)",
                    (id_utilisateurs,id_musiques,commentaire,date))
     connection.commit()
-    print('insertion reussie..')
+    print('Votre commentaire a été ajouté avec succes..')
     connection.close()
 
 def affichercommentaires(id_musiques):
@@ -1766,7 +1766,6 @@ def showpageaccount():
 @app.route('/music/<int:musique_id>/<titre>/', methods=['GET', 'POST'])
 def ajoutercommentaire(musique_id, titre):
     commentaires = []
-    resultatmusique = []
     if 'user' not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
@@ -1833,7 +1832,7 @@ def ajoutercommentaire(musique_id, titre):
 
         commentaires.append({'nomutilisateur': session['user'], 'commentaires': commentaire, 'date': date}) # pour afficher le dernier commentaire
         inserercommentaire(id_utilisateurs, id_musiques, commentaire, date) # insertion de commentaire dans une base
-        return jsonify({'message': 'Commentaire ajouté avec succès!',
+        return jsonify({'message': 'Votre commentaire a été ajouté avec succès...',
                         'commentaires':commentaires, 'affcommentaires':affcommentaires_list,
                         'musique' : resultatmusique, 'recommandations': recommandations_list,
                       'plus_contenu_musique':plus_contenu_musique, 'chanson':paroles
