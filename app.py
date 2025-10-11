@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import lyricsgenius
 from googleapiclient.discovery import build # pour les videos youtube
-from babel.dates import format_date
+from babel.dates import format_date, format_datetime
 from flask_mail import Mail, Message
 import hashlib
 import mailtrap as mt
@@ -93,27 +93,17 @@ def jouer_musique_aprescommentaires(musique_id, titre):
 
 def aff_stationradio():
     # Dictionnaire avec des flux de radio et des images
-    mydictstream = {
-        'Radio Metropole': ['https://s4.radio.co/s5cedb108a/listen','images/metro.jpg'],
-        'Guy Wewe Radio A': ['http://stream.radiojar.com/2kepnmff1wzuv','images/guywewe.jpg'],
-        'RFI France': ['https://rfimonde-96k.ice.infomaniak.ch/rfimonde-96k.mp3','images/RFI.png'],
-        'Radio Magik 9': ['http://radiomagik9.primcast.com:7500/','images/magik9.png'],
-        'Chokarella': ['https://streaming.radio.co/s97764d52b/listen', 'images/choko.jpg'],
-        'Radio Lumiere': ['http://stream.zenolive.com/yw0309xbgseuv','images/vision2000.jpg'],
-        'Radio Ginen': ['https://stream-141.zeno.fm/gp19hsnth54tv?zs=J0tKOCFNTNW-PAPC-q6Z-Q', 'images/ginen.webp'],
-        'Radio Eclair': ['http://stream.radiojar.com/2b0gs3cu4tzuv', 'images/RadioEclair.webp'],
-        "L'essentiel Radio": ['http://lessentielradio.ice.infomaniak.ch/lessentielradio-128.mp3', 'images/essentielradio.webp'],
-        'MKM Caraibes': ['http://caraibes.mkmradio.com:8000/stream  ','images/mkm-lg.webp'],
-        "RMC Sport": ['https://audio.bfmtv.com/rmcradio_128.mp3','images/rmc-sport-2.webp'],
-        "RMC Radio Monte Carlo (Milan)": ['http://icecast.unitedradio.it/RMC.mp3','images/Logo_RMC_1981.png']
-        }
-    # parcourir
-    stations = []  # initialiser une variable vide pour stocker tous les messages
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select * from stationradios limit 30")
+    connection.commit()
+    stations = []
+    for result in req.fetchall():
+        stations.append({'nom': result[1],'url': result[2], 'images': result[3]})
+    # stations = []  # initialiser une variable vide pour stocker tous les messages
     # on va faire un choix aleatoire pour affichage les stations par nombre de 12.
-    choix_a = dict(random.sample(list(mydictstream.items()), 12))
+    # choix_a = dict(random.sample(list(mydictstream.items()), 12))
     # Boucle pour itérer sur les éléments du dictionnaire
-    for i, (nomstation, lien) in enumerate(choix_a.items(), 1):
-        stations.append({'nom': nomstation,'url': lien[0], 'images':lien[1]})
     # renvoyer un message à l'utilisateur
     return stations
 
@@ -1174,7 +1164,11 @@ def accueil():
                     if link.get('type', '').startswith('image'):
                         image_url = link.get('href')
                         break
-            articles.append({'title': article.get('title'), 'link': article.get('link'), 'summary':article.get('summary'),'published': article.get('published'), 'image': image_url})
+            dte = article.get('published') # le format fri, 10 oct 2025 11:10:25 +0200
+            dt = datetime.strptime(dte, "%a, %d %b %Y %H:%M:%S %z")
+            dtt = dt.replace(tzinfo=None)
+            dateformatf = format_datetime(dtt , format="EEEE d MMMM y 'à' HH:mm a", locale='fr_FR')
+            articles.append({'title': article.get('title'), 'link': article.get('link'), 'summary':article.get('summary'),'published': dateformatf, 'image': image_url})
     except Exception as e:
         print(f'Erreur API:{e}')
     # Création du dictionnaire de l'article
@@ -1560,42 +1554,13 @@ def infossciences():
 
 @app.route('/live-tv')
 def livetv():
-    chaines_tv_en_direct = {"tele eclair":['https://acwstream.com/hb/chaine04live/index.fmp4.m3u8','https://is3-ssl.mzstatic.com/image/thumb/Purple125/v4/29/46/dc/2946dcfb-3789-db1e-a9c6-ee87cda55bb3/source/256x256bb.jpg'],
-                            "Tf1 series films":['https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/tf1plus/tf1-series-films.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8gorVJkAxI34pQBfwwgVdhKINXelYg6wLVQ&s'],
-                            "BFM2":['https://live-cdn-bfm2-euw1.bfmtv.bct.nextradiotv.com/master.m3u8','https://fr.themedialeader.com/wp-content/uploads/2024/08/BFM2.jpg'],
-                            "France 24":["https://tvradiozap.eu/tv/m3u8/france24.m3u8",'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/3a/08/7d/3a087d49-8b12-ebe6-c925-11d36bdcf0bb/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1200x630wa.png'],
-                            "TV5 Monde":['https://ott.tv5monde.com/Content/HLS/Live/channel(info)/variant.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd0WmZGKAza-sCISqAGuffiCThITyRzf4dBA&s'],
-                            "RMC Talk Info":['https://stream.ads.ottera.tv/playlist.m3u8?network_id=7433','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG-8MoxV5tsuBdgUMeJCSh6_kbvDKrWtFhKA&s'],
-                            "CNews":['https://hls-m015-live-aka-canalplus.akamaized.net/live/disk/cnews-clair-hd/hls-v3-hd-clair/cnews-clair-hd.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbKX_cIzrj4KZ5m0YnOAtgVaAPbCyl2tSo3A&s'],
-                            "LN 24":["https://live-ln24.digiteka.com/1911668011/tracks-v1a1/mono.m3u8",'https://vod.digiteka.com/playlists/q5pm3u/bb7318befe207b8ad55f1d0b0a71fdb95e79ac25.jpeg'],
-                            "Ici RDI":["https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_YpyIrbuvFoLo1yeMKjs0pxA4GItJDJBbWw&s'],
-                            "I24 news":["https://rcavlive.akamaized.net/hls/live/704020/cancbxft/master.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShxFsmqy_DAkhVF2gRffdh5m5d96lcrbK9Wg&s'],
-                            "LCN":["https://tvalive.akamaized.net/hls/live/2014213/tvan01/tvan01.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2lPL6VHc-o6nAIURKlP8MvsVBicY33rla0Q&s'],
-                            "Monaco info":["https://webtv.monacoinfo.com/live/prod/index.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1VR57eePeExf7WUKjoYkuVNU7adK3xjA83w&s'],
-                            "Euro news": ["https://euronews-live-fra-fr.fast.rakuten.tv/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6564/bitok/eyJzdGlkIjoiOTgyOTZjMmUtYWQ4MS00M2YyLTk4MjktYTc4ODhiYjk4YzE1IiwibWt0IjoiZnIiLCJjaCI6NjU2NCwicHRmIjoxfQ==/26032/euronews-fr.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsYmwNKSQ_YAUFeD6Fdf_w4ogSsvc5jkrTjw&s'],
-                            "Figaro LIVE": ['https://d358c6mfrono1y.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-0ppx9nh29jpk7-prod/fa5bf751-4c1a-465b-97bd-1fa62e8a7d00/3.m3u8','https://i.f1g.fr/media/cms/1200x630_crop/2020/04/23/5d488b28d8769cab0f220dbe3c23076465b6ffc688f006a2f90abd4f666e478e.jpeg'],
-                            "LÉquipe": ['https://www.dailymotion.com/embed/video/x2lefik','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_XHPZ9L4v9x4BxUtezSMukLIV0HDSnYj9Ig&s'],
-                            "Sky news":['https://skynewsau-live.akamaized.net/hls/live/2002689/skynewsau-extra1/master.m3u8', 'https://www.newscaststudio.com/wp-content/uploads/2018/01/sky-news-new-logo.jpg'],
-                            "France info":['https://geo.dailymotion.com/embed/video/x4rdeu6', 'https://mouvement-europeen.eu/wp-content/uploads/2018/04/Logo-France-Info.png'],
-                            "Gulli":['https://origin-caf900c010ea8046.live.6cloud.fr/out/v1/c65696b42ca34e97a9b5f54758d6dd50/cmaf/hlsfmp4_short_q2hyb21h_gulli_sd_index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm1LzBhAYbnBaV5At5nyZVBL7wRyA5CG0CMA&s'],
-                            "LCI": ['https://raw.githubusercontent.com/ipstreet312/freeiptv/master/ressources/btv/py/lci1.m3u8', 'https://photos.tf1.fr/480/0/vignette-paysage-chaine-lci-3d6048-f2e387-0@2x.webp'],
-                            "Haiti news":['https://haititivi.com/website/haitinews/tracks-v1a1/mono.m3u8','https://image.roku.com/developer_channels/prod/7b489e981d6b5c3d76fbbcce619181319a41b7358c5a7732467ac86eab50dd9b.png'],
-                            "Tele Variete(CH30)":['https://acwstream.com/hb/website/30/index.m3u8','https://pbs.twimg.com/profile_images/1301265682978476033/V_eBxD1-_400x400.jpg'],
-                            "Tele soleil":['https://live-kto.akamaized.net/hls/live/2033284/KTO/master.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrtlJj6e4Npcup9Tu_pOOscGkLEg5Tc3_yCQ&s'],
-                            "RTVC CH22":["https://customer-gllhkkbamkskdl1p.cloudflarestream.com/eyJhbGciOiJSUzI1NiIsImtpZCI6ImI3YmIwODNmMDhkNmQ5NWExZjIzZWE3ZWRhOWY4NTZhIn0.eyJzdWIiOiIwYjY4N2JkZDE3N2ZjZTI5NWZkOTQxMGZiZGUwNDAxYiIsImtpZCI6ImI3YmIwODNmMDhkNmQ5NWExZjIzZWE3ZWRhOWY4NTZhIiwiZXhwIjoxNzUxMDg3OTQ3LCJhY2Nlc3NSdWxlcyI6W3sidHlwZSI6ImlwLmdlb2lwLmNvdW50cnkiLCJhY3Rpb24iOiJibG9jayIsImNvdW50cnkiOlsiUlUiLCJCWSJdfV19.MIJIkZz65s9ZRWf4rjap9oJ7TmOWBGrbN9UbT0LWkFRgHROkiB-M_l3LFqHtOQzLAaSE-FUU-MlpZ30YQECshTGDm7DWpitns6j0wixw2Wzqm0yIYOGek-IWJKx2_SOOHV5kYND4RclfIgaeG-UYMOtsMk2byIf--YbjJMHjE0l87_iTP7-Ml7e1Uc-1Jg2bFXL0kvOLkdIErqlm_KagwRO-hvJAcWBPtFmc9A1QhqwV-yInqWc1Lc1wWlVIUGAXiA_WHM2V1cczesch8NCcE26G0t7OyjBDPbnmt8aSnlqNZU-lQ9rd_Ph6ftxmP8jNTRwh85pmE1M7uKAR1SO9fQ/manifest/video.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBl5Sr1H_3dxSbxNwIRlUYlX_Z6hIUkHN5Rg&s'],
-                            "tele Hirondelle": ['https://haititivi.com/rezo/boul4/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuRgFYAOwnyQyoxDwfN4yQxfCqs91tOhI1w&s'],
-                            "Tele PAM":['https://lakay.online/ott/telepam/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIiNkdqNQHbe5oUlZTRfg1DWPDBlEh3uG4QQ&s'],
-                            "Tele Prince":['https://acwstream.com/stream/netalkole/public/tv/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgsWvdXcA6yKZmJ6oXYV20LpysRY7PGI6KiA&s'],
-                            "Kajou TV":['https://video1.getstreamhosting.com:1936/8055/8055/playlist.m3u8', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf4_bRlqCaetp3tAzXnHTilBgVzKro_7uxeg&s'],
-                            "Tele Pluriel":['https://acwstream.com/hb/tvpluriel/index.m3u8','https://yt3.googleusercontent.com/ytc/AIdro_lywQgtFU41-MZKrsep_UeNTwoS1cbP-Hwx647H5CsjsA=s900-c-k-c0x00ffffff-no-rj'],
-                            "snl tv":['https://live.acwstream.com:3246/live/snltvlive.m3u8','https://ih1.redbubble.net/image.803414841.9971/flat,750x,075,f-pad,750x1000,f8f8f8.u2.jpg'],
-                            "Tele Puissance":['https://video1.getstreamhosting.com:1936/8560/8560/playlist.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfPtQQ1mf-ZATV9A9_5N1Imjc3Sw-9F6SCjw&s']
-        }
-    #
-    tv = []  # creation d'une liste juste pour ajouter les coordonnées de differentes chaines tv
-    # parcourir l'ensemble des elements du dictionnaire
-    for i, (nomtele, url) in enumerate(chaines_tv_en_direct.items(), 1):
-        tv.append({'nomtele':nomtele, 'url': url[0], 'images': url[1]})
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select * from channeltv limit 30")
+    connection.commit()
+    tv = []
+    for result in req.fetchall():
+        tv.append({'nomtele': result[1], 'url': result[2], 'images': result[3]})
     # transmettre les donnees du tv vers la page livetv.html
     return render_template('livetv.html', channeltv=tv)
 
