@@ -7,10 +7,10 @@ import requests
 from dotenv import load_dotenv  # Pour lire les fichiers de type (. env)
 import google.generativeai as genai  # Pour l'utilisation de l'IA Gemini
 import random
-from deep_translator import GoogleTranslator  # Pour traduction de donnees meteos
+from deep_translator import GoogleTranslator  # Pour traduction de données météos
 from collections import defaultdict
 from datetime import datetime, timedelta
-import pytz  # converti l'heure selon la timezone defini
+import pytz  # converti l'heure selon la timezone défini
 import feedparser  # pour utiliser des flux rss pour les donnees sur le web
 import sqlite3
 import io
@@ -1136,6 +1136,92 @@ def affichercommentaires(id_musiques):
         affcommentaire.append({'nomutilisateur':row[0], 'id_utilisateurs': row[1], 'commentaires': row[3], 'date': row[4]})
     return affcommentaire
 
+
+def previsions_5_journees(lat, lon):
+    # lat = 18.5392
+    # lon = -72.335
+    apikey = os.getenv('api_key_meteo')
+    urlprev = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={apikey}&lang=fr"
+    response1 = requests.get(urlprev)
+    previsionsjours = []
+
+    # Vérifier si la requête a réussi
+    if response1.status_code == 200:
+        data = response1.json()
+
+        # Grouper par jour (une prévision par jour)
+        forecasts_by_day = {}
+
+        for forecast in data['list']:
+            if isinstance(forecast['dt_txt'], str):
+                date_str = forecast['dt_txt']
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+                date_key = date_obj.date()
+
+                if date_key not in forecasts_by_day:
+                    forecasts_by_day[date_key] = forecast
+
+        # Afficher les 6 premiers jours
+        for date_key, forecast in list(forecasts_by_day.items())[:6]:
+            # Format: "mercredi 20 janvier 2025"
+            date_formatted = format_date(date_key, format="EEEE d MMMM y", locale='fr_FR')
+            # converti la temperature de Kelvin en degre celsius
+            cal_temp_cel = float(forecast['main']['temp']) - 273.15
+            cal_temp_min = float(forecast['main']['temp_min']) - 273.15
+            cal_temp_max = float(forecast['main']['temp_min']) - 273.15
+            # formater les reponses avec un seul chiffre apres la virgule
+            temp_celsius = f"{cal_temp_cel:.1f}"
+            temp_min = f"{cal_temp_min:.1f}"
+            temp_max = f"{cal_temp_max:.1f}"
+
+            description = forecast['weather'][0]  # Description météo
+            humidity = forecast['main']['humidity']
+            wind_speed = int(forecast['wind']['speed']) * 3.6
+            # Construire l'URL de l'icône
+            icon_url = f"https://openweathermap.org/img/wn/{description['icon']}@2x.png"
+
+            # print(f"  Humidité: {humidity}%, Vent: {wind_speed} m/s\n")
+            previsionsjours.append({"dateprevjour": date_formatted,
+                                    "temperature": temp_celsius,
+                                    "temperaturemin": temp_min,
+                                    "temperaturemax": temp_max,
+                                    "description": description,
+                                    "humidite": humidity,
+                                    "vitessevent": wind_speed,
+                                    "icon": icon_url
+                                    })
+        return previsionsjours
+
+def previsions_prochains_heure(ville):
+    apikey = os.getenv('api_key_meteo') # Remplacez par votre clé API
+    previsionshoraires = [] # declaration de liste vide
+    # Utiliser l'endpoint forecast pour les prévisions
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={ville}&appid={apikey}&units=metric"
+    r = requests.get(url)
+    # Vérifier si la requête a réussi
+    if r.status_code == 200:
+        data = r.json()
+
+        # Récupérer les 6 prochaines prévisions (chaque entrée = 3 heures)
+        previsions = data['list'][:8]
+
+        # Extraire la température pour chaque prévision
+        for i, prev in enumerate(previsions):
+            tempnormal = prev['main']['temp']
+            tempressenti = prev['main']['feels_like']
+            dateheure = prev['dt_txt']  # Date et heure de la prévision
+            description = prev['weather'][0]
+            heure = datetime.strptime(dateheure, '%Y-%m-%d %H:%M:%S')
+            icon_url = f"https://openweathermap.org/img/wn/{description['icon']}@2x.png"
+
+            previsionshoraires.append({'horaire': heure.time().strftime('%H'),
+                                       'tempsnormal': tempnormal,
+                                      'tempsressenti': tempressenti,
+                                       "icon": icon_url})
+        return previsionshoraires
+    else:
+        print(f"Erreur: {r.status_code}")
+
 @app.route('/')
 def accueil():
     api_key = os.getenv('api_key_nouvelles')
@@ -1228,6 +1314,8 @@ def assistanceai():
 @app.route('/meteo', methods=['GET','POST'])
 def affichermeteo():
     meteos = []
+    previsionsjours = []
+    previsionshoraires = []
     # verifier quel type de method utilise pour renvoyer le formulaire
     if request.method == 'GET':
         ville = request.args.get('ville')  # Récupérer les valeurs du champ texte (Ville)
@@ -1235,9 +1323,9 @@ def affichermeteo():
         if not ville:
             ville = "Port-au-Prince"
         try:
-            API_KEY = os.getenv('api_key_meteo')
+            apikey = os.getenv('api_key_meteo')
             # Faire une requête à l'API OpenWeatherMap
-            url = f"https://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric"  # Call de l'api
+            url = f"https://api.openweathermap.org/data/2.5/weather?q={ville}&appid={apikey}&lang=fr&units=metric"  # Call de l'api
             r = requests.get(url)
             # Vérifier si la requête a réussi
             if r.status_code == 200:
@@ -1249,14 +1337,29 @@ def affichermeteo():
                 weather = data['weather'][0]
                 sys = data['sys']
                 description = weather['description']
+                icon_url = f"https://openweathermap.org/img/wn/{weather['icon']}@2x.png"
+
                 # Traduction du français vers l'anglais
-                translator = GoogleTranslator(source='en', target='fr')
-                traduct_fr = translator.translate(description)
+                # translator = GoogleTranslator(source='en', target='fr')
+                # traduct_fr = translator.translate(description)
                 # meteos = []
                 # Créer un dictionnaire pour stocker les informations meteos
-                meteos.append({"Longitude": lon_lat['lon'], "Latitude": lon_lat['lat'], "Temperature": f"{data['main']['temp']}",
-                                 "Direction": f"{int(data['wind']['deg'] / 10)} degrés", "Vitesse": f"{round(data['wind']['speed'] * 3.6)}",
-                                "Humidite": f"{data['main']['humidity']}", "Conditions": f"{traduct_fr}", "Pays": f"{sys['country']}", 'ville': ville})
+                meteos.append({"Longitude": lon_lat['lon'],
+                               "Latitude": lon_lat['lat'],
+                               "Temperature": f"{data['main']['temp']}",
+                               "Temperatureressenti": round(data['main']['feels_like'], 1),
+                               "Pression": f"{data['main']['pressure']}",
+                                "Direction": f"{int(data['wind']['deg'] / 10)} degrés",
+                               "Vitessekm": f"{round(data['wind']['speed'] * 3.6)}",
+                               "Vitesse_m": f"{data['wind']['speed']} m/s",
+                               "Humidite": data['main']['humidity'],
+                               "description": f"{description}",
+                               "Pays": f"{sys['country']}",
+                               'ville': ville,
+                               "icon": icon_url})
+                # previsions pour les 5 prochains jours
+                previsionsjours = previsions_5_journees(lon_lat['lat'], lon_lat['lon'])
+                previsionshoraires = previsions_prochains_heure(ville)
                 # return messages # retourner la valeur de la fonction
             else:
                 # Gérer les erreurs
@@ -1267,7 +1370,7 @@ def affichermeteo():
         except Exception as e:
             print("reponse",f"Erreur:lors de la récupération des données météo.{e}")
 
-    return render_template('meteo.html', meteos=meteos)
+    return render_template('meteo.html', meteos=meteos, previsionsjours=previsionsjours, previsionshoraires=previsionshoraires)
 
 @app.route('/music')
 def musiques():
