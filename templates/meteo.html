@@ -18,9 +18,9 @@
             box-sizing: border-box;
         }
 
-body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to right, #e96443, #904e95);
               }
 
         .main-container {
@@ -32,14 +32,14 @@ body {
         }
 
         .container {
-            background: linear-gradient(135deg, #4a7ba7 0%, #6b5b95 100%);
+           background: linear-gradient(to right, #e96443, #904e95);
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
         .header {
-            background: linear-gradient(135deg, #4a7ba7 0%, #5a8bb8 100%);
+            background: linear-gradient(to right, #e96443, #904e95);
             color: white;
             padding: 20px;
             display: flex;
@@ -427,49 +427,373 @@ body {
                 font-size: 18px;
             }
         }
-<!--    ancien css-->
-        .meteo-container {
-            max-width: 800px;
-            margin: 10px auto; /* réduit l'espacement vertical */
-            padding: 20px;
-            background-color: #f5f7fa;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            font-family: 'Arial', sans-serif;
+
+<!--        MOBILES-->
+
+        /* ===== RESPONSIVE MOBILE ===== */
+
+/* Téléphones (320px - 768px) */
+@media (max-width: 768px) {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
-        .meteo-header {
-            text-align: center;
-            margin-bottom: 30px;
+    body {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Barre de recherche */
+    .form-meteo {
+        margin-bottom: 15px;
+    }
+
+    .form-meteo form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-meteo input {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 14px;
+        border-radius: 8px !important;
+    }
+
+    .form-meteo button {
+        width: 100%;
+        padding: 12px !important;
+        font-size: 14px;
+    }
+
+    /* Container */
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    /* Header */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .header-location {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .star-icon {
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    /* Current Weather */
+    .current-weather {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 20px;
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .current-icon img {
+        width: 40px !important;
+        height: 80px !important;
+        margin-bottom: 10px;
+    }
+
+    .current-temp {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .current-condition {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .current-details {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        padding: 8px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .detail-item span:first-child {
+        font-size: 18px;
+    }
+
+    /* Forecast Section */
+    .forecast-section {
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007BFF;
+    }
+
+    .forecast-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .forecast-card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .forecast-day {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .forecast-icon img {
+        width: 60px !important;
+        height: 60px !important;
+        margin: 8px auto;
+        display: block;
+    }
+
+    .forecast-tempsT {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 8px 0;
+        color: #007BFF;
+    }
+
+    .forecast-desc {
+        font-size: 13px;
+        color: #666;
+        margin: 5px 0;
+        text-transform: capitalize;
+    }
+
+    .forecast-temps {
+        display: flex;
+        justify-content: space-around;
+        margin: 10px 0;
+        font-size: 12px;
+    }
+
+    .temp-high, .temp-low {
+        padding: 5px 10px;
+        background: #f0f0f0;
+        border-radius: 6px;
+    }
+
+    .forecast-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .forecast-info-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        padding: 6px;
+        background: #f9f9f9;
+        border-radius: 6px;
+    }
+
+    /* Hourly Section */
+    .hourly-section {
+        margin-bottom: 20px;
+    }
+
+    .hourly-scroll {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .hourly-card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 12px;
+        min-width: 110px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    .hourly-time {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+            .hourly-icon img {
+        width: 50px !important;
+        height: 50px !important;
+        margin: 8px auto;
+        display: block;
+    }
+
+    .hourly-temp {
+        font-size: 12px;
+        color: #666;
+        margin: 5px 0;
+        line-height: 1.4;
+    }
+}
+
+/* Téléphones petits (320px - 480px) */
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .container {
+        padding: 8px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .current-temp {
+        font-size: 28px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .forecast-card {
+        padding: 10px;
+    }
+
+    .forecast-tempsT {
+        font-size: 14px;
+    }
+
+    .forecast-info {
+        grid-template-columns: 1fr;
+    }
+
+    .hourly-card {
+        min-width: 100px;
+        padding: 10px;
+    }
+
+    .detail-item {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .current-details {
+        gap: 8px;
+    }
+    img{
+    width:50%;
+    }
+}
+
+/* Tablettes (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .forecast-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .current-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-meteo form {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .form-meteo input {
+        flex: 1;
+    }
+
+    .form-meteo button {
+        width: auto;
+    }
+}
+
+
+        @media screen and (max-width: 600px) {
+             .forecast-icon img {
+                width:40% !important;
+            }
+            .hourly-icon img
+            {
+                width:40% !important;
+            }
+              .form-meteo {
+            padding: 8px;
+            margin-bottom: 12px;
         }
 
-        .meteo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        .form-meteo input,
+        .form-meteo button {
+            padding: 10px;
+            font-size: 13px;
 
-        .meteo-item {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            text-align: center;
         }
+        button{margin-top: 10px;}
+        .form-meteo form {
+            gap: 8px;
+        }
+        .menu-label p{color:white;}
+    }
+<!--DEsktop-->
 
-        .meteo-item h4 {
-            margin-bottom: 8px;
-            color: #555;
-        }
-.form-meteo{margin-top:25px;}
+
     </style>
 
-    <hr/>
+<br/>
 <!--Barre de recherche-->
 <div class="form-meteo">
     <form action="/meteo" method="GET" style="text-align: center; margin-bottom: 20px;">
-    <input type="text" name="ville" placeholder="Entrer un nom de ville ou pays" style="padding: 10px; width: 250px; border-radius: 8px; border: 1px solid #ccc;">
-    <button type="submit" style="padding: 10px 15px; border-radius: 8px; background-color: #007BFF; color: white; border: none;">Rechercher</button>
+    <input type="text" name="ville" placeholder="Entrer un nom de ville ou un nom de pays......" style="padding: 10px; width: 300px; border-radius: 8px; border: 1px solid #ccc;">
+    <button type="submit" style="padding: 10px 15px; border-radius: 8px; background-color: background: linear-gradient(to right, #e96443, #904e95);; color: blue; border: none;">Rechercher</button>
     </form>
 </div>
 
@@ -585,8 +909,9 @@ body {
             {% for previsionsh in previsionshoraires %}
                 <div class="hourly-card">
                     <div class="hourly-time">{{previsionsh.horaire}}H</div>
+                    <div class="hourly-icon">
                         <img class="icon" src="{{ previsionsh.icon }}" alt="{{ description }}">
-                    <div class="hourly-icon"></div>
+                        </div>
                     <div class="hourly-temp">température normal: {{previsionsh.tempsnormal}}°</div>
                     <div class="hourly-temp">température ressenti: {{previsionsh.tempsressenti}}°</div>
                 </div>
