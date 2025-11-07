@@ -1062,6 +1062,44 @@ def recupererscorejoueur(championnat):
     except Exception as e:
         print(f"Erreur API{e}")
 
+def scorer_europeen():
+    topscorerpl = recupererscorejoueur('PL')
+    topscorerpd = recupererscorejoueur('PD')
+    topscorersa = recupererscorejoueur('SA')
+    topscorerfl1 = recupererscorejoueur('FL1')
+    topscorerbl1 = recupererscorejoueur('BL1')
+
+    topsc = []
+    result1 = next(((maxscorepl['player_name'], maxscorepl['goals']) for maxscorepl in topscorerpl if maxscorepl['goals'] > 0), None)
+    result2 = next(((maxscorepd['player_name'], maxscorepd['goals']) for maxscorepd in topscorerpd if maxscorepd['goals'] > 0), None)
+    result3 = next(((maxscoresa['player_name'], maxscoresa['goals']) for maxscoresa in topscorersa if maxscoresa['goals'] > 0), None)
+    result4 = next(((maxscorefl1['player_name'], maxscorefl1['goals']) for maxscorefl1 in topscorerfl1 if maxscorefl1['goals'] > 0), None)
+    result5 = next(((maxscorebl1['player_name'], maxscorebl1['goals']) for maxscorebl1 in topscorerbl1 if maxscorebl1['goals'] > 0), None)
+
+    topsc.append({'Angleterre': result1, 'Espagne': result2, 'Italie': result3, 'France': result4, 'Allemagne': result5})
+    # print(f"'Angletere':result1 , 'Espagne':{result2}, 'Italie':{result3}, 'France': {result4}, 'Allemagne': {result5}")
+
+    # parcourir la liste de dictionnaire
+    max_buts = 0
+    meilleur_joueur = []
+
+    for d in topsc:
+        for pays, (joueur, buts) in d.items():
+
+            if buts > max_buts:
+                max_buts = buts
+                # meilleur_joueur = joueur
+                pays_meilleur = pays
+                print(pays_meilleur, joueur, max_buts)
+                meilleur_joueur = [{"pays":pays,
+                                    "joueur":joueur,
+                                    "buts":buts
+                                    }]
+            elif buts == max_buts:
+                meilleur_joueur.append({"pays":pays,"joueur":joueur, "buts":buts})
+        return meilleur_joueur
+
+
 def matchtermine_bundesliga():
     API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/BL1/matches?status=FINISHED'
@@ -1165,7 +1203,7 @@ def previsions_5_journees(lat, lon):
         for date_key, forecast in list(forecasts_by_day.items())[:6]:
             # Format: "mercredi 20 janvier 2025"
             date_formatted = format_date(date_key, format="EEEE d MMMM y", locale='fr_FR')
-            # converti la temperature de Kelvin en degre celsius
+            # Convertir la temperature de Kelvin en degre celsius
             cal_temp_cel = float(forecast['main']['temp']) - 273.15
             cal_temp_min = float(forecast['main']['temp_min']) - 273.15
             cal_temp_max = float(forecast['main']['temp_min']) - 273.15
@@ -1294,14 +1332,14 @@ def stationradio():    # Récupération des stations par défaut
 @app.route('/assistant-ia', methods=['GET','POST'])
 def assistanceai():
     genai.configure(api_key=os.getenv('GEMINI_APIKEY'))
-    model = genai.GenerativeModel('gemini-2.0-flash-lite')
+    model = genai.GenerativeModel('gemini-2.5-flash-lite')
     reponses = []  # creation d'une liste vide
     # Formulaire (avec requete POST)
     if request.method=='POST':
         prompt = request.form.get('prompt')  # Récupérer les valeurs du champ texte
         try:
             response = model.generate_content(prompt)
-            # conditions si le modele génere des réponses
+            # conditions si le modèle génère des réponses
             if response.candidates and response.candidates[0].finish_reason != 4:
                 reponses.append({'reponse': response.text})
             else:
@@ -1470,17 +1508,19 @@ def matchtermineEnd():
 
 @app.route('/sports/classement-buteurs')
 def recuperertousbuteurs():
-    buteurs_pl, buteurs_sa, buteurs_fl1, buteurs_pd, buteurs_bl1=None,None,None,None,None
+    buteurs_pl, buteurs_sa, buteurs_fl1, buteurs_pd, buteurs_bl1 = None,None,None,None,None
+    scorer_europe = []
     try:
         buteurs_pl = recupererscorejoueur('PL')
         buteurs_sa = recupererscorejoueur('SA')
         buteurs_pd = recupererscorejoueur('PD')
         buteurs_fl1 = recupererscorejoueur('FL1')
         buteurs_bl1 = recupererscorejoueur('BL1')
+        scorer_europe = scorer_europeen()
     except Exception as e:
         print('erreur')
     return render_template('classementbuteur.html', buteurs_pl= buteurs_pl,buteurs_pd=buteurs_pd, buteurs_sa=buteurs_sa,
-                                                               buteurs_bl1=buteurs_bl1, buteurs_fl1=buteurs_fl1)
+                                                               buteurs_bl1=buteurs_bl1, buteurs_fl1=buteurs_fl1, scorer_europe=scorer_europe)
 
 @app.route('/music/<int:musique_id>/<slug>/')
 def jouer_musique(musique_id, slug):
