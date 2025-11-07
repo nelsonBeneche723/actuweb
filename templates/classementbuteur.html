@@ -81,7 +81,28 @@ section h2 {
     }
 }
     </style>
+
+
 <h1>Classement des buteurs</h1>
+    <h2> 🥇 Soulier d'Or</h2>
+
+<table border=1 style="width:50%; margin:auto; text-align:center; background-color: #fff;">
+    <tr>
+        <th>Pays</th>
+        <th>Joueur</th>
+        <th>Buts</th>
+    </tr>
+    {% for scorer in scorer_europe %}
+        <tr>
+            <td>{{ scorer.joueur }}</td>
+            <td>{{ scorer.pays }}</td>
+            <td><strong>{{scorer.buts }} buts</strong></td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+
     <h2>Premier League</h2>
     <table>
         <tr>
