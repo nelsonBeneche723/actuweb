@@ -92,12 +92,25 @@ section h2 {
         <th>Joueur</th>
         <th>Buts</th>
     </tr>
+    {% set pays_drapeaux = {
+    'Angleterre': '🇬🇧',
+    'Espagne': '🇪🇸',
+    'France': '🇫🇷',
+    'Allemagne': '🇩🇪',
+    'Italie': '🇮🇹'
+} %}
     {% for scorer in scorer_europe %}
+        {% if scorer.pays in pays_drapeaux %}
         <tr>
+            <td>
+                <div class="flag">{{pays_drapeaux[scorer.pays]}}</div>
+                {{ scorer.pays }}
+            </td>
             <td>{{ scorer.joueur }}</td>
-            <td>{{ scorer.pays }}</td>
             <td><strong>{{scorer.buts }} buts</strong></td>
         </tr>
+        {% endif %}
+
     {% endfor %}
 </table>
 
