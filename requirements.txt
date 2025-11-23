@@ -13,4 +13,6 @@ google-api-python-client
 flask-mail
 babel
 mailtrap
+flask_wtf
+bleach
 gunicorn

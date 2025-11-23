@@ -15,24 +15,28 @@ import feedparser  # pour utiliser des flux rss pour les donnees sur le web
 import sqlite3
 import io
 import base64
-import numpy as np
+# import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib
+# import matplotlib
 import lyricsgenius
 from googleapiclient.discovery import build # pour les videos youtube
 from babel.dates import format_date, format_datetime
 from flask_mail import Mail, Message
 import hashlib
 import mailtrap as mt
+from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
+import bleach
 
+# chargement du fichier .env
 load_dotenv()
+#instanciation de la Flask
 app = Flask(__name__)
-
 # Générer un clé secret
-app.secret_key = 'tudoismefaire'
+app.secret_key = "je_suis_sony_devweb+"
+csrf = CSRFProtect(app)
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
-
 
 def envoyer_email(email):
     msg = Message('Notification', recipients=[email])
@@ -1099,7 +1103,6 @@ def scorer_europeen():
                 meilleur_joueur.append({"pays":pays,"joueur":joueur, "buts":buts})
         return meilleur_joueur
 
-
 def matchtermine_bundesliga():
     API_KEY = os.getenv('api_key_sports')  # Remplace par ta vraie clé API
     url = 'https://api.football-data.org/v4/competitions/BL1/matches?status=FINISHED'
@@ -1259,6 +1262,28 @@ def previsions_prochains_heure(ville):
         return previsionshoraires
     else:
         print(f"Erreur: {r.status_code}")
+
+def autrechannel(nomtele):
+    recommandations = []
+    nomtele_tv = str(nomtele).replace("-"," ")
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    requ = cursor.execute("select nom, url_stream, url_logo from channeltv where nom!=?", (nomtele_tv,))
+    connection.commit()
+    result_recom = requ.fetchall()
+    # connection.close()
+    for result_re in result_recom:
+        recommandations.append({"chaine": result_re[0],
+                                "urlstream": result_re[1],
+                                "urllogo": result_re[2]
+                                })
+
+    return recommandations
+
+@app.after_request
+def ajout_csp(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
+    return response
 
 @app.route('/')
 def accueil():
@@ -1492,7 +1517,7 @@ def heure_actuelle():
     return jsonify({"heure": dth})
 
 @app.route('/sports/match-termine')
-def matchtermineEnd():
+def matchtermineend():
     resultat_tpl, resultat_tsa, resultat_tlig, resultat_tlig1, resultat_tligb = None, None, None, None, None
     try:
         resultat_tpl = matchtermine_pl()
@@ -1695,55 +1720,33 @@ def infossciences():
 
     return render_template('sciences.html',sciences_=infos_sciences)
 
+
 @app.route('/live-tv')
 def livetv():
     connection = sqlite3.connect('musique_bunny.db')
     cursor = connection.cursor()
-    req = cursor.execute("select * from channeltv limit 30")
+    req = cursor.execute("select * from channeltv limit 32")
     connection.commit()
     tv = []
     for result in req.fetchall():
-        tv.append({'nomtele': result[1], 'url': result[2], 'images': result[3]})
+        tv.append({'nomtv': result[1], 'url': result[2], 'images': result[3]})
     # transmettre les donnees du tv vers la page livetv.html
     return render_template('livetv.html', channeltv=tv)
 
 @app.route('/watch-tv/<nomtele>')
 def lecturestreaming_tv(nomtele):
-    chaines_tv_en_direct = {"tele eclair":['https://acwstream.com/hb/chaine04live/index.fmp4.m3u8','https://is3-ssl.mzstatic.com/image/thumb/Purple125/v4/29/46/dc/2946dcfb-3789-db1e-a9c6-ee87cda55bb3/source/256x256bb.jpg'],
-                            "Tf1 series films":['https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/tf1plus/tf1-series-films.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8gorVJkAxI34pQBfwwgVdhKINXelYg6wLVQ&s'],
-                            "BFM2":['https://live-cdn-bfm2-euw1.bfmtv.bct.nextradiotv.com/master.m3u8','https://fr.themedialeader.com/wp-content/uploads/2024/08/BFM2.jpg'],
-                            "France 24":["https://tvradiozap.eu/tv/m3u8/france24.m3u8",'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/3a/08/7d/3a087d49-8b12-ebe6-c925-11d36bdcf0bb/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1200x630wa.png'],
-                            "TV5 Monde":['https://ott.tv5monde.com/Content/HLS/Live/channel(info)/variant.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd0WmZGKAza-sCISqAGuffiCThITyRzf4dBA&s'],
-                            "RMC Talk Info":['https://stream.ads.ottera.tv/playlist.m3u8?network_id=7433','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG-8MoxV5tsuBdgUMeJCSh6_kbvDKrWtFhKA&s'],
-                            "CNews":['https://hls-m015-live-aka-canalplus.akamaized.net/live/disk/cnews-clair-hd/hls-v3-hd-clair/cnews-clair-hd.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbKX_cIzrj4KZ5m0YnOAtgVaAPbCyl2tSo3A&s'],
-                            "LN 24":["https://live-ln24.digiteka.com/1911668011/tracks-v1a1/mono.m3u8",'https://vod.digiteka.com/playlists/q5pm3u/bb7318befe207b8ad55f1d0b0a71fdb95e79ac25.jpeg'],
-                            "Ici RDI":["https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_YpyIrbuvFoLo1yeMKjs0pxA4GItJDJBbWw&s'],
-                            "I24 news":["https://rcavlive.akamaized.net/hls/live/704020/cancbxft/master.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShxFsmqy_DAkhVF2gRffdh5m5d96lcrbK9Wg&s'],
-                            "LCN":["https://tvalive.akamaized.net/hls/live/2014213/tvan01/tvan01.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2lPL6VHc-o6nAIURKlP8MvsVBicY33rla0Q&s'],
-                            "Monaco info":["https://webtv.monacoinfo.com/live/prod/index.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1VR57eePeExf7WUKjoYkuVNU7adK3xjA83w&s'],
-                            "Euro news": ["https://euronews-live-fra-fr.fast.rakuten.tv/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6564/bitok/eyJzdGlkIjoiOTgyOTZjMmUtYWQ4MS00M2YyLTk4MjktYTc4ODhiYjk4YzE1IiwibWt0IjoiZnIiLCJjaCI6NjU2NCwicHRmIjoxfQ==/26032/euronews-fr.m3u8",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsYmwNKSQ_YAUFeD6Fdf_w4ogSsvc5jkrTjw&s'],
-                            "Figaro LIVE": ['https://d358c6mfrono1y.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-0ppx9nh29jpk7-prod/fa5bf751-4c1a-465b-97bd-1fa62e8a7d00/3.m3u8','https://i.f1g.fr/media/cms/1200x630_crop/2020/04/23/5d488b28d8769cab0f220dbe3c23076465b6ffc688f006a2f90abd4f666e478e.jpeg'],
-                            "LÉquipe": ['https://www.dailymotion.com/embed/video/x2lefik','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_XHPZ9L4v9x4BxUtezSMukLIV0HDSnYj9Ig&s'],
-                            "Sky news":['https://skynewsau-live.akamaized.net/hls/live/2002689/skynewsau-extra1/master.m3u8', 'https://www.newscaststudio.com/wp-content/uploads/2018/01/sky-news-new-logo.jpg'],
-                            "France info":['https://geo.dailymotion.com/embed/video/x4rdeu6', 'https://mouvement-europeen.eu/wp-content/uploads/2018/04/Logo-France-Info.png'],
-                            "Gulli":['https://origin-caf900c010ea8046.live.6cloud.fr/out/v1/c65696b42ca34e97a9b5f54758d6dd50/cmaf/hlsfmp4_short_q2hyb21h_gulli_sd_index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm1LzBhAYbnBaV5At5nyZVBL7wRyA5CG0CMA&s'],
-                            "LCI": ['https://raw.githubusercontent.com/ipstreet312/freeiptv/master/ressources/btv/py/lci1.m3u8', 'https://photos.tf1.fr/480/0/vignette-paysage-chaine-lci-3d6048-f2e387-0@2x.webp'],
-                            "Haiti news":['https://haititivi.com/website/haitinews/tracks-v1a1/mono.m3u8','https://image.roku.com/developer_channels/prod/7b489e981d6b5c3d76fbbcce619181319a41b7358c5a7732467ac86eab50dd9b.png'],
-                            "Tele Variete(CH30)":['https://acwstream.com/hb/website/30/index.m3u8','https://pbs.twimg.com/profile_images/1301265682978476033/V_eBxD1-_400x400.jpg'],
-                            "Tele soleil":['https://live-kto.akamaized.net/hls/live/2033284/KTO/master.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrtlJj6e4Npcup9Tu_pOOscGkLEg5Tc3_yCQ&s'],
-                            "RTVC CH22":["https://customer-gllhkkbamkskdl1p.cloudflarestream.com/eyJhbGciOiJSUzI1NiIsImtpZCI6ImI3YmIwODNmMDhkNmQ5NWExZjIzZWE3ZWRhOWY4NTZhIn0.eyJzdWIiOiIzZjJhMjA4NmMyMWM5ZThlYTgyZWIzMmMwZDc1MDdjMiIsImtpZCI6ImI3YmIwODNmMDhkNmQ5NWExZjIzZWE3ZWRhOWY4NTZhIiwiZXhwIjoxNzUwOTI0NDMzLCJhY2Nlc3NSdWxlcyI6W3sidHlwZSI6ImlwLmdlb2lwLmNvdW50cnkiLCJhY3Rpb24iOiJibG9jayIsImNvdW50cnkiOlsiUlUiLCJCWSJdfV19.Za-hHmvALWPVnIP2kwD40DwrwTHKB4yhWszp4a8Mcale0XxTDmpOQEpDDfK9Hh1itDD-tucIVf-4_ENZ8cGD-2WQIh-gWDfyaBULWJHE_UBnUrErcUNhYKVYY2u7sC3iLw2HaNInBDy541p1hRphzyWnoCiTZopxm4C-tO-6IPbmNldUII22FBpKoPkcvgSXxotsR-L04aAqqguzFsdx57IIxtyC2CDgXmCyi0k7cjvP1OTp039QlSA1IlnZv3-UhhwG3LXkqGOsgDIV_gskpx4LjrKmb_LUYPFMxkYiipVvayJZYFwbcqm_TrLMiKzeHRKE5YiJsid8Q137fvCY-A/manifest/stream_t908ee6c226505c3a3f99a4d3c623e5a4_r1110203755.m3u8?llhlsHBs=0.5&CMCD=cid%3D%221750881238246%22%2Cmtp%3D500%2Cot%3Dm%2Csf%3Dh%2Csid%3D%22b9f4c7aa-6f05-4ef4-95cb-615c52a445be%22%2Csu",'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBl5Sr1H_3dxSbxNwIRlUYlX_Z6hIUkHN5Rg&s'],
-                            "tele Hirondelle": ['https://haititivi.com/rezo/boul4/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuRgFYAOwnyQyoxDwfN4yQxfCqs91tOhI1w&s'],
-                            "Tele PAM":['https://lakay.online/ott/telepam/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIiNkdqNQHbe5oUlZTRfg1DWPDBlEh3uG4QQ&s'],
-                            "Tele Prince":['https://acwstream.com/stream/netalkole/public/tv/index.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgsWvdXcA6yKZmJ6oXYV20LpysRY7PGI6KiA&s'],
-                            "Kajou TV":['https://video1.getstreamhosting.com:1936/8055/8055/playlist.m3u8', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf4_bRlqCaetp3tAzXnHTilBgVzKro_7uxeg&s'],
-                            "Tele Pluriel":['https://acwstream.com/hb/tvpluriel/index.m3u8','https://yt3.googleusercontent.com/ytc/AIdro_lywQgtFU41-MZKrsep_UeNTwoS1cbP-Hwx647H5CsjsA=s900-c-k-c0x00ffffff-no-rj'],
-                            "snl tv":['https://live.acwstream.com:3246/live/snltvlive.m3u8','https://ih1.redbubble.net/image.803414841.9971/flat,750x,075,f-pad,750x1000,f8f8f8.u2.jpg'],
-                            "Tele Puissance":['https://video1.getstreamhosting.com:1936/8560/8560/playlist.m3u8','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfPtQQ1mf-ZATV9A9_5N1Imjc3Sw-9F6SCjw&s']
-        }
-    urltele = chaines_tv_en_direct[str(nomtele).replace('-', ' ')]  # retirer le tiret qui se trouve dans le nom de chaine
-    recommandations = [(nom, urls) for nom, urls in chaines_tv_en_direct.items() if str(nomtele).replace('-', ' ') != nom]
-    print(urltele)
-    return render_template('watchtv.html', channel_tv=urltele, nomtele=str(nomtele).replace('-', ' '), autres_chaines=recommandations)
+    channel_tv = []
+    nomtele_tv = str(nomtele).replace("-"," ")
+    recommandations = autrechannel(nomtele_tv)
+    connection = sqlite3.connect('musique_bunny.db')
+    cursor = connection.cursor()
+    req = cursor.execute("select nom, url_stream, url_logo from channeltv where nom=?", (nomtele_tv,))
+    connection.commit()
+    result = req.fetchall()
+    connection.close()
+    for row in result:
+        channel_tv.append({"nomtele": str(row[0]).replace("-", " "),"urlstream": row[1]})
+    return render_template('watchtv.html', channel_tv=channel_tv, recommandations=recommandations)
 
 @app.route('/search', methods=['POST','GET'])
 def searchmusic():
@@ -1950,7 +1953,7 @@ def ajoutercommentaire(musique_id, titre):
     else:
         print('commentaire non envoye..')
 
-# pour ajouter l'année dans le pied de page
+# pour ajouter l'année en cours au pied de page
 @app.context_processor
 def inject_year():
     return {"year": datetime.now().year}
