@@ -1280,10 +1280,10 @@ def autrechannel(nomtele):
 
     return recommandations
 
-@app.after_request
-def ajout_csp(response):
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
-    return response
+# ###@app.after_request
+# def ajout_csp(response):
+#     response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
+#     return response
 
 @app.route('/')
 def accueil():
