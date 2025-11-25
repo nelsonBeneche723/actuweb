@@ -678,13 +678,14 @@ document.getElementById('commentForm').addEventListener('submit', async function
     // Recuperer les commentaires de l'utilisateur
     const comment = document.getElementById('comment').value;
     const url = this.action; // l'URL du form Flask
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': csrf_token
+                'X-CSRFToken': csrfToken
             },
             body: 'comment=' + encodeURIComponent(comment)
         });
