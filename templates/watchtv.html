@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
 
+{% block link %}<link rel="icon" href="" type="image/x-icon"> {% endblock %}
 
-{% block title %} 📺 {{nomtele}}: En direct {% endblock %}
+{% block title %}
+📺
+{% for channelinfo in channel_tv %}
+{{channelinfo.nomtele}}: En direct
+{% endfor %}
+
+{% endblock %}
 
 
 <!--Contenu de la page tv-->
 {% block content %}
 <div class="container">
-    <h2>📺 {{ nomtele }} - En direct</h2>
+    {% for channelinfo in channel_tv %}
+    <h2>📺 {{ channelinfo.nomtele}} - En direct</h2>
   <div class="video-wrapper">
         <video
                 id="my-video"
@@ -18,20 +26,21 @@
                 data-setup="{}"
                 controls>
             <source
-                    src="{{channel_tv[0]}}"
+                    src="{{channelinfo.urlstream}}"
                     type="application/x-mpegURL">
 
             Votre navigateur ne supporte pas la lecture vidéo en direct.
         </video>
   </div>
+{% endfor %}
 
   <h3>🔁 Chaînes recommandées</h3>
     <div class="recommendations">
-        {% for chaine, urls in autres_chaines %}
+        {% for chainerecommande in recommandations %}
             <div class="channel-card">
-                <a href="{{url_for('lecturestreaming_tv', nomtele=chaine.replace(' ','-'))}}">
-                    {{ chaine }}
-                <img src="{{urls[1]}}" alt="image de chaine tv" style="height:40px;width:80px;">
+                <a href="{{url_for('lecturestreaming_tv', nomtele=chainerecommande.chaine|replace(' ','-'))}}">
+                    {{ chainerecommande.chaine }}
+                <img src="{{chainerecommande.urllogo}}" alt="image de chaine tv" style="height:40px;width:80px;">
                 </a>
             </div>
         {% endfor %}
