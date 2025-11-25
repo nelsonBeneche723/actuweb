@@ -25,7 +25,7 @@ from flask_mail import Mail, Message
 import hashlib
 import mailtrap as mt
 from flask_wtf import FlaskForm
-from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 import bleach
 
 # chargement du fichier .env
@@ -34,7 +34,7 @@ load_dotenv()
 app = Flask(__name__)
 # Générer un clé secret
 app.secret_key = "je_suis_sony_devweb+"
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
 
@@ -1960,5 +1960,5 @@ def inject_year():
 
 # fonction principale
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True, port=5002)
+    app.run(debug=True, use_reloader=True, port=5005)
 
