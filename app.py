@@ -25,7 +25,7 @@ from flask_mail import Mail, Message
 import hashlib
 import mailtrap as mt
 from flask_wtf import FlaskForm
-# from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect
 import bleach
 
 # chargement du fichier .env
@@ -34,7 +34,9 @@ load_dotenv()
 app = Flask(__name__)
 # Générer un clé secret
 app.secret_key = "je_suis_sony_devweb+"
-# csrf = CSRFProtect(app)
+csrf = CSRFProtect()
+csrf.init_app(app)
+
 app.config['BABEL_DEFAULT_TIMEZONE']='America/Port-au-Prince'
 lien_database = 'musique_bunny.db'
 
@@ -1285,6 +1287,7 @@ def autrechannel(nomtele):
 #     response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
 #     return response
 
+@csrf.exempt
 @app.route('/')
 def accueil():
     api_key = os.getenv('api_key_nouvelles')
@@ -1326,6 +1329,7 @@ def accueil():
 
     #
 
+@csrf.exempt
 @app.route('/stations-radios', methods=['GET'])
 def stationradio():    # Récupération des stations par défaut
     stat = aff_stationradio()
@@ -1354,6 +1358,7 @@ def stationradio():    # Récupération des stations par défaut
 
     return render_template('stationradio.html',sections=sections,stat=stat, nomstations=nomstations)
 
+@csrf.exempt
 @app.route('/assistant-ia', methods=['GET','POST'])
 def assistanceai():
     genai.configure(api_key=os.getenv('GEMINI_APIKEY'))
@@ -1374,6 +1379,7 @@ def assistanceai():
 
     return render_template('assistanceai.html', reponses=reponses)
 
+@csrf.exempt
 @app.route('/meteo', methods=['GET','POST'])
 def affichermeteo():
     meteos = []
@@ -1435,6 +1441,7 @@ def affichermeteo():
 
     return render_template('meteo.html', meteos=meteos, previsionsjours=previsionsjours, previsionshoraires=previsionshoraires)
 
+@csrf.exempt
 @app.route('/music')
 def musiques():
     resultcompas = affichermusique_genre('compas')
@@ -1442,6 +1449,7 @@ def musiques():
     resultevangelique = affichermusique_genre("evangelique")
     return render_template('musiques.html', resultcompas=resultcompas, resultafro=resultafro, resultevangelique=resultevangelique)
 
+@csrf.exempt
 @app.route('/sports/score-en-direct')
 def matchsencours():
     resultat_mpl, resultat_sa, resultat_fl1, resultat_mpd, resultat_bl1 = None, None, None, None, None
@@ -1456,6 +1464,7 @@ def matchsencours():
     return render_template('score.html', section='championnat', resultat_mpl=resultat_mpl, resultat_sa=resultat_sa,
                            resultat_bl1=resultat_bl1, resultat_fl1=resultat_fl1, resultat_mpd=resultat_mpd)
 
+@csrf.exempt
 @app.route('/sports')
 def sportactualites():
     section = request.args.get("section")
@@ -1500,6 +1509,7 @@ def sportactualites():
                            resultat=resultat, section=section, resultat_mpl=resultat_mpl)
 
 # ✅ Route AJAX pour afficher l'heure
+@csrf.exempt
 @app.route('/heure')
 def heure_actuelle():
     # dateheure = datetime.date.today()
@@ -1516,6 +1526,7 @@ def heure_actuelle():
     dth = f'{hre}:{mnts}:{sec}'
     return jsonify({"heure": dth})
 
+@csrf.exempt
 @app.route('/sports/match-termine')
 def matchtermineend():
     resultat_tpl, resultat_tsa, resultat_tlig, resultat_tlig1, resultat_tligb = None, None, None, None, None
@@ -1531,6 +1542,7 @@ def matchtermineend():
                            resultat_tlig=resultat_tlig, resultat_tsa=resultat_tsa,
                            resultat_tlig1=resultat_tlig1, resultat_tligb=resultat_tligb)
 
+@csrf.exempt
 @app.route('/sports/classement-buteurs')
 def recuperertousbuteurs():
     buteurs_pl, buteurs_sa, buteurs_fl1, buteurs_pd, buteurs_bl1 = None,None,None,None,None
@@ -1547,6 +1559,7 @@ def recuperertousbuteurs():
     return render_template('classementbuteur.html', buteurs_pl= buteurs_pl,buteurs_pd=buteurs_pd, buteurs_sa=buteurs_sa,
                                                                buteurs_bl1=buteurs_bl1, buteurs_fl1=buteurs_fl1, scorer_europe=scorer_europe)
 
+@csrf.exempt
 @app.route('/music/<int:musique_id>/<slug>/')
 def jouer_musique(musique_id, slug):
     conn = sqlite3.connect(lien_database)
@@ -1598,6 +1611,7 @@ def jouer_musique(musique_id, slug):
     return render_template('lecteur.html', musique=resultatmusique, recommandations=recommandations,
                            plus_contenu_musique=plus_contenu_musique, chanson=paroles,  affcommentaires= affcommentaires)
 
+@csrf.exempt
 @app.route('/music/trending-songs')
 def trendingsong():
     client_id = os.getenv('client_id_jamendo')
@@ -1618,7 +1632,7 @@ def trendingsong():
         print(f'Erreur API{e}')
     return render_template('trending-song.html', trending_songs=trending_songs)
 
-
+@csrf.exempt
 @app.route('/music/new-track-music')
 def newtrack():
     client_id = os.getenv('client_id_jamendo')
@@ -1639,6 +1653,7 @@ def newtrack():
         print(f'Erreur API{e}')
     return render_template('new-song.html', new_songs=new_songs)
 
+@csrf.exempt
 @app.route('/music/news-artist')
 def newsartist():
     news = []
@@ -1654,6 +1669,7 @@ def newsartist():
         news.append({"titre":row.title,"image-url":image, "published":row.published, 'description':traduction.translate(row.description), "lien":row.link})
     return render_template('artist.html', news=news)
 
+@csrf.exempt
 @app.route('/sante')
 def infossante():
     url_rss = "https://lemonde.fr/sante/rss_full.xml"
@@ -1678,6 +1694,7 @@ def infossante():
         print(f"Erreur de requete vers le fichier xml: {e}")
     return render_template('sante.html', santes=infos_santes)
 
+@csrf.exempt
 @app.route('/music/videos-youtube-trending')
 def playvideosyoutube():
     apikey = os.getenv('api_youtubedata')
@@ -1695,6 +1712,7 @@ def playvideosyoutube():
         print(f'erreur {str(e)}')
     return render_template('videosyoutube.html', videosyoutube=videosyoutube)
 
+@csrf.exempt
 @app.route('/sciences')
 def infossciences():
     url = 'https://www.lemonde.fr/sciences/rss_full.xml'
@@ -1720,7 +1738,7 @@ def infossciences():
 
     return render_template('sciences.html',sciences_=infos_sciences)
 
-
+@csrf.exempt
 @app.route('/live-tv')
 def livetv():
     connection = sqlite3.connect('musique_bunny.db')
@@ -1733,6 +1751,7 @@ def livetv():
     # transmettre les donnees du tv vers la page livetv.html
     return render_template('livetv.html', channeltv=tv)
 
+@csrf.exempt
 @app.route('/watch-tv/<nomtele>')
 def lecturestreaming_tv(nomtele):
     channel_tv = []
@@ -1748,6 +1767,7 @@ def lecturestreaming_tv(nomtele):
         channel_tv.append({"nomtele": str(row[0]).replace("-", " "),"urlstream": row[1]})
     return render_template('watchtv.html', channel_tv=channel_tv, recommandations=recommandations)
 
+@csrf.exempt
 @app.route('/search', methods=['POST','GET'])
 def searchmusic():
     query_mus = []
@@ -1873,6 +1893,7 @@ def logout():
 @app.route('/create-account')
 def showpageaccount():
     return render_template('createaccount.html')
+
 
 @app.route('/music/<int:musique_id>/<titre>/', methods=['GET', 'POST'])
 def ajoutercommentaire(musique_id, titre):
