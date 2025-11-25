@@ -584,7 +584,6 @@ img {
       {% if 'user' in session %}
 
         <form id="commentForm" class="comment-form" method="post" action="{{url_for('ajoutercommentaire', musique_id=musique.id,titre=musique.titre|replace(' ','-')) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="comment">Ajouter un commentaire :</label>
             <textarea name="comment" id="comment" rows="5" cols="70" required></textarea>
             <button type="submit">Envoyer</button>

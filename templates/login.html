@@ -14,7 +14,6 @@
   width: 100%;
   max-width: 400px;
   text-align: center;
-
   /* Ajout d’un espace autour */
   margin: 30px auto;  /* 20px en haut et en bas, auto au centre horizontal */
 }
@@ -149,7 +148,6 @@
     {% endif %}
 
     <form method="POST" action="/login">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div>
         <label for="username">Nom d'utilisateur :</label>
         <input type="text" id="username" name="username" required>

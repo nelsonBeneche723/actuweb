@@ -86,10 +86,11 @@
 <div class="endirect-container">
      {% for channel in channeltv %}
     <div class="endirect-card">
-        <a href ="{{url_for('lecturestreaming_tv', nomtele=channel.nomtele|replace(' ','-'))}}">
-            <img src="{{channel.images}}" alt="image de l'articles" style="height:150px;">
 
+        <a href ="{{url_for('lecturestreaming_tv', nomtele=channel.nomtv|replace(' ', '-'))}}">
+            <img src="{{channel.images}}" alt="image de l'articles" style="height:150px;">
         </a>
+
         <h2 style="text-align:center; font-size: 1em;">{{channel.nomtele}}</h2>
     </div>
   {% endfor %}
