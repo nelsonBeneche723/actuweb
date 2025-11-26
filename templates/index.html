@@ -1,9 +1,34 @@
 {% extends 'base.html' %}
 
-{% block title %}Actu Web: Politiques, Sports, Sante.. {% endblock %}
+{% block title %}Actu Web: Politiques, Sports, Sante, Musiques, Resultats matchs.... {% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/actuweb.ico') }}" type="image/x-icon">
+{% endblock %}
+
+{% block description %}
+Actu Web est un site qui vous offre : les dernières actualités politiques,
+les résultats sportifs et classements des 5 grands championnats européens.
+Vous pouvez aussi écouter des musiques en ligne, profiter de la radio, regarder des chaînes TV, consulter la météo,
+discuter avec Gemini directement depuis le site, et suivre les actualités santé et technologies.
+
+{% endblock %}
+
+{% block og_description %}
+Actu Web est un site qui vous offre : les dernières actualités politiques, les résultats sportifs, regarder des chaines tv,
+consulter la météo, ecouter des musiques et classements des 5 grands championnats européens.
+{% endblock %}
+
+{% block og_title %}
+Actu Web: Politiques, Sports, Santé, Musiques, Resultats matchs..
+{% endblock %}
+
+{% block og_url %}
+    {{request.url}}
+{% endblock %}
+
+{% block og_image %}
+{{url_for('static', filename='images/actuweb.png', _external=True)}}
 {% endblock %}
 
 
