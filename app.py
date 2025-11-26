@@ -1979,6 +1979,9 @@ def ajoutercommentaire(musique_id, titre):
 def inject_year():
     return {"year": datetime.now().year}
 
+@app.context_processor
+def inject_request():
+    return dict(request=request)
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True, port=5005)
