@@ -6,6 +6,12 @@
 <link rel="icon" href="{{ url_for('static', filename='images/actuweb.ico') }}" type="image/x-icon">
 {% endblock %}
 
+{% block link %}
+<link rel="icon" href="{{ url_for('static', filename='images/actuweb.png') }}" type="image/png">
+{% endblock %}
+
+
+
 {% block description %}
 Actu Web est un site qui vous offre : les dernières actualités politiques,
 les résultats sportifs et classements des 5 grands championnats européens.
@@ -37,18 +43,22 @@ Actu Web: Politiques, Sports, Santé, Musiques, Resultats matchs..
 
 
 .error {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            text-align:center;
-        }
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-align:center;
+}
 
 .error p {
-            margin-bottom: 8px;
-            color: #555;
-        }
-    .suma{font-family:arial; text-align:center;}
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.suma {
+    font-family:arial;
+    text-align:center;
+}
 </style>
 
 
