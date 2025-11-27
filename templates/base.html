@@ -53,10 +53,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </head>
 <body>
-<div class="menu-label">Actu Web <hr/><p>Politiques, santé, technologies, sports, musiques...</p></div>
+<!--<div class="menu-label">Actu Web <hr/><p>Politiques, santé, technologies, sports, musiques...</p></div>-->
+<div class="menu-label">
+    <img src="{{url_for('static', filename='images/1000127898-removebg-preview.png')}}" alt="logo du site">
+</div>
 <!--Menu toggle-->
 <button id="menuToggle" class="menuToggle" onclick="toggleMenu()">☰</button>
     <nav id="mainNav">
+        <div class="logo">
+            <img src="{{url_for('static', filename='images/1000127898-removebg-preview.png')}}" alt="logo du site">
+        </div>
         <ul>
             <li><a href="/">Accueil</a></li>
             <li><a href="/sports">Sports</a></li>
