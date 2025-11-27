@@ -1,7 +1,8 @@
 import datetime
 import time
 from pyradios import RadioBrowser
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
+from flask import (Flask, render_template, request, redirect, url_for, jsonify,
+                   session, flash, send_from_directory)
 import os
 import requests
 from dotenv import load_dotenv  # Pour lire les fichiers de type (. env)
@@ -1974,14 +1975,30 @@ def ajoutercommentaire(musique_id, titre):
     else:
         print('commentaire non envoye..')
 
+
 # pour ajouter l'année en cours au pied de page
 @app.context_processor
 def inject_year():
     return {"year": datetime.now().year}
 
+
 @app.context_processor
 def inject_request():
     return dict(request=request)
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
+
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('static','robots.txt', mimetype='text/plain')
+
+@app.route('/googleadf9f2a8534e6c04.html')
+def google_verification():
+    return app.send_static_file('googleadf9f2a8534e6c04.html')
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True, port=5005)
