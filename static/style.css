@@ -181,7 +181,7 @@ p, ul {
 /* Sticky Footer */
 
 footer {
-  background: #2c3e50;
+  background: black;
   color: #fff;
   padding: 30px 20px;
   text-align: center;
@@ -492,7 +492,10 @@ body {
     {
         display:block;
     }
-
+    .logo
+    {
+    display:none;
+    }
 
     .champ {
         background-color:black;
@@ -550,6 +553,8 @@ body {
         width:100% !important;
         }
         .images-covers img { width:85% !important;}
+
+
 
 }
 
@@ -637,4 +642,51 @@ body {
  .music-carte img {
     height: 150px; /* Hauteur réduite sur petit écran */
   }
+}
+
+
+/*Ajouter le logo dans le menu*/
+#mainNav {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: black; /*#2c3e50*/
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+}
+
+#mainNav .nav-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 30px; /* Espace entre logo et menu */
+}
+
+#mainNav .logo {
+    flex-shrink: 0; /* Empêche le logo de rétrécir */
+}
+
+#mainNav .logo img {
+    height: 50px; /* Ajustez selon votre logo */
+    width: 130px;
+}
+
+#mainNav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px; /* Espace entre les liens */
+    flex-wrap: wrap;
+}
+
+#mainNav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+#mainNav ul li a:hover {
+    color: #007bff;
 }
