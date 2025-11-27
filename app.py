@@ -1992,13 +1992,14 @@ def sitemap():
     return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
 
 
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory('static','robots.txt', mimetype='text/plain')
+# @app.route('/robots.txt')
+# def robots():
+#     return send_from_directory('static','robots.txt', mimetype='text/plain')
 
 @app.route('/googleadf9f2a8534e6c04.html')
 def google_verification():
     return app.send_static_file('googleadf9f2a8534e6c04.html')
+
 # fonction principale
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True, port=5005)
