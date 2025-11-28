@@ -496,6 +496,14 @@ body {
     {
     display:none;
     }
+.nav-container {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+
+    height: 100%;
+
+}
 
     .champ {
         background-color:black;
@@ -659,7 +667,7 @@ body {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 200px; /* Espace entre logo et menu */
+    gap: 150px; /* Espace entre logo et menu */
 }
 
 #mainNav .logo {
