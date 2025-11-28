@@ -397,11 +397,16 @@ body {
         font-size: 1rem;
   }
   input[type="text"] {
-    width: 100%;
-    max-width: 300px;
-        }
-
+        width: 100%;
+        max-width: 300px;
     }
+    .search-input-wrapper input {
+        flex-direction:column;
+        width: 100%;
+        gap:8px;
+    }
+
+}
 
     </style>
 
@@ -434,7 +439,7 @@ body {
      <form class="search-bar" action="/search" method="GET">
          <div class="search-input-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" name="query" placeholder="Rechercher par Artistes, Songs, Albums, Videos..">
+            <input type="text" name="query" placeholder="Rechercher par Artistes...">
         </div>
     <button class="btn-search" type="submit">Rechercher</button>
   </form>
@@ -527,7 +532,16 @@ function toggleSubMenu(event) {
 
 function toggleSidebar() {
    const sidebar = document.getElementById('mySidebar')
-   sidebar.classList.toggle('closed');
+   const searchbar = document.querySelector('.search-bar');
+   const isclosed = sidebar.classList.toggle('closed');
+   if (isclosed) {
+        searchbar.style.display = 'flex';
+   }
+   else {
+
+        searchbar.style.display = 'none';
+   }
+
 }
 
   function openModal() {
@@ -567,6 +581,7 @@ function toggleSidebar() {
       modal.style.display = "none";
     }
   }
+
 </script>
 
 
