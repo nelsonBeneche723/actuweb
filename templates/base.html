@@ -60,8 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
 <!--Menu toggle-->
 <button id="menuToggle" class="menuToggle" onclick="toggleMenu()">☰</button>
     <nav id="mainNav">
+        <div class="nav-container">
         <div class="logo">
-            <img src="{{url_for('static', filename='images/1000127898-removebg-preview.png')}}" alt="logo du site">
+            <img src="{{url_for('static', filename='images/1000127950-removebg-preview.png')}}" alt="logo du site">
         </div>
         <ul>
             <li><a href="/">Accueil</a></li>
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <li><a href="/music">Musiques</a></li>
             <li><a href="/assistant-ia">Gemini AI</a></li>
         </ul>
+            </div>
     </nav>
 
 <!--Contenu-->
