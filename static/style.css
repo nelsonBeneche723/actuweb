@@ -496,15 +496,13 @@ body {
     {
     display:none;
     }
+
 .nav-container {
     display:flex;
     flex-direction: column;
     justify-content: center;
-
     height: 100%;
-
 }
-
     .champ {
         background-color:black;
         max-width: 60%; /* Ajuster la valeur selon vos besoins */
@@ -697,4 +695,16 @@ body {
 
 #mainNav ul li a:hover {
     color: #007bff;
+}
+
+
+@media screen and (min-width: 601px) and (max-width:1024px) {
+
+#mainNav .nav-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0px; /* Espace entre logo et menu */
+}
+
 }
