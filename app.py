@@ -1,7 +1,7 @@
 import datetime
 import time
 from pyradios import RadioBrowser
-from flask import (Flask, render_template, request, redirect, url_for, jsonify,
+from flask import (Flask, render_template, request, redirect, url_for, jsonify, Response,
                    session, flash, send_from_directory)
 import os
 import requests
@@ -1368,17 +1368,18 @@ def assistanceai():
     # Formulaire (avec requete POST)
     if request.method=='POST':
         prompt = request.form.get('prompt')  # Récupérer les valeurs du champ texte
-        try:
-            response = model.generate_content(prompt)
-            # conditions si le modèle génère des réponses
-            if response.candidates and response.candidates[0].finish_reason != 4:
-                reponses.append({'reponse': response.text})
-            else:
-                reponses.append({'reponse': "Désolé, aucune réponse pertinente."})
-        except Exception as e:
-            reponses.append({'reponse': f"Erreur : {str(e)}"})
-
-    return render_template('assistanceai.html', reponses=reponses)
+        def generate():
+            try:
+                response = model.generate_content(prompt, stream=True) # affichage en streaming tout comme chatgpt
+                # conditions si le modèle génère des réponses
+                for chunk in response:
+                    if chunk.text:
+                        yield chunk.text
+            except Exception as e:
+                yield f"Erreur : {str(e)}"
+    # on precise le type de conteu 'text/plain' ou text/event-stream
+        return Response(generate(), mimetype='text/event-stream')
+    return render_template('assistanceai.html')
 
 @csrf.exempt
 @app.route('/meteo', methods=['GET','POST'])
