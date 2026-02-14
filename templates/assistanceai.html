@@ -18,6 +18,7 @@
 
   form {
     display: flex;
+    align-items:center;
     justify-content: center;
     margin-bottom: 2rem;
     margin-top: 2rem;
@@ -60,7 +61,6 @@
   }
 
   form {
-    display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 1rem;
@@ -93,22 +93,66 @@
     font-size: 1rem;
     line-height: 1.4;
   }
+
+}
+
+  textarea {width:500px; height:220px;}
+
+@media (max-width: 600px) {
+#prompttextarea{
+    width:100%;
+    margin-bottom:15px;
+    }
 }
 </style>
 <!--    <h2>Assistant IA</h2>-->
 
     <!-- Formulaire de saisi -->
-    <form action="/assistant-ia" method="POST">
-        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;" placeholder="Entrer votre prompt...">
+    <form action="/assistant-ia" method="POST" id="promptForm">
+         <textarea name="prompt" placeholder="Votre question..." id ="prompttextarea" required></textarea>
+<!--        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;" placeholder="Entrer votre prompt...">-->
         <button type="submit">Envoyer</button>
     </form>
   <!-- Affichage de la réponse -->
-    <div class="reponse-container">
-        {% for rep in reponses %}
-        <h2>Réponse de l'assistant IA :</h2>
-        <p>{{rep.reponse}}</p>
-        {% endfor %}
+    <div id="response">
+
     </div>
 
 
+<!--        {% for rep in reponses %}-->
+<!--            <h2>Réponse de l'assistant IA :</h2>-->
+<!--            <p>{{rep.reponse}}</p>-->
+<!--        {% endfor %}-->
+
+
+
+<script>
+document.getElementById('promptForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const responseDiv = document.getElementById('response');
+    responseDiv.innerHTML = ''; // Vider les résultats précédents
+
+    try {
+        const response = await fetch('/assistant-ia', {
+            method: 'POST',
+            body: formData
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const text = decoder.decode(value);
+            responseDiv.innerHTML += text;
+        }
+    } catch (error) {
+        responseDiv.innerHTML = `<p>Erreur : ${error.message}</p>`;
+    }
+});
+</script>
 {% endblock %}
