@@ -1,22 +1,286 @@
-<footer>
-  <div class="footer-container">
-    <h2>Actu Web</h2>
-    <p>
-      Actu Web est un site qui vous offre : les dernières <strong>actualités politiques</strong>,
-      les <strong>résultats sportifs</strong> et classements des <strong>5 grands championnats européens</strong>.
-      Vous pouvez aussi <strong>écouter des musiques en ligne</strong>, profiter de la <strong>radio</strong>,
-      regarder des <strong>chaînes TV</strong>, consulter la <strong>météo</strong>,
-      discuter avec <strong>Gemini</strong> directement depuis le site,
-    et suivre les <strong>actualités santé</strong> et <strong>technologies</strong>.
-    </p>
+<footer class="ft">
+    <div class="ft-container">
 
-    <div class="social-links">
-      <a href="https://facebook.com/Nelson Beneche" target="_blank">Facebook</a>
-      <a href="https://twitter.com" target="_blank">Twitter</a>
-      <a href="https://instagram.com/Beneche1992Ing" target="_blank">Instagram</a>
-      <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+        <!-- ══ COLONNE 1 — Marque ══ -->
+        <div class="ft-brand">
+            <div class="ft-brand__logo">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <h2 class="ft-brand__name">ActuWeb<span>Media</span></h2>
+            <p class="ft-brand__desc">
+                Votre portail d'information haïtien — actualités, sports, musique,
+                radio, TV, météo, sciences et bien-être, disponible 24h/24.
+            </p>
+            <div class="ft-social">
+                <a href="https://facebook.com/Nelson Beneche"
+                   target="_blank" rel="noopener" aria-label="Facebook"
+                   class="ft-social__link ft-social__link--fb">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com"
+                   target="_blank" rel="noopener" aria-label="Twitter / X"
+                   class="ft-social__link ft-social__link--tw">
+                    <i class="fab fa-x-twitter"></i>
+                </a>
+                <a href="https://instagram.com/Beneche1992Ing"
+                   target="_blank" rel="noopener" aria-label="Instagram"
+                   class="ft-social__link ft-social__link--ig">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://linkedin.com"
+                   target="_blank" rel="noopener" aria-label="LinkedIn"
+                   class="ft-social__link ft-social__link--li">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- ══ COLONNE 2 — Rubriques ══ -->
+        <div class="ft-col">
+            <h3 class="ft-col__title">Rubriques</h3>
+            <ul class="ft-links">
+                <li><a href="/actualites"><i class="fas fa-newspaper"></i> Actualités</a></li>
+                <li><a href="/sports"><i class="fas fa-futbol"></i> Sports</a></li>
+                <li><a href="/musiques"><i class="fas fa-music"></i> Musiques</a></li>
+                <li><a href="/stations-radios"><i class="fas fa-radio"></i> Radio</a></li>
+                <li><a href="/live-tv"><i class="fas fa-tv"></i> Live TV</a></li>
+                <li><a href="/meteo"><i class="fas fa-cloud-sun"></i> Météo</a></li>
+                <li><a href="/sante"><i class="fas fa-heart-pulse"></i> Santé</a></li>
+                <li><a href="/sciences"><i class="fas fa-flask"></i> Sciences</a></li>
+            </ul>
+        </div>
+
+        <!-- ══ COLONNE 3 — Outils ══ -->
+        <div class="ft-col">
+            <h3 class="ft-col__title">Outils</h3>
+            <ul class="ft-links">
+                <li><a href="/assistant-ia"><i class="fas fa-robot"></i> Gemini IA</a></li>
+                <li><a href="/search"><i class="fas fa-magnifying-glass"></i> Recherche</a></li>
+                <li><a href="/trendingsong"><i class="fas fa-fire"></i> Trending Songs</a></li>
+                <li><a href="/playvideosyoutube"><i class="fab fa-youtube"></i> Vidéos YouTube</a></li>
+                <li><a href="/login"><i class="fas fa-arrow-right-to-bracket"></i> Connexion</a></li>
+                <li><a href="/create-account"><i class="fas fa-user-plus"></i> Créer un compte</a></li>
+            </ul>
+        </div>
+
+        <!-- ══ COLONNE 4 — À propos ══ -->
+        <div class="ft-col">
+            <h3 class="ft-col__title">À propos</h3>
+            <p class="ft-about">
+                ActuWebMedia couvre les <strong>actualités politiques</strong>,
+                les <strong>5 grands championnats européens</strong>,
+                la <strong>musique haïtienne</strong> et internationale,
+                la <strong>radio en streaming</strong>, les <strong>chaînes TV live</strong>
+                et les actualités <strong>santé &amp; technologies</strong>.
+            </p>
+            <div class="ft-live">
+                <i class="fas fa-circle"></i>
+                <span>Mis à jour en temps réel</span>
+            </div>
+        </div>
+
     </div>
 
-    <p class="copy">&copy; {{year}} Actu Web. Tous droits réservés.</p>
-  </div>
+    <!-- ══ BARRE BAS ══ -->
+    <div class="ft-bottom">
+        <div class="ft-bottom__inner">
+            <span class="ft-copy">
+                &copy; {{ year }} ActuWebMedia. Tous droits réservés.
+            </span>
+            <div class="ft-bottom__links">
+                <a href="#">Politique de confidentialité</a>
+                <span class="ft-sep">·</span>
+                <a href="#">Conditions d'utilisation</a>
+                <span class="ft-sep">·</span>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </div>
 </footer>
+
+<style>
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+.ft {
+    background: #0A0A0F;
+    border-top: 1px solid rgba(255,255,255,.07);
+    font-family: 'Outfit', sans-serif;
+    margin-top: auto;
+}
+
+/* ══ CONTAINER 4 COLONNES ══ */
+.ft-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 52px 32px 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.4fr;
+    gap: 40px;
+}
+
+/* ══ COLONNE 1 — MARQUE ══ */
+.ft-brand__logo {
+    width: 44px; height: 44px;
+    border-radius: 11px;
+    background: rgba(232,39,75,.1);
+    border: 1px solid rgba(232,39,75,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #E8274B;
+    margin-bottom: 12px;
+}
+
+.ft-brand__name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px;
+    color: #fff; margin-bottom: 12px;
+}
+
+.ft-brand__name span { color: #E8274B; }
+
+.ft-brand__desc {
+    font-size: 13px; color: #64748B;
+    line-height: 1.75; margin-bottom: 20px;
+}
+
+/* Réseaux sociaux */
+.ft-social {
+    display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+.ft-social__link {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #94A3B8;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.07);
+    text-decoration: none;
+    transition: background .2s, color .2s, border-color .2s, transform .15s;
+}
+
+.ft-social__link:hover { transform: translateY(-2px); }
+
+.ft-social__link--fb:hover { background: rgba(24,119,242,.15); color: #1877F2; border-color: rgba(24,119,242,.3); }
+.ft-social__link--tw:hover { background: rgba(255,255,255,.1);  color: #fff;    border-color: rgba(255,255,255,.2); }
+.ft-social__link--ig:hover { background: rgba(225,48,108,.15);  color: #E1306C; border-color: rgba(225,48,108,.3); }
+.ft-social__link--li:hover { background: rgba(10,102,194,.15);  color: #0A66C2; border-color: rgba(10,102,194,.3); }
+
+/* ══ COLONNES 2 & 3 — LIENS ══ */
+.ft-col__title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; letter-spacing: 2.5px;
+    color: #fff; text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    position: relative;
+}
+
+.ft-col__title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 28px; height: 2px;
+    background: #E8274B; border-radius: 2px;
+}
+
+.ft-links {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 9px;
+}
+
+.ft-links li a {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #64748B;
+    text-decoration: none;
+    transition: color .2s, gap .2s;
+}
+
+.ft-links li a i {
+    font-size: 11px; color: #E8274B;
+    width: 14px; flex-shrink: 0;
+    opacity: .7; transition: opacity .2s;
+}
+
+.ft-links li a:hover {
+    color: #E2E2EE; gap: 12px;
+}
+
+.ft-links li a:hover i { opacity: 1; }
+
+/* ══ COLONNE 4 — À PROPOS ══ */
+.ft-about {
+    font-size: 13px; color: #64748B;
+    line-height: 1.75; margin-bottom: 16px;
+}
+
+.ft-about strong { color: #94A3B8; font-weight: 600; }
+
+.ft-live {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; color: #10B981;
+    background: rgba(16,185,129,.08);
+    border: 1px solid rgba(16,185,129,.18);
+    border-radius: 20px; padding: 5px 12px;
+}
+
+.ft-live i {
+    font-size: 7px;
+    animation: ftBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes ftBlink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+/* ══ BARRE BAS ══ */
+.ft-bottom {
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 16px 32px;
+}
+
+.ft-bottom__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+}
+
+.ft-copy {
+    font-size: 12.5px; color: #475569;
+}
+
+.ft-bottom__links {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ft-bottom__links a {
+    font-size: 12px; color: #475569;
+    text-decoration: none; transition: color .2s;
+}
+
+.ft-bottom__links a:hover { color: #94A3B8; }
+
+.ft-sep { color: #334155; font-size: 12px; }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 1024px) {
+    .ft-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+    .ft-brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+    .ft-container {
+        grid-template-columns: 1fr;
+        padding: 32px 20px 28px;
+        gap: 28px;
+    }
+    .ft-brand { grid-column: 1; }
+    .ft-bottom { padding: 14px 20px; }
+    .ft-bottom__inner { flex-direction: column; text-align: center; gap: 8px; }
+}
+</style>

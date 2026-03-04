@@ -1,48 +1,456 @@
 {% extends 'base.html' %}
-{% block title %} Santé: Actu Web  {% endblock %}
+
+{% block title %}Santé — ActuWebMedia{% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/sante.ico') }}" type="image/x-icon">
 {% endblock %}
 
-<!--Contenus de la page sante-->
 {% block content %}
-
-
 <style>
+:root {
+    --sh-bg:     #0A0A0F;
+    --sh-bg2:    #111118;
+    --sh-bg3:    #18181F;
+    --sh-bg4:    #1E1E28;
+    --sh-border: rgba(255,255,255,.07);
+    --sh-red:    #E8274B;
+    --sh-green:  #10B981;
+    --sh-teal:   #14B8A6;
+    --sh-text:   #E2E2EE;
+    --sh-muted:  #64748B;
+    --sh-muted2: #94A3B8;
+    --ff-head:   'Bebas Neue', sans-serif;
+    --ff-body:   'Outfit', sans-serif;
+}
 
-.error {
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        text-align:center;
+/* ══ PAGE ══ */
+.sh-page {
+    background: var(--sh-bg);
+    font-family: var(--ff-body);
+    min-height: 100vh;
+}
+
+/* ══ HERO ══ */
+.sh-hero {
+    background: linear-gradient(135deg, #0A0F0E 0%, #0A140F 50%, #0A0A0F 100%);
+    border-bottom: 1px solid var(--sh-border);
+    padding: 44px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.sh-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(16,185,129,.1) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.sh-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; right: 8%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(20,184,166,.08) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.sh-hero__inner { position: relative; z-index: 1; }
+
+.sh-hero__icon {
+    width: 68px; height: 68px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(20,184,166,.12));
+    border: 1px solid rgba(16,185,129,.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 26px; color: var(--sh-green);
+    animation: shPulse 3s ease-in-out infinite;
+}
+
+@keyframes shPulse {
+    0%,100% { box-shadow: 0 0 20px rgba(16,185,129,.1); }
+    50%      { box-shadow: 0 0 50px rgba(16,185,129,.25); }
+}
+
+.sh-hero__eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--ff-head);
+    font-size: 12px; letter-spacing: 3px;
+    color: var(--sh-green); text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.sh-hero__eyebrow::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--sh-green); border-radius: 2px;
+}
+
+.sh-hero__title {
+    font-family: var(--ff-head);
+    font-size: clamp(36px, 6vw, 62px);
+    letter-spacing: 3px; color: #fff; line-height: 1;
+    margin-bottom: 8px;
+}
+
+.sh-hero__title em { font-style: normal; color: var(--sh-green); }
+
+.sh-hero__sub {
+    font-size: 14px; color: var(--sh-muted2);
+    max-width: 480px; margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ══ CONTENU ══ */
+.sh-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 28px;
+}
+
+/* Section head */
+.sh-section-head {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px; gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sh-section-label {
+    display: flex; align-items: center; gap: 10px;
+}
+
+.sh-section-label::before {
+    content: '';
+    width: 3px; height: 22px;
+    background: var(--sh-green); border-radius: 2px;
+}
+
+.sh-section-label h2 {
+    font-family: var(--ff-head);
+    font-size: 22px; letter-spacing: 1.5px; color: #fff;
+}
+
+.sh-count {
+    background: rgba(16,185,129,.1);
+    border: 1px solid rgba(16,185,129,.2);
+    color: var(--sh-green);
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ══ GRILLE ARTICLES ══ */
+.sh-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Article featured (premier) */
+.sh-grid .sh-card:first-child {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.sh-card {
+    background: var(--sh-bg3);
+    border: 1px solid var(--sh-border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.sh-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    border-color: rgba(16,185,129,.22);
+}
+
+/* Thumb */
+.sh-card__thumb {
+    position: relative; overflow: hidden;
+    height: 200px; background: var(--sh-bg4);
+    flex-shrink: 0;
+}
+
+.sh-grid .sh-card:first-child .sh-card__thumb {
+    height: 100%; min-height: 260px;
+}
+
+.sh-card__thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .32s;
+}
+
+.sh-card:hover .sh-card__thumb img { transform: scale(1.04); }
+
+/* Badge santé */
+.sh-card__badge {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(16,185,129,.18);
+    border: 1px solid rgba(16,185,129,.3);
+    backdrop-filter: blur(8px);
+    color: #6EE7B7;
+    font-family: var(--ff-head);
+    font-size: 10px; letter-spacing: 1.5px;
+    padding: 4px 10px; border-radius: 4px;
+}
+
+.sh-card__badge i { font-size: 9px; }
+
+/* Corps carte */
+.sh-card__body {
+    padding: 20px 20px 16px;
+    display: flex; flex-direction: column;
+    flex: 1;
+}
+
+.sh-card__date {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--sh-muted);
+    margin-bottom: 10px;
+}
+
+.sh-card__date i { font-size: 10px; color: var(--sh-green); }
+
+.sh-card__title {
+    font-family: var(--ff-head);
+    font-size: 20px; letter-spacing: .8px;
+    color: var(--sh-text); line-height: 1.25;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color .2s;
+    text-decoration: none;
+}
+
+.sh-grid .sh-card:first-child .sh-card__title {
+    font-size: 26px; -webkit-line-clamp: 4;
+}
+
+.sh-card:hover .sh-card__title { color: var(--sh-green); }
+
+.sh-card__summary {
+    font-size: 13.5px; color: var(--sh-muted2);
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+    margin-bottom: 16px;
+}
+
+/* Footer carte */
+.sh-card__footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--sh-border);
+}
+
+.sh-read-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 700;
+    color: var(--sh-green); text-decoration: none;
+    transition: gap .2s;
+}
+
+.sh-read-link:hover { gap: 10px; }
+.sh-read-link i { font-size: 11px; }
+
+.sh-card__source {
+    font-size: 11px; color: var(--sh-muted);
+    display: flex; align-items: center; gap: 5px;
+}
+
+.sh-card__source i { font-size: 10px; }
+
+/* ══ ÉTAT VIDE / ERREUR ══ */
+.sh-empty {
+    text-align: center; padding: 60px 20px;
+    background: var(--sh-bg3);
+    border: 1px dashed rgba(255,255,255,.08);
+    border-radius: 16px;
+}
+
+.sh-empty i {
+    font-size: 48px; color: var(--sh-muted);
+    margin-bottom: 16px; display: block; opacity: .5;
+}
+
+.sh-empty h3 {
+    font-family: var(--ff-head);
+    font-size: 22px; letter-spacing: 1px;
+    color: var(--sh-muted2); margin-bottom: 8px;
+}
+
+.sh-empty p { font-size: 13.5px; color: var(--sh-muted); }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 900px) {
+    .sh-hero    { padding: 28px 20px; }
+    .sh-content { padding: 20px; }
+    .sh-grid .sh-card:first-child {
+        grid-column: 1;
+        grid-template-columns: 1fr;
     }
+    .sh-grid .sh-card:first-child .sh-card__thumb { min-height: 200px; }
+}
 
-.error p {
-            margin-bottom: 8px;
-            color: #555;
-        }
-
+@media (max-width: 600px) {
+    .sh-hero    { padding: 20px 16px; }
+    .sh-content { padding: 14px; }
+    .sh-grid    { grid-template-columns: 1fr; gap: 14px; }
+    .sh-card__thumb { height: 170px; }
+    .sh-card__title { font-size: 17px; }
+}
 </style>
 
-{% if santes %}
- <div class="actualites-container">
-      {% for sante in santes %}
-            <div class="article-card">
-                 <img src="{{sante.image}}" alt="image de..{{sante.title}}">
-                 <h3><a href="{{sante.link}}" target="_blank">{{sante.title}}</a></h3>
-                <div class="suma"><a>{{sante.summary|safe}}</a></div>
-                <h4><a>Date de Publication: {{sante.published}}</a></h4>
+<!-- ══ PAGE ══ -->
+<div class="sh-page">
+
+    <!-- ══ HERO ══ -->
+    <div class="sh-hero">
+        <div class="sh-hero__inner">
+            <div class="sh-hero__icon">
+                <i class="fas fa-heart-pulse"></i>
             </div>
-      {% endfor %}
-  </div>
-{% else %}
-<div class="error">
-    <p>Erreur API</p>
-    <p>Aucune donnée disponible.</p>
-</div>
-{% endif %}
+            <div class="sh-hero__eyebrow">
+                <i class="fas fa-stethoscope"></i> ActuWebMedia Santé
+            </div>
+            <h1 class="sh-hero__title">ACTUALITÉS <em>SANTÉ</em></h1>
+            <p class="sh-hero__sub">
+                Médecine, bien-être, nutrition, recherche — suivez toute
+                l'actualité santé en temps réel.
+            </p>
+        </div>
+    </div>
 
+    <!-- ══ CONTENU ══ -->
+    <div class="sh-content">
 
+        {% if santes %}
+
+        <div class="sh-section-head">
+            <div class="sh-section-label">
+                <h2>Dernières actualités</h2>
+            </div>
+            <span class="sh-count">
+                {{ santes|length }} article{{ 's' if santes|length > 1 }}
+            </span>
+        </div>
+
+        <div class="sh-grid">
+            {% for sante in santes %}
+            <div class="sh-card">
+
+                <!-- Thumbnail -->
+                <div class="sh-card__thumb">
+                    <img
+                        src="{{ sante.image }}"
+                        alt="{{ sante.title }}"
+                        loading="lazy"
+                        onerror="this.src='https://placehold.co/600x300/18181F/64748B?text=Santé'"
+                    >
+                    <div class="sh-card__badge">
+                        <i class="fas fa-heart-pulse"></i> SANTÉ
+                    </div>
+                </div>
+
+                <!-- Corps -->
+                <div class="sh-card__body">
+                    <div class="sh-card__date">
+                        <i class="fas fa-clock"></i>
+                        {{ sante.published }}
+                    </div>
+
+                    <a class="sh-card__title"
+                       href="{{ sante.link }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        {{ sante.title }}
+                    </a>
+
+                    <div class="sh-card__summary">
+                        {{ sante.summary | safe }}
+                    </div>
+
+                    <div class="sh-card__footer">
+                        <a class="sh-read-link"
+                           href="{{ sante.link }}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Lire l'article
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <span class="sh-card__source">
+                            <i class="fas fa-newspaper"></i> Source
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+
+        <div class="sh-empty">
+            <i class="fas fa-heart-crack"></i>
+            <h3>Aucun article disponible</h3>
+            <p>Erreur API — vérifiez votre connexion ou revenez plus tard.</p>
+        </div>
+
+        {% endif %}
+
+    </div><!-- /sh-content -->
+</div><!-- /sh-page -->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    /* Lazy images fade-in */
+    if ('IntersectionObserver' in window) {
+        document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+            img.style.opacity    = '0';
+            img.style.transition = 'opacity .35s';
+            const io = new IntersectionObserver(([e]) => {
+                if (!e.isIntersecting) return;
+                img.addEventListener('load', () => img.style.opacity = '1');
+                if (img.complete) img.style.opacity = '1';
+                io.disconnect();
+            }, { rootMargin: '80px' });
+            io.observe(img);
+        });
+    }
+
+    /* Clic sur la carte entière → ouvre le lien */
+    document.querySelectorAll('.sh-card').forEach(card => {
+        card.addEventListener('click', e => {
+            if (e.target.closest('a')) return;
+            const link = card.querySelector('.sh-read-link');
+            if (link) window.open(link.href, '_blank');
+        });
+    });
+})();
+</script>
 {% endblock %}

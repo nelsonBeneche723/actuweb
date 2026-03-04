@@ -1,619 +1,1278 @@
 {% extends 'base.html' %}
 
-{% block title %}Sports: Actu Web{% endblock %}
+{% block title %}Sports — Actu Web{% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/sport.ico') }}" type="image/x-icon">
 {% endblock %}
 
-
 {% block content %}
-
-<!--{{bienvenue}}-->
-<!--<span id="horloge"> {{data}} </span>-->
 <style>
-.sidebar {
-    width: 250px;
-    height: 100vh; /* pleine hauteur */
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+    --sp-bg:      #0A0A0F;
+    --sp-bg2:     #111118;
+    --sp-bg3:     #18181F;
+    --sp-bg4:     #1E1E28;
+    --sp-border:  rgba(255,255,255,.07);
+    --sp-red:     #E8274B;
+    --sp-gold:    #F5A623;
+    --sp-green:   #10B981;
+    --sp-blue:    #3B82F6;
+    --sp-text:    #E2E2EE;
+    --sp-muted:   #64748B;
+    --sp-muted2:  #94A3B8;
+    --ff-head:    'Bebas Neue', sans-serif;
+    --ff-body:    'Outfit', sans-serif;
+}
+
+/* ══════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════ */
+.sports-page {
+    display: flex;
+    min-height: 100vh;
+    background: var(--sp-bg);
+    font-family: var(--ff-body);
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════ */
+.sports-sidebar {
+    width: 240px;
+    background: var(--sp-bg2);
+    border-right: 1px solid var(--sp-border);
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
     overflow-y: auto;
-    background-color: #1e1e2f;
-    color: white;
-    padding: 20px;
-    box-sizing: border-box;
-    position: fixed; /* fixe à gauche */
-    top: 8%;
-    left: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    z-index: 50;
 }
 
-/* Scrollbar moderne */
-.sidebar::-webkit-scrollbar {
-    width: 8px;
+.sports-sidebar::-webkit-scrollbar { width: 3px; }
+.sports-sidebar::-webkit-scrollbar-thumb { background: var(--sp-red); border-radius: 3px; }
+
+.sb-head {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--sp-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
+.sb-head-title {
+    font-family: var(--ff-head);
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: var(--sp-text);
 }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.sidebar h2 {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    color: #ff4081;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-}
-
-.sidebar li {
-    padding: 10px 0;
+/* Horloge en direct */
+.sb-clock {
     display: flex;
     align-items: center;
     gap: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 16px;
+    background: rgba(232,39,75,.06);
+    border-bottom: 1px solid var(--sp-border);
+    font-family: var(--ff-head);
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--sp-red);
 }
 
-.sidebar li:hover {
-    color: #ff4081;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
-    padding-left: 5px;
-    transition: 0.3s ease;
+.sb-clock i { font-size: 11px; animation: blink 1.2s ease-in-out infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+/* Nav sidebar */
+.sb-nav { padding: 10px 10px; list-style: none; flex: 1; }
+.sb-nav li { margin-bottom: 2px; }
+
+.sb-nav-section {
+    padding: 12px 12px 4px;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--sp-muted);
 }
 
-
-
-    /* Centrer tout */
-    .calendrier-container {
+.sb-nav a {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sp-muted2);
+    text-decoration: none;
+    transition: background .18s, color .18s;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.match-result {
-<!--    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);-->
+.sb-nav a:hover { background: rgba(255,255,255,.06); color: var(--sp-text); }
+.sb-nav a.is-active { background: rgba(232,39,75,.12); color: #fff; }
+.sb-nav a.is-active .sb-ico { color: var(--sp-red); }
+
+.sb-ico { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
+
+/* Sous-menu championnats */
+.sb-submenu {
+    list-style: none;
+    padding: 4px 0 4px 14px;
+    display: none;
+}
+
+.sb-submenu.is-open { display: block; }
+
+.sb-submenu li { margin-bottom: 1px; }
+
+.sb-submenu a {
+    padding: 8px 10px;
+    font-size: 12.5px;
+    border-radius: 8px;
+    color: var(--sp-muted2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: background .18s, color .18s;
+}
+
+.sb-submenu a:hover { background: rgba(255,255,255,.05); color: var(--sp-text); }
+
+.sb-submenu a.is-active {
+    background: rgba(232,39,75,.1);
     color: #fff;
-    border-radius: 15px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-    background-color:   #e8f5e9 ;
 }
 
-.match-result:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+.sb-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    transition: transform .2s;
+    color: var(--sp-muted);
 }
 
-.match-result p {
-    margin: 10px 0;
-    font-size: 1.1rem;
-}
+.sb-nav li.sub-open > a .sb-arrow { transform: rotate(180deg); }
 
-.match-result p strong {
-    font-size: 1.2rem;
-}
-
-    /* Centrer le tableau */
-    .classement-table {
-        margin: 20px auto; /* Centre le tableau */
-        border-collapse: collapse;
-        width: 90%;
-        max-width: 1000px;
-        background-color: #ffffff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    /* Style des titres */
-    .classement-table thead {
-        background-color: #3498db;
-        color: white;
-        font-weight: bold;
-    }
-
-    /* Espacement */
-    .classement-table th, .classement-table td {
-        padding: 12px 15px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-    }
-
-    /* Effet hover sur les lignes */
-    .classement-table tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* Dernière ligne sans bord bas */
-    .classement-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .error {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            text-align:center;
-        }
-
-.error p {
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-
-.match-container {
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
+.sports-main {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+}
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.sports-hero {
+    background: linear-gradient(135deg, #0A0D18 0%, #0D1520 60%, #0A0A14 100%);
+    border-bottom: 1px solid var(--sp-border);
+    padding: 36px 40px 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sports-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: 8%;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(59,130,246,.12) 0%, transparent 68%);
+    pointer-events: none;
+}
+
+.sports-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 5%;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(232,39,75,.08) 0%, transparent 68%);
+    pointer-events: none;
+}
+
+.hero-inner {
+    position: relative; z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     gap: 20px;
-    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ff-head);
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--sp-blue);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.hero-eyebrow::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--sp-blue);
+    border-radius: 2px;
+}
+
+.hero-title {
+    font-family: var(--ff-head);
+    font-size: clamp(34px, 5vw, 54px);
+    letter-spacing: 2px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.hero-title em { font-style: normal; color: var(--sp-red); }
+
+.hero-sub {
+    font-size: 13.5px;
+    color: var(--sp-muted2);
+    max-width: 460px;
+    line-height: 1.6;
+}
+
+/* Horloge hero */
+.hero-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.hero-clock-time {
+    font-family: var(--ff-head);
+    font-size: 38px;
+    letter-spacing: 3px;
+    color: #fff;
+    line-height: 1;
+}
+
+.hero-clock-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--sp-muted);
+}
+
+/* ══════════════════════════════════════
+   TABS LIGUES
+══════════════════════════════════════ */
+.league-tabs {
+    background: var(--sp-bg2);
+    border-bottom: 1px solid var(--sp-border);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 32px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 60px;
+    z-index: 40;
+}
+
+.league-tabs::-webkit-scrollbar { display: none; }
+
+.league-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 16px;
+    font-family: var(--ff-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sp-muted2);
+    white-space: nowrap;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+    flex-shrink: 0;
+}
+
+.league-tab:hover { color: var(--sp-text); }
+
+.league-tab.is-active {
+    color: #fff;
+    border-bottom-color: var(--sp-red);
+}
+
+.league-tab .flag { font-size: 15px; }
+
+/* ══════════════════════════════════════
+   CONTENU
+══════════════════════════════════════ */
+.sports-content {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* ══════════════════════════════════════
+   BANDEAU INFO (data)
+══════════════════════════════════════ */
+.info-band {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: rgba(59,130,246,.08);
+    border: 1px solid rgba(59,130,246,.2);
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #93C5FD;
+}
+
+.info-band i { color: var(--sp-blue); }
+
+/* ══════════════════════════════════════
+   SECTION TITRE
+══════════════════════════════════════ */
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 12px;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-label::before {
+    content: '';
+    width: 3px; height: 22px;
+    background: var(--sp-red);
+    border-radius: 2px;
+}
+
+.section-label h2 {
+    font-family: var(--ff-head);
+    font-size: 24px;
+    letter-spacing: 1.5px;
+    color: #fff;
+}
+
+/* ══════════════════════════════════════
+   GRAPHIQUE
+══════════════════════════════════════ */
+.chart-wrap {
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 14px;
+    overflow: hidden;
+    padding: 20px;
+    text-align: center;
+}
+
+.chart-wrap img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* ══════════════════════════════════════
+   TABLEAU CLASSEMENT
+══════════════════════════════════════ */
+.ranking-card {
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.ranking-card__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: var(--sp-bg4);
+    border-bottom: 1px solid var(--sp-border);
+}
+
+.ranking-card__head h3 {
+    font-family: var(--ff-head);
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: #fff;
+}
+
+.ranking-card__head .flag { font-size: 18px; }
+
+.ranking-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 640px;
+}
+
+.ranking-table thead th {
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--sp-muted);
+    background: var(--sp-bg4);
+    border-bottom: 1px solid var(--sp-border);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.ranking-table thead th:nth-child(2) { text-align: left; }
+
+.ranking-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: var(--sp-text);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.ranking-table tbody td:nth-child(2) { text-align: left; font-weight: 600; }
+
+.ranking-table tbody tr:last-child td { border-bottom: none; }
+
+.ranking-table tbody tr {
+    transition: background .15s;
+}
+
+.ranking-table tbody tr:hover { background: rgba(255,255,255,.03); }
+
+/* Zones colorées */
+.ranking-table tbody tr:nth-child(-n+4) td:first-child {
+    border-left: 3px solid #3B82F6;
+}
+
+.ranking-table tbody tr:nth-child(5) td:first-child,
+.ranking-table tbody tr:nth-child(6) td:first-child {
+    border-left: 3px solid #F5A623;
+}
+
+.ranking-table tbody tr:last-child td:first-child,
+.ranking-table tbody tr:nth-last-child(2) td:first-child,
+.ranking-table tbody tr:nth-last-child(3) td:first-child {
+    border-left: 3px solid var(--sp-red);
+}
+
+/* Badge points */
+.pts-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 24px;
+    background: rgba(59,130,246,.15);
+    border: 1px solid rgba(59,130,246,.25);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #93C5FD;
+}
+
+/* Position badge */
+.pos-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.05);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--sp-muted2);
+}
+
+.pos-1 { background: rgba(245,166,35,.2); color: #FDE68A; }
+.pos-2 { background: rgba(156,163,175,.15); color: #D1D5DB; }
+.pos-3 { background: rgba(180,120,60,.15); color: #D4A96A; }
+
+/* ══════════════════════════════════════
+   MATCHS CARDS
+══════════════════════════════════════ */
+.matches-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.matches-block {}
+
+.matches-block-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--ff-head);
+    font-size: 20px;
+    letter-spacing: 1.5px;
+    color: #fff;
+    margin-bottom: 14px;
+}
+
+.matches-block-title i { color: var(--sp-red); font-size: 15px; }
+
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
 }
 
 .match-card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px 20px;
-    width: 250px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 12px;
+    padding: 16px;
     text-align: center;
-    font-family: Arial, sans-serif;
-    transition: transform 0.2s;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    cursor: default;
 }
 
 .match-card:hover {
-    transform: scale(1.05);
-    background: #eef2f3;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.4);
+    border-color: rgba(255,255,255,.12);
 }
 
- .suma {
-    font-family:arial;
-    text-align:center;
- }
-    /* Styles pour les appareils mobiles pour la page sports*/
-    /* Styles pour les appareils mobiles */
-@media (max-width: 767px) {
-  .classement-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.8rem;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+.match-card__vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
 
-  .classement-table th,
-  .classement-table td {
-    padding: 0.5rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
+.match-card__team {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--sp-text);
+    line-height: 1.3;
+}
 
-  .classement-table th {
-    background-color: #007bff;
-    color: #fff;
-    font-weight: bold;
-  }
+.match-card__sep {
+    font-family: var(--ff-head);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--sp-red);
+    flex-shrink: 0;
+}
 
-  .classement-table td {
-    white-space: nowrap;
+.match-card__date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 11.5px;
+    color: var(--sp-muted);
+    font-weight: 500;
+}
+
+.match-card__date i { color: var(--sp-gold); font-size: 10px; }
+
+/* ══════════════════════════════════════
+   RÉSULTATS CALENDRIER
+══════════════════════════════════════ */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.result-card {
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: transform .2s, border-color .2s;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,.12);
+}
+
+.result-card__competition {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(232,39,75,.1);
+    border: 1px solid rgba(232,39,75,.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--sp-red);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 12px;
+}
+
+.result-card__match {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sp-text);
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.result-card__date {
+    font-size: 11.5px;
+    color: var(--sp-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ══════════════════════════════════════
+   ACTU SPORTS
+══════════════════════════════════════ */
+.actu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+}
+
+.actu-card {
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 14px;
     overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+}
 
-  .classement-table td:nth-child(2) {
-    max-width: 100px;
-  }
+.actu-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    border-color: rgba(255,255,255,.12);
+}
 
+.actu-card__thumb {
+    height: 170px;
+    overflow: hidden;
+    position: relative;
+}
+
+.actu-card__thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .32s;
+}
+
+.actu-card:hover .actu-card__thumb img { transform: scale(1.06); }
+
+.actu-card__body { padding: 14px 16px; }
+
+.actu-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sp-text);
+    line-height: 1.45;
+    margin-bottom: 8px;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color .2s;
+}
+
+.actu-card__title:hover { color: var(--sp-red); }
+
+.actu-card__summary {
+    font-size: 12.5px;
+    color: var(--sp-muted2);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.actu-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--sp-border);
+}
+
+.actu-card__date {
+    font-size: 11px;
+    color: var(--sp-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.actu-card__link {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sp-red);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap .2s;
+}
+
+.actu-card__link:hover { gap: 7px; }
+
+/* ══════════════════════════════════════
+   ERREUR
+══════════════════════════════════════ */
+.sports-error {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--sp-bg3);
+    border: 1px solid var(--sp-border);
+    border-radius: 16px;
+}
+
+.sports-error i {
+    font-size: 48px;
+    color: var(--sp-muted);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.sports-error h3 {
+    font-family: var(--ff-head);
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: var(--sp-muted2);
+    margin-bottom: 8px;
+}
+
+.sports-error p { font-size: 13.5px; color: var(--sp-muted); }
+
+/* ══════════════════════════════════════
+   LÉGENDE
+══════════════════════════════════════ */
+.ranking-legend {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    border-top: 1px solid var(--sp-border);
+    font-size: 11.5px;
+    color: var(--sp-muted);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 900px) {
+    .sports-sidebar { display: none; }
+    .sports-hero    { padding: 24px 20px; }
+    .hero-clock     { display: none; }
+    .sports-content { padding: 20px; }
+    .league-tabs    { padding: 0 16px; }
+}
+
+@media (max-width: 600px) {
+    .sports-hero    { padding: 18px 16px; }
+    .sports-content { padding: 14px; gap: 20px; }
+    .matches-grid   { grid-template-columns: 1fr 1fr; }
+    .results-grid   { grid-template-columns: 1fr; }
+    .actu-grid      { grid-template-columns: 1fr; }
+    .ranking-table  { font-size: 12px; }
+    .ranking-table thead th,
+    .ranking-table tbody td { padding: 9px 10px; }
+}
+
+@media (max-width: 400px) {
+    .matches-grid { grid-template-columns: 1fr; }
 }
 </style>
 
+<!-- ══ PAGE STRUCTURE ══ -->
+<div class="sports-page">
 
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sports-sidebar">
 
+        <div class="sb-head">
+            <span class="sb-head-title">SPORTS</span>
+        </div>
+
+        <!-- Horloge en direct -->
+        <div class="sb-clock">
+            <i class="fas fa-circle"></i>
+            <span id="horloge">--:--:--</span>
+        </div>
+
+        <ul class="sb-nav">
+            <div class="sb-nav-section">Championnats</div>
+
+            <!-- Classements avec sous-menu -->
+            <li id="sub-classement">
+                <a href="#" onclick="toggleSub('sub-classement'); return false;">
+                    <i class="fas fa-trophy sb-ico" style="color:var(--sp-gold)"></i>
+                    Classements
+                    <i class="fas fa-chevron-down sb-arrow"></i>
+                </a>
+                <ul class="sb-submenu" id="submenu-classement">
+                    <li>
+                        <a href="/sports?section=classement&championnat=france"
+                           class="{{ 'is-active' if request.args.get('championnat') == 'france' }}">
+                            🇫🇷 Ligue 1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/sports?section=classement&championnat=espagne"
+                           class="{{ 'is-active' if request.args.get('championnat') == 'espagne' }}">
+                            🇪🇸 La Liga
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/sports?section=classement&championnat=italie"
+                           class="{{ 'is-active' if request.args.get('championnat') == 'italie' }}">
+                            🇮🇹 Serie A
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/sports?section=classement&championnat=allemagne"
+                           class="{{ 'is-active' if request.args.get('championnat') == 'allemagne' }}">
+                            🇩🇪 Bundesliga
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/sports?section=classement&championnat=angleterre"
+                           class="{{ 'is-active' if request.args.get('championnat') == 'angleterre' }}">
+                            🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <div class="sb-nav-section">Navigation</div>
+
+            <li>
+                <a href="/sports/score-en-direct">
+                    <i class="fas fa-broadcast-tower sb-ico" style="color:var(--sp-red)"></i>
+                    Score en direct
+                </a>
+            </li>
+            <li>
+                <a href="/sports?section=calendrier-matchs">
+                    <i class="fas fa-calendar-days sb-ico" style="color:var(--sp-blue)"></i>
+                    Calendrier
+                </a>
+            </li>
+            <li>
+                <a href="/sports/classement-buteurs">
+                    <i class="fas fa-ranking-star sb-ico" style="color:var(--sp-gold)"></i>
+                    Top Buteurs
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('sportactualites') }}">
+                    <i class="fas fa-newspaper sb-ico"></i>
+                    Dernières news
+                </a>
+            </li>
+            <li>
+                <a href="/sports/match-termine">
+                    <i class="fas fa-futbol sb-ico" style="color:var(--sp-green)"></i>
+                    Résultats
+                </a>
+            </li>
+        </ul>
+
+    </aside>
+
+    <!-- ══════════ MAIN ══════════ -->
+    <div class="sports-main">
+
+        <!-- HERO -->
+        <div class="sports-hero">
+            <div class="hero-inner">
+                <div>
+                    <div class="hero-eyebrow">
+                        <i class="fas fa-futbol"></i> Sports
+                    </div>
+                    <h1 class="hero-title">FOOTBALL <em>LIVE</em></h1>
+                    <p class="hero-sub">
+                        Classements, résultats, calendriers — les 5 grands championnats européens en temps réel.
+                    </p>
+                </div>
+                <div class="hero-clock">
+                    <div class="hero-clock-time" id="horloge-hero">--:--</div>
+                    <div class="hero-clock-label">Heure locale</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS LIGUES -->
+        <div class="league-tabs">
+            <a href="/sports" class="league-tab {{ 'is-active' if not request.args.get('championnat') and not request.args.get('section') }}">
+                <i class="fas fa-globe"></i> Tout
+            </a>
+            <a href="/sports?section=classement&championnat=france"
+               class="league-tab {{ 'is-active' if request.args.get('championnat') == 'france' }}">
+                <span class="flag">🇫🇷</span> Ligue 1
+            </a>
+            <a href="/sports?section=classement&championnat=espagne"
+               class="league-tab {{ 'is-active' if request.args.get('championnat') == 'espagne' }}">
+                <span class="flag">🇪🇸</span> La Liga
+            </a>
+            <a href="/sports?section=classement&championnat=italie"
+               class="league-tab {{ 'is-active' if request.args.get('championnat') == 'italie' }}">
+                <span class="flag">🇮🇹</span> Serie A
+            </a>
+            <a href="/sports?section=classement&championnat=allemagne"
+               class="league-tab {{ 'is-active' if request.args.get('championnat') == 'allemagne' }}">
+                <span class="flag">🇩🇪</span> Bundesliga
+            </a>
+            <a href="/sports?section=classement&championnat=angleterre"
+               class="league-tab {{ 'is-active' if request.args.get('championnat') == 'angleterre' }}">
+                <span class="flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> Premier League
+            </a>
+            <a href="/sports/score-en-direct" class="league-tab">
+                <i class="fas fa-broadcast-tower" style="color:var(--sp-red)"></i> Direct
+            </a>
+        </div>
+
+        <!-- CONTENU -->
+        <div class="sports-content">
+
+            <!-- Bandeau info -->
+            {% if data %}
+            <div class="info-band">
+                <i class="fas fa-circle-info"></i>
+                <strong>{{ data }}</strong>
+            </div>
+            {% endif %}
+
+            <!-- ══ MACRO CLASSEMENT (évite la répétition) ══ -->
+            {% macro render_classement(rows, flag, league_name,
+                                       matches_auj, matches_dem,
+                                       key_dom='domicile', key_ext='exterieur', key_date='date',
+                                       key_dom_dem='domicile_dem', key_ext_dem='exterieur_dem', key_date_dem='date_dem') %}
+
+            <!-- Classement -->
+            <div>
+                <div class="section-head">
+                    <div class="section-label">
+                        <h2>{{ flag }} {{ league_name }}</h2>
+                    </div>
+                </div>
+
+                <div class="ranking-card">
+                    <div class="ranking-card__head">
+                        <span class="flag">{{ flag }}</span>
+                        <h3>{{ league_name }} — Classement</h3>
+                    </div>
+                    <div class="ranking-wrap">
+                        <table class="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Équipe</th>
+                                    <th>J</th>
+                                    <th>Pts</th>
+                                    <th>G</th>
+                                    <th>N</th>
+                                    <th>P</th>
+                                    <th>BP</th>
+                                    <th>BC</th>
+                                    <th>Diff</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cl in rows %}
+                                <tr>
+                                    <td>
+                                        <span class="pos-badge {{ 'pos-1' if loop.index == 1 else 'pos-2' if loop.index == 2 else 'pos-3' if loop.index == 3 }}">
+                                            {{ cl.position }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cl.equipe }}</td>
+                                    <td>{{ cl.journee }}</td>
+                                    <td><span class="pts-badge">{{ cl.points }}</span></td>
+                                    <td style="color:var(--sp-green)">{{ cl.gagne }}</td>
+                                    <td>{{ cl.nul }}</td>
+                                    <td style="color:var(--sp-red)">{{ cl.perdu }}</td>
+                                    <td>{{ cl.buts_marques }}</td>
+                                    <td>{{ cl.buts_encaisses }}</td>
+                                    <td>
+                                        {% if cl.difference > 0 %}
+                                            <span style="color:var(--sp-green)">+{{ cl.difference }}</span>
+                                        {% elif cl.difference < 0 %}
+                                            <span style="color:var(--sp-red)">{{ cl.difference }}</span>
+                                        {% else %}
+                                            {{ cl.difference }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ranking-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background:#3B82F6"></div> Ligue des Champions
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background:#F5A623"></div> Europa League
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background:var(--sp-red)"></div> Relégation
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique -->
+            {% if image %}
+            <div class="chart-wrap">
+                <img src="data:image/png;base64,{{ image }}" alt="Graphique {{ league_name }}">
+            </div>
+            {% endif %}
+
+            <!-- Matchs aujourd'hui + demain -->
+            <div class="matches-section">
+                {% if matches_auj %}
+                <div class="matches-block">
+                    <div class="matches-block-title">
+                        <i class="fas fa-circle"></i> Matchs Aujourd'hui
+                    </div>
+                    <div class="matches-grid">
+                        {% for mat in matches_auj %}
+                        <div class="match-card">
+                            <div class="match-card__vs">
+                                <span class="match-card__team">{{ mat[key_dom] }}</span>
+                                <span class="match-card__sep">VS</span>
+                                <span class="match-card__team">{{ mat[key_ext] }}</span>
+                            </div>
+                            <div class="match-card__date">
+                                <i class="fas fa-clock"></i>
+                                {{ mat[key_date] }} (PAP)
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if matches_dem %}
+                <div class="matches-block">
+                    <div class="matches-block-title">
+                        <i class="fas fa-calendar-day"></i> Matchs Demain
+                    </div>
+                    <div class="matches-grid">
+                        {% for matc in matches_dem %}
+                        <div class="match-card">
+                            <div class="match-card__vs">
+                                <span class="match-card__team">{{ matc[key_dom_dem] }}</span>
+                                <span class="match-card__sep">VS</span>
+                                <span class="match-card__team">{{ matc[key_ext_dem] }}</span>
+                            </div>
+                            <div class="match-card__date">
+                                <i class="fas fa-clock"></i>
+                                {{ matc[key_date_dem] }} (PAP)
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% endmacro %}
+
+            <!-- ══ RENDU CONDITIONNEL PAR CHAMPIONNAT ══ -->
+
+            {% if classementfrance %}
+                {{ render_classement(classementfrance, '🇫🇷', 'Ligue 1',
+                    match_ligue1_auj, match_ligue1_dem) }}
+
+            {% elif classementespagne %}
+                {{ render_classement(classementespagne, '🇪🇸', 'La Liga',
+                    match_esp_auj, match_esp_dem) }}
+
+            {% elif classementangleterre %}
+                {{ render_classement(classementangleterre, '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Premier League',
+                    match_ang_auj, match_ang_dem) }}
+
+            {% elif classementitalie %}
+                {{ render_classement(classementitalie, '🇮🇹', 'Serie A',
+                    match_ita_auj, match_ita_dem) }}
+
+            {% elif classementallemagne %}
+                {{ render_classement(classementallemagne, '🇩🇪', 'Bundesliga',
+                    match_all_auj, match_all_dem) }}
+
+            <!-- ══ CALENDRIER / RÉSULTATS ══ -->
+            {% elif resultat %}
+            <div>
+                <div class="section-head">
+                    <div class="section-label">
+                        <h2>📅 Calendrier des Matchs</h2>
+                    </div>
+                </div>
+                <div class="results-grid">
+                    {% for result in resultat %}
+                    <div class="result-card">
+                        <div class="result-card__competition">
+                            <i class="fas fa-trophy"></i>
+                            {{ result.competition }}
+                        </div>
+                        <div class="result-card__match">{{ result.match }}</div>
+                        <div class="result-card__date">
+                            <i class="fas fa-calendar"></i>
+                            {{ result.date }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ══ ACTUALITÉS SPORTS ══ -->
+            {% elif sportsactu %}
+            <div>
+                <div class="section-head">
+                    <div class="section-label">
+                        <h2>📰 Actualités Sports</h2>
+                    </div>
+                </div>
+                <div class="actu-grid">
+                    {% for sport in sportsactu %}
+                    <article class="actu-card">
+                        <div class="actu-card__thumb">
+                            <img src="{{ sport.image }}" alt="{{ sport.title }}" loading="lazy">
+                        </div>
+                        <div class="actu-card__body">
+                            <a href="{{ sport.link }}" target="_blank" rel="noopener"
+                               class="actu-card__title">{{ sport.title }}</a>
+                            <p class="actu-card__summary">{{ sport.summary | safe }}</p>
+                            <div class="actu-card__footer">
+                                <time class="actu-card__date">
+                                    <i class="fas fa-clock"></i>
+                                    {{ sport.published }}
+                                </time>
+                                <a href="{{ sport.link }}" target="_blank" rel="noopener"
+                                   class="actu-card__link">
+                                    Lire <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ══ ERREUR ══ -->
+            {% else %}
+            <div class="sports-error">
+                <i class="fas fa-satellite-dish"></i>
+                <h3>Aucune donnée disponible</h3>
+                <p>Vérifiez votre connexion ou sélectionnez un championnat.</p>
+            </div>
+            {% endif %}
+
+        </div><!-- /sports-content -->
+    </div><!-- /sports-main -->
+</div><!-- /sports-page -->
+
+{% endblock %}
+
+{% block scripts %}
 <script>
-    function mettreAJourHeure() {
-        fetch('/heure')
-            .then(response => response.json())
-            .then(data => {
-                const horloge = document.getElementById('horloge');
-                if (horloge) {
-                    horloge.textContent = data.heure;
-                }
-            })
-            .catch(error => console.error('Erreur lors de la récupération de l\'heure :', error));
+(function () {
+
+    /* ── Horloge en direct ── */
+    function updateClock() {
+        const now  = new Date();
+        const hh   = String(now.getHours()).padStart(2,'0');
+        const mm   = String(now.getMinutes()).padStart(2,'0');
+        const ss   = String(now.getSeconds()).padStart(2,'0');
+        const full = `${hh}:${mm}:${ss}`;
+        const short= `${hh}:${mm}`;
+
+        const sb   = document.getElementById('horloge');
+        const hero = document.getElementById('horloge-hero');
+        if (sb)   sb.textContent   = full;
+        if (hero) hero.textContent = short;
     }
 
-  //Mise à jour immédiate + toutes les secondes
-    mettreAJourHeure();
-    setInterval(mettreAJourHeure, 1000);
-    //ici on passe à 1000 ms = 1 seconde
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* ── Sous-menu sidebar ── */
+    window.toggleSub = function(liId) {
+        const li  = document.getElementById(liId);
+        const sub = document.getElementById('submenu-' + liId.replace('sub-',''));
+        if (!li || !sub) return;
+        const open = sub.classList.toggle('is-open');
+        li.classList.toggle('sub-open', open);
+    };
+
+    /* ── Auto-ouvrir le sous-menu si un lien enfant est actif ── */
+    const activeSub = document.querySelector('.sb-submenu a.is-active');
+    if (activeSub) {
+        const subList = activeSub.closest('.sb-submenu');
+        const liParent = subList?.closest('li');
+        if (subList && liParent) {
+            subList.classList.add('is-open');
+            liParent.classList.add('sub-open');
+        }
+    }
+
+    /* ── Lazy images fade-in ── */
+    if ('IntersectionObserver' in window) {
+        document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+            img.style.opacity = '0';
+            img.style.transition = 'opacity .3s';
+            const io = new IntersectionObserver(([e]) => {
+                if (!e.isIntersecting) return;
+                img.addEventListener('load', () => img.style.opacity = '1');
+                if (img.complete) img.style.opacity = '1';
+                io.disconnect();
+            }, { rootMargin: '80px' });
+            io.observe(img);
+        });
+    }
+
+})();
 </script>
-<!-- Bouton pour ouvrir/fermer la sidebar -->
-<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
-<div class="sidebar" id="mySidebar">
-    <ul>
-
-        <li><a href="#" onclick="toggleSubMenu(event)">🏆 Classement Championnat</a>
-            <ul class="submenu">
-                <li><a href="/sports?section=classement&championnat=france">🇫🇷 Ligue 1 (France)</a></li>
-                <li><a href="/sports?section=classement&championnat=espagne">🇪🇸 La Liga (Espagne)</a></li>
-                <li><a href="/sports?section=classement&championnat=italie">🇮🇹 Serie A (Italie)</a></li>
-                <li><a href="/sports?section=classement&championnat=allemagne">🇩🇪 Bundesliga (Allemagne)</a></li>
-                <li><a href="/sports?section=classement&championnat=angleterre">🏴 Premier League (Angleterre)</a></li>
-            </ul>
-        </li>
-        <li><a href="/sports/score-en-direct">⚽ Score en direct</a></li>
-        <li><a href="/sports?section=calendrier-matchs">🗓️ Calendrier des matchs</a></li>
-        <li><a href="/sports/classement-buteurs"><i class="fas fa-trophy"></i> Classement buteur(s)</a></li>
-        <li><a href="{{url_for('sportactualites')}}"> <i class="fas fa-newspaper"></i> Dernières news</a></li>
-        <li><a href="/sports/match-termine"><i class="fas fa-futbol"></i> Resultat(s) matchs</a></li>
-    </ul>
-</div>
-
-<!--(contenus dynamique)-->
-<p style="text-align: center;background-color: #f0f0f0;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-size:1.1em;"><strong>{{data}}</strong></p>
-
-{% if classementfrance %}
-<!-- FRANCE -->
-<table class="classement-table">
-    <thead>
-        <tr>
-            <th>Position</th>
-            <th>Équipe</th>
-            <th>Journée(s)</th>
-            <th>Points</th>
-            <th>Gagné</th>
-            <th>Nul</th>
-            <th>Perdu</th>
-            <th>Buts marqués</th>
-            <th>Buts encaissés</th>
-            <th>Différence</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for clfr in classementfrance %}
-        <tr>
-            <td>{{ clfr.position }}</td>
-            <td>{{ clfr.equipe }}</td>
-            <td>{{ clfr.journee }}</td>
-            <td><strong>{{ clfr.points }}</strong></td>
-            <td>{{ clfr.gagne }}</td>
-            <td>{{ clfr.nul }}</td>
-            <td>{{ clfr.perdu }}</td>
-            <td>{{ clfr.buts_marques }}</td>
-            <td>{{ clfr.buts_encaisses }}</td>
-            <td>{{ clfr.difference }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% if image %}
-<img src="data:image/png;base64,{{ image }}" class="img-fluid rounded shadow" alt="Graphique classement">
-{% endif %}
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Aujourd'hui</h2>
-<div class="match-container">
-    {% for mat in match_ligue1_auj %}
-    <div class="match-card">
-        <p><strong>{{ mat.domicile }}</strong> vs <strong>{{ mat.exterieur }}</strong></p>
-        <p>📅 {{ mat.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Demain</h2>
-<div class="match-container">
-    {% for matc in match_ligue1_dem %}
-    <div class="match-card">
-        <p><strong>{{ matc.domicile_dem }}</strong> vs <strong>{{ matc.exterieur_dem }}</strong></p>
-        <p>📅 {{ matc.date_dem }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- ESPAGNE -->
-{% elif classementespagne %}
-<table class="classement-table">
-    <thead>
-        <tr>
-            <th>Position</th>
-            <th>Équipe</th>
-            <th>Journée(s)</th>
-            <th>Points</th>
-            <th>Gagné</th>
-            <th>Nul</th>
-            <th>Perdu</th>
-            <th>Buts marqués</th>
-            <th>Buts encaissés</th>
-            <th>Différence</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for clfr in classementespagne %}
-        <tr>
-            <td>{{ clfr.position }}</td>
-            <td>{{ clfr.equipe }}</td>
-            <td>{{ clfr.journee }}</td>
-            <td><strong>{{ clfr.points }}</strong></td>
-            <td>{{ clfr.gagne }}</td>
-            <td>{{ clfr.nul }}</td>
-            <td>{{ clfr.perdu }}</td>
-            <td>{{ clfr.buts_marques }}</td>
-            <td>{{ clfr.buts_encaisses }}</td>
-            <td>{{ clfr.difference }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% if image %}
-<img src="data:image/png;base64,{{ image }}" class="img-fluid rounded shadow" alt="Graphique classement">
-{% endif %}
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Aujourd'hui</h2>
-<div class="match-container">
-    {% for mt in match_esp_auj %}
-    <div class="match-card">
-        <p><strong>{{ mt.domicile }}</strong> vs <strong>{{ mt.exterieur }}</strong></p>
-        <p>📅 {{ mt.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Demain</h2>
-<div class="match-container">
-    {% for matc in match_esp_dem %}
-    <div class="match-card">
-        <p><strong>{{ matc.domicile_dem }}</strong> vs <strong>{{ matc.exterieur_dem }}</strong></p>
-        <p>📅 {{ matc.date_dem }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- ANGLETERRE -->
-{% elif classementangleterre %}
-<table class="classement-table">
-    <thead>
-        <tr>
-            <th>Position</th>
-            <th>Équipe</th>
-            <th>Journée(s)</th>
-            <th>Points</th>
-            <th>Gagné</th>
-            <th>Nul</th>
-            <th>Perdu</th>
-            <th>Buts marqués</th>
-            <th>Buts encaissés</th>
-            <th>Différence</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for clfr in classementangleterre %}
-        <tr>
-            <td>{{ clfr.position }}</td>
-            <td>{{ clfr.equipe }}</td>
-            <td>{{ clfr.journee }}</td>
-            <td><strong>{{ clfr.points }}</strong></td>
-            <td>{{ clfr.gagne }}</td>
-            <td>{{ clfr.nul }}</td>
-            <td>{{ clfr.perdu }}</td>
-            <td>{{ clfr.buts_marques }}</td>
-            <td>{{ clfr.buts_encaisses }}</td>
-            <td>{{ clfr.difference }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% if image %}
-<img src="data:image/png;base64,{{ image }}" class="img-fluid rounded shadow" alt="Graphique classement">
-{% endif %}
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Aujourd'hui</h2>
-<div class="match-container">
-    {% for mt in match_ang_auj %}
-    <div class="match-card">
-        <p><strong>{{ mt.domicile }}</strong> vs <strong>{{ mt.exterieur }}</strong></p>
-        <p>📅 {{ mt.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Demain</h2>
-<div class="match-container">
-    {% for matc in match_ang_dem %}
-    <div class="match-card">
-        <p><strong>{{ matc.domicile_dem }}</strong> vs <strong>{{ matc.exterieur_dem }}</strong></p>
-        <p>📅 {{ matc.date_dem }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- ITALIE (À ajouter) -->
-{% elif classementitalie %}
-<table class="classement-table">
-  <thead>
-        <tr>
-            <th>Position</th>
-            <th>Équipe</th>
-            <th>Journée(s)</th>
-            <th>Points</th>
-            <th>Gagné</th>
-            <th>Nul</th>
-            <th>Perdu</th>
-            <th>Buts marqués</th>
-            <th>Buts encaissés</th>
-            <th>Différence</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for clfr in classementitalie %}
-        <tr>
-            <td>{{ clfr.position }}</td>
-            <td>{{ clfr.equipe }}</td>
-            <td>{{ clfr.journee }}</td>
-            <td><strong>{{ clfr.points }}</strong></td>
-            <td>{{ clfr.gagne }}</td>
-            <td>{{ clfr.nul }}</td>
-            <td>{{ clfr.perdu }}</td>
-            <td>{{ clfr.buts_marques }}</td>
-            <td>{{ clfr.buts_encaisses }}</td>
-            <td>{{ clfr.difference }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% if image %}
-<img src="data:image/png;base64,{{ image }}" class="img-fluid rounded shadow" alt="Graphique classement">
-{% endif %}
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Aujourd'hui</h2>
-<div class="match-container">
-    {% for mt in match_ita_auj %}
-    <div class="match-card">
-        <p><strong>{{ mt.domicile }}</strong> vs <strong>{{ mt.exterieur }}</strong></p>
-        <p>📅 {{ mt.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Demain</h2>
-<div class="match-container">
-    {% for matc in match_ita_dem %}
-    <div class="match-card">
-        <p><strong>{{ matc.domicile_dem }}</strong> vs <strong>{{ matc.exterieur_dem }}</strong></p>
-        <p>📅 {{ matc.date_dem }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- ALLEMAGNE (À ajouter) -->
-{% elif classementallemagne %}
-<table class="classement-table"><thead>
-        <tr>
-            <th>Position</th>
-            <th>Équipe</th>
-            <th>Journée(s)</th>
-            <th>Points</th>
-            <th>Gagné</th>
-            <th>Nul</th>
-            <th>Perdu</th>
-            <th>Buts marqués</th>
-            <th>Buts encaissés</th>
-            <th>Différence</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for clfr in classementallemagne %}
-        <tr>
-            <td>{{ clfr.position }}</td>
-            <td>{{ clfr.equipe }}</td>
-            <td>{{ clfr.journee }}</td>
-            <td><strong>{{ clfr.points }}</strong></td>
-            <td>{{ clfr.gagne }}</td>
-            <td>{{ clfr.nul }}</td>
-            <td>{{ clfr.perdu }}</td>
-            <td>{{ clfr.buts_marques }}</td>
-            <td>{{ clfr.buts_encaisses }}</td>
-            <td>{{ clfr.difference }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% if image %}
-<img src="data:image/png;base64,{{ image }}" class="img-fluid rounded shadow" alt="Graphique classement">
-{% endif %}
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Aujourd'hui</h2>
-<div class="match-container">
-    {% for mt in match_all_auj %}
-    <div class="match-card">
-        <p><strong>{{ mt.domicile }}</strong> vs <strong>{{ mt.exterieur }}</strong></p>
-        <p>📅 {{ mt.date }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<h2 style="text-align:center; margin-top:20px;">Matchs Demain</h2>
-<div class="match-container">
-    {% for matc in match_all_dem %}
-    <div class="match-card">
-        <p><strong>{{ matc.domicile_dem }}</strong> vs <strong>{{ matc.exterieur_dem }}</strong></p>
-        <p>📅 {{ matc.date_dem }} Heure Port-au-Prince</p>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- AUCUN RESULTAT -->
-{% elif resultat %}
-<div class="calendrier-container">
-    {% for result in resultat %}
-    <div class="match-result">
-        <p><strong>📅 {{ result.date }}</strong></p>
-        <p style><strong>🏆 {{ result.competition }}</strong></p>
-        <p>🕘 {{ result.match }}</p>
-    </div>
-    {% endfor %}
-</div>
-
-{% elif sportsactu %}
-  <div class="actualites-container">
-      {% for sport in sportsactu %}
-            <div class="article-card">
-                 <img src="{{sport.image}}" alt="image de l'articles">
-                 <h3><a href="{{sport.link}}" target="_blank">{{sport.title}}</a></h3>
-                <div class="suma"><a>{{sport.summary|safe}}</a></div>
-                <h4><a>Date de Publication: {{sport.published}}</a></h4>
-            </div>
-      {% endfor %}
-  </div>
-
-
-<!-- ERREUR -->
-{% else %}
-<div class="error">
-    <p>Erreur API. Aucune donnée disponible.</p>
-</div>
-{% endif %}
-
-
-
-<script>
-<!--    Affichage menu-->
-function toggleSubMenu(event) {
-    event.preventDefault();
-    const submenu = event.target.nextElementSibling;
-    submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
-}
-<!--   cacher le sidebar-->
-    function toggleSidebar() {
-    const sidebar = document.getElementById('mySidebar');
-    sidebar.classList.toggle('closed');
-}
-<!--   Masquer le sidebar-->
-function toggleSubMenu(event) {
-    event.preventDefault();
-    const submenu = event.target.nextElementSibling;
-    submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
-}
-</script>
-
 {% endblock %}

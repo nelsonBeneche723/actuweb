@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<h1>Classement des buteurs</h1>
+
+<!-- Soulier d'Or -->
+{% if top_scorer %}
+ <h2>🏆 Soulier d'Or</h2>
+<div style="background-color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+
+    <p><strong>Joueur :</strong>Kylian Mbappe</p>
+    <p><strong>Pays :</strong> France</p>
+    <p><strong>Buts :</strong> 13 buts</p>
+</div>
+{% if top_scorer %}
+<div style="background-color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+
+    <p><strong>Joueur :</strong> {{ top_scorer.joueur }}</p>
+    <p><strong>Pays :</strong> {{ top_scorer.pays }}</p>
+    <p><strong>Buts :</strong> {{ top_scorer.buts }}</p>
+</div>
+{% endif %}
+
+
+
+
+
+
+<table style="width:50%;  background-color: #fff;">
+        <tr>
+            <td>France</td>
+            <td>Erling Haaland</td>
+            <td><strong>15 buts</strong></td>
+        </tr>
+</table>
+
+
+
+</body>
+</html>

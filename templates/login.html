@@ -1,171 +1,336 @@
 {% extends 'base.html' %}
-{% block title %}Login {% endblock %}
+
+{% block title %}Connexion — ActuWebMedia{% endblock %}
 
 {% block content %}
 <style>
-     body {
-      font-family: Arial, sans-serif;
-    }
-.login-container {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  /* Ajout d’un espace autour */
-  margin: 30px auto;  /* 20px en haut et en bas, auto au centre horizontal */
+:root {
+    --lg-bg:     #0A0A0F;
+    --lg-bg2:    #111118;
+    --lg-bg3:    #18181F;
+    --lg-border: rgba(255,255,255,.07);
+    --lg-red:    #E8274B;
+    --lg-text:   #E2E2EE;
+    --lg-muted:  #64748B;
+    --lg-muted2: #94A3B8;
+    --ff-head:   'Bebas Neue', sans-serif;
+    --ff-body:   'Outfit', sans-serif;
 }
 
-    .login-container h1 {
-      margin-bottom: 1rem;
-      color: #333;
-      font-size: 1.8rem;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    label {
-      text-align: left;
-      font-weight: bold;
-      color: #555;
-      margin-bottom: 0.3rem;
-      display: block;
-    }
-
-    input[type="text"], input[type="password"] {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border 0.3s;
-      width: 100%;
-    }
-
-    input:focus {
-      border-color: #007AFF;
-      outline: none;
-    }
-
-    .btn-connecter {
-      background: #007AFF;
-      color: #fff;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-   .btn-connecter:hover {
-      background: #005BBB;
-    }
-
-    .create-account {
-      margin-top: 1.2rem;
-      font-size: 0.9rem;
-    }
-
-    .create-account a {
-      color: #007AFF;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .create-account a:hover {
-      text-decoration: underline;
-    }
-
-    p.error {
-      color: red;
-      margin-bottom: 1rem;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-
-  /* 📱 Responsive pour mobile */
-@media (max-width: 600px) {
-  .login-container {
-    width: 95%;
-    margin: 20px auto;
-    padding: 15px;
-  }
-
-  .login-container h1 {
-    font-size: 22px;
-  }
-
-  .login-container input,
-  .login-container button {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .create-account p {
-    font-size: 14px;
-  }
-}
-  /* 📲 Tablette (entre 600px et 900px) */
-@media (min-width: 601px) and (max-width: 900px) {
-  .login-container {
-    width: 70%;   /* Un peu plus large que sur PC */
-    margin: 30px auto;
-    padding: 20px;
-  }
-
-  .login-container h1 {
-    font-size: 24px;
-  }
-
-  .login-container input,
-  .login-container button {
-    font-size: 15px;
-    padding: 12px;
-  }
-
-  .create-account p {
-    font-size: 15px;
-  }
+/* ══ PAGE ══ */
+.lg-page {
+    background: var(--lg-bg);
+    font-family: var(--ff-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    position: relative;
+    overflow: hidden;
 }
 
-  </style>
+/* Lueurs décoratives */
+.lg-page::before {
+    content: '';
+    position: fixed;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(232,39,75,.08) 0%, transparent 65%);
+    pointer-events: none;
+}
 
-  <div class="login-container">
-    <h1>Connexion</h1>
+.lg-page::after {
+    content: '';
+    position: fixed;
+    bottom: -80px; right: 10%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(59,130,246,.06) 0%, transparent 65%);
+    pointer-events: none;
+}
 
-    {% if error %}
-      <p class="error">{{ error }}</p>
-    {% endif %}
+/* ══ CARD ══ */
+.lg-card {
+    position: relative; z-index: 1;
+    background: var(--lg-bg3);
+    border: 1px solid var(--lg-border);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    animation: lgIn .35s cubic-bezier(.34,1.2,.64,1);
+}
 
-    <form method="POST" action="/login">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-      <div>
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" id="username" name="username" required>
-      </div>
+@keyframes lgIn {
+    from { opacity: 0; transform: translateY(20px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
 
-      <div>
-        <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required>
-      </div>
+/* Top barre rouge */
+.lg-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--lg-red), transparent);
+    border-radius: 0 0 3px 3px;
+}
 
-      <button class="btn-connecter" type="submit">Se connecter</button>
-    </form>
+/* ══ EN-TÊTE ══ */
+.lg-head {
+    text-align: center;
+    margin-bottom: 32px;
+}
 
-    <div class="create-account">
-      <p>Pas encore de compte ? <a href="/create-account">Créer un compte</a></p>
+.lg-logo {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: rgba(232,39,75,.1);
+    border: 1px solid rgba(232,39,75,.2);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 22px; color: var(--lg-red);
+    animation: lgPulse 3s ease-in-out infinite;
+}
+
+@keyframes lgPulse {
+    0%,100% { box-shadow: 0 0 16px rgba(232,39,75,.1); }
+    50%      { box-shadow: 0 0 36px rgba(232,39,75,.25); }
+}
+
+.lg-head__site {
+    font-family: var(--ff-head);
+    font-size: 13px; letter-spacing: 3px;
+    color: var(--lg-red); text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.lg-head__title {
+    font-family: var(--ff-head);
+    font-size: 34px; letter-spacing: 2px;
+    color: #fff; line-height: 1;
+    margin-bottom: 6px;
+}
+
+.lg-head__sub {
+    font-size: 13px; color: var(--lg-muted2);
+}
+
+/* ══ ERREUR ══ */
+.lg-error {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: rgba(232,39,75,.08);
+    border: 1px solid rgba(232,39,75,.2);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 13.5px; color: #FCA5A5;
+}
+
+.lg-error i { color: var(--lg-red); flex-shrink: 0; }
+
+/* ══ FORMULAIRE ══ */
+.lg-form {
+    display: flex; flex-direction: column; gap: 18px;
+}
+
+.lg-field { display: flex; flex-direction: column; gap: 6px; }
+
+.lg-label {
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--lg-muted2);
+}
+
+.lg-input-wrap {
+    position: relative; display: flex; align-items: center;
+}
+
+.lg-input-wrap i {
+    position: absolute; left: 15px;
+    color: var(--lg-muted); font-size: 14px;
+    pointer-events: none;
+    transition: color .2s;
+}
+
+.lg-input {
+    width: 100%;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: 13px 16px 13px 42px;
+    font-family: var(--ff-body); font-size: 14px;
+    color: var(--lg-text); outline: none;
+    caret-color: var(--lg-red);
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.lg-input::placeholder { color: var(--lg-muted); }
+
+.lg-input:focus {
+    background: rgba(255,255,255,.08);
+    border-color: var(--lg-red);
+    box-shadow: 0 0 0 3px rgba(232,39,75,.1);
+}
+
+.lg-input:focus + i,
+.lg-input-wrap:focus-within i {
+    color: var(--lg-red);
+}
+
+/* Toggle mot de passe */
+.lg-eye {
+    position: absolute; right: 14px;
+    background: none; border: none;
+    color: var(--lg-muted); font-size: 14px;
+    cursor: pointer; padding: 4px;
+    transition: color .2s;
+}
+
+.lg-eye:hover { color: var(--lg-text); }
+
+/* ══ BOUTON SUBMIT ══ */
+.lg-submit {
+    width: 100%; padding: 14px;
+    background: var(--lg-red);
+    border: none; border-radius: 10px;
+    font-family: var(--ff-body);
+    font-size: 15px; font-weight: 700;
+    color: #fff; cursor: pointer;
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 18px rgba(232,39,75,.35);
+    margin-top: 4px;
+}
+
+.lg-submit:hover {
+    background: #c71f40;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(232,39,75,.45);
+}
+
+.lg-submit:active { transform: scale(.98); }
+
+/* ══ FOOTER CARD ══ */
+.lg-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--lg-border);
+    font-size: 13.5px; color: var(--lg-muted2);
+}
+
+.lg-footer a {
+    color: var(--lg-red); font-weight: 700;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.lg-footer a:hover { color: #ff4d6d; text-decoration: underline; }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 480px) {
+    .lg-card    { padding: 28px 20px; border-radius: 16px; }
+    .lg-head__title { font-size: 28px; }
+}
+</style>
+
+<!-- ══ PAGE ══ -->
+<div class="lg-page">
+    <div class="lg-card">
+
+        <!-- En-tête -->
+        <div class="lg-head">
+            <div class="lg-logo">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="lg-head__site">ActuWebMedia</div>
+            <h1 class="lg-head__title">CONNEXION</h1>
+            <p class="lg-head__sub">Accédez à votre espace personnel</p>
+        </div>
+
+        <!-- Erreur -->
+        {% if error %}
+        <div class="lg-error">
+            <i class="fas fa-triangle-exclamation"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Formulaire -->
+        <form class="lg-form" method="POST" action="/login">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Nom d'utilisateur -->
+            <div class="lg-field">
+                <label class="lg-label" for="username">Nom d'utilisateur</label>
+                <div class="lg-input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input
+                        class="lg-input"
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Votre identifiant…"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+            </div>
+
+            <!-- Mot de passe -->
+            <div class="lg-field">
+                <label class="lg-label" for="password">Mot de passe</label>
+                <div class="lg-input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input
+                        class="lg-input"
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Votre mot de passe…"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="lg-eye" id="lgEye" aria-label="Afficher le mot de passe">
+                        <i class="far fa-eye" id="lgEyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="lg-submit">
+                <i class="fas fa-arrow-right-to-bracket"></i>
+                Se connecter
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="lg-footer">
+            Pas encore de compte ?
+            <a href="/create-account">Créer un compte</a>
+        </div>
+
     </div>
-  </div>
+</div>
 
+{% endblock %}
 
+{% block scripts %}
+<script>
+(function () {
+    /* Toggle affichage mot de passe */
+    const eye     = document.getElementById('lgEye');
+    const eyeIcon = document.getElementById('lgEyeIcon');
+    const pwInput = document.getElementById('password');
+
+    eye?.addEventListener('click', () => {
+        const show = pwInput.type === 'password';
+        pwInput.type       = show ? 'text' : 'password';
+        eyeIcon.className  = show ? 'far fa-eye-slash' : 'far fa-eye';
+    });
+})();
+</script>
 {% endblock %}

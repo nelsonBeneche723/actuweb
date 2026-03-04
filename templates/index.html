@@ -1,81 +1,971 @@
 {% extends 'base.html' %}
 
-{% block title %}Actu Web: Politiques, Sports, Sante, Musiques, Resultats matchs.... {% endblock %}
+{% block title %}Actu Web — Politiques, Sports, Santé, Musiques, Résultats matchs{% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/actuweb.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='images/actuweb.png') }}" type="image/png">
 {% endblock %}
 
-
-
-
-{% block description %}
-Actu Web est un site qui vous offre : les dernières actualités politiques,
-les résultats sportifs et classements des 5 grands championnats européens.
-Vous pouvez aussi écouter des musiques en ligne, profiter de la radio, regarder des chaînes TV, consulter la météo,
-discuter avec Gemini directement depuis le site, et suivre les actualités santé et technologies.
-
-{% endblock %}
-
-{% block og_description %}
-Actu Web est un site qui vous offre : les dernières actualités politiques, les résultats sportifs, regarder des chaines tv,
-consulter la météo, ecouter des musiques et classements des 5 grands championnats européens.
-{% endblock %}
-
-{% block og_title %}
-Actu Web: Politiques, Sports, Santé, Musiques, Resultats matchs..
-{% endblock %}
-
-{% block og_url %}
-    {{request.url}}
-{% endblock %}
-
-{% block og_image %}
-{{url_for('static', filename='images/actuweb.png', _external=True)}}
-{% endblock %}
-
+{% block description %}Actu Web est un site qui vous offre : les dernières actualités politiques, les résultats sportifs et classements des 5 grands championnats européens. Vous pouvez aussi écouter des musiques en ligne, profiter de la radio, regarder des chaînes TV, consulter la météo, discuter avec Gemini directement depuis le site, et suivre les actualités santé et technologies.{% endblock %}
+{% block og_description %}Actu Web est un site qui vous offre : les dernières actualités politiques, les résultats sportifs, regarder des chaînes TV, consulter la météo, écouter des musiques et classements des 5 grands championnats européens.{% endblock %}
+{% block og_title %}Actu Web — Politiques, Sports, Santé, Musiques, Résultats matchs{% endblock %}
+{% block og_url %}{{ request.url }}{% endblock %}
+{% block og_image %}{{ url_for('static', filename='images/actuweb.png', _external=True) }}{% endblock %}
 
 {% block content %}
 <style>
-
-
-.error {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    text-align:center;
+/* ══════════════════════════════════════
+   TOKENS (hérite de base.html)
+══════════════════════════════════════ */
+:root {
+    --news-bg:     #0A0A0F;
+    --news-bg2:    #111118;
+    --news-bg3:    #18181F;
+    --news-border: rgba(255,255,255,.07);
+    --news-red:    #E8274B;
+    --news-gold:   #F5A623;
+    --news-text:   #E2E2EE;
+    --news-muted:  #64748B;
+    --news-muted2: #94A3B8;
+    --ff-head:     'Bebas Neue', sans-serif;
+    --ff-body:     'Outfit', sans-serif;
 }
 
-.error p {
+/* ══════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════ */
+.news-hero {
+    background: linear-gradient(135deg, #0D0D16 0%, #130A18 60%, #0A0D16 100%);
+    border-bottom: 1px solid var(--news-border);
+    padding: 40px 40px 36px;
+    position: relative;
+    overflow: hidden;
+}
+
+.news-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: 10%;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(232,39,75,.12) 0%, transparent 68%);
+    pointer-events: none;
+}
+
+.news-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 5%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(245,166,35,.07) 0%, transparent 68%);
+    pointer-events: none;
+}
+
+.news-hero__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.news-hero__left {}
+
+.news-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ff-head);
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--news-red);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.news-hero__eyebrow::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--news-red);
+    border-radius: 2px;
+    display: block;
+}
+
+.news-hero__title {
+    font-family: var(--ff-head);
+    font-size: clamp(36px, 5vw, 58px);
+    letter-spacing: 2px;
+    color: #fff;
+    line-height: 1;
     margin-bottom: 8px;
-    color: #555;
 }
 
-.suma {
-    font-family:arial;
-    text-align:center;
+.news-hero__title em {
+    font-style: normal;
+    color: var(--news-red);
+}
+
+.news-hero__sub {
+    font-family: var(--ff-body);
+    font-size: 14px;
+    color: var(--news-muted2);
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+.news-hero__stats {
+    display: flex;
+    gap: 24px;
+    flex-shrink: 0;
+}
+
+.news-stat {
+    text-align: right;
+}
+
+.news-stat__num {
+    font-family: var(--ff-head);
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1;
+}
+
+.news-stat__label {
+    font-family: var(--ff-body);
+    font-size: 11px;
+    color: var(--news-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+/* ══════════════════════════════════════
+   CATEGORY TABS
+══════════════════════════════════════ */
+.news-tabs {
+    background: var(--news-bg2);
+    border-bottom: 1px solid var(--news-border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 60px; /* hauteur navbar */
+    z-index: 40;
+}
+
+.news-tabs::-webkit-scrollbar { display: none; }
+
+.news-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 16px;
+    font-family: var(--ff-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--news-muted2);
+    white-space: nowrap;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-decoration: none;
+}
+
+.news-tab i { font-size: 12px; }
+
+.news-tab:hover { color: var(--news-text); }
+
+.news-tab.is-active {
+    color: #fff;
+    border-bottom-color: var(--news-red);
+}
+
+/* ══════════════════════════════════════
+   LAYOUT PRINCIPAL
+══════════════════════════════════════ */
+.news-layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+    align-items: start;
+}
+
+/* ══════════════════════════════════════
+   SECTION TITRE
+══════════════════════════════════════ */
+.news-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.news-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.news-section-label::before {
+    content: '';
+    width: 3px; height: 22px;
+    background: var(--news-red);
+    border-radius: 2px;
+    display: block;
+}
+
+.news-section-label h2 {
+    font-family: var(--ff-head);
+    font-size: 26px;
+    letter-spacing: 1.5px;
+    color: #fff;
+    line-height: 1;
+}
+
+.news-section-label h2 span { color: var(--news-red); }
+
+.news-count-badge {
+    background: rgba(232,39,75,.15);
+    border: 1px solid rgba(232,39,75,.25);
+    color: var(--news-red);
+    font-family: var(--ff-body);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+}
+
+/* ══════════════════════════════════════
+   ARTICLE FEATURED (premier article)
+══════════════════════════════════════ */
+.article-featured {
+    background: var(--news-bg3);
+    border: 1px solid var(--news-border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 28px;
+    transition: border-color .22s, box-shadow .22s;
+    cursor: pointer;
+}
+
+.article-featured:hover {
+    border-color: rgba(232,39,75,.3);
+    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+}
+
+.article-featured__img {
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+}
+
+.article-featured__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s;
+}
+
+.article-featured:hover .article-featured__img img { transform: scale(1.04); }
+
+.article-featured__tag {
+    position: absolute;
+    top: 14px; left: 14px;
+    background: var(--news-red);
+    color: #fff;
+    font-family: var(--ff-head);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 4px 11px;
+    border-radius: 20px;
+}
+
+.article-featured__body {
+    padding: 28px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.article-featured__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.article-featured__meta time {
+    font-family: var(--ff-body);
+    font-size: 11.5px;
+    color: var(--news-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.article-featured__meta time i { font-size: 10px; }
+
+.article-featured__title {
+    font-family: var(--ff-head);
+    font-size: 26px;
+    letter-spacing: .8px;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 14px;
+}
+
+.article-featured__summary {
+    font-family: var(--ff-body);
+    font-size: 13.5px;
+    color: var(--news-muted2);
+    line-height: 1.7;
+    flex: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.article-featured__footer {
+    margin-top: 20px;
+}
+
+.article-read-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--news-red);
+    border-radius: 50px;
+    font-family: var(--ff-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 14px rgba(232,39,75,.3);
+}
+
+.article-read-btn:hover {
+    background: #c71f40;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(232,39,75,.4);
+}
+
+/* ══════════════════════════════════════
+   GRILLE D'ARTICLES
+══════════════════════════════════════ */
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.article-card {
+    background: var(--news-bg3);
+    border: 1px solid var(--news-border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+    cursor: pointer;
+}
+
+.article-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    border-color: rgba(255,255,255,.12);
+}
+
+.article-card__thumb {
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+}
+
+.article-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .32s;
+}
+
+.article-card:hover .article-card__thumb img { transform: scale(1.06); }
+
+/* Gradient en bas de l'image */
+.article-card__thumb::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(transparent, rgba(0,0,0,.6));
+    pointer-events: none;
+}
+
+.article-card__category {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.1);
+    color: #fff;
+    font-family: var(--ff-body);
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+
+.article-card__body {
+    padding: 16px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card__title {
+    font-family: var(--ff-body);
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--news-text);
+    line-height: 1.45;
+    margin-bottom: 10px;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color .2s;
+}
+
+.article-card__title:hover { color: var(--news-red); }
+
+.article-card__summary {
+    font-family: var(--ff-body);
+    font-size: 12.5px;
+    color: var(--news-muted2);
+    line-height: 1.65;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.article-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--news-border);
+}
+
+.article-card__date {
+    font-family: var(--ff-body);
+    font-size: 11px;
+    color: var(--news-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.article-card__date i { font-size: 10px; }
+
+.article-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--ff-body);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--news-red);
+    text-decoration: none;
+    transition: gap .2s;
+}
+
+.article-card__link:hover { gap: 8px; }
+
+/* ══════════════════════════════════════
+   SIDEBAR DROITE
+══════════════════════════════════════ */
+.news-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: calc(60px + 52px + 36px); /* navbar + tabs + padding */
+}
+
+/* Widget */
+.sidebar-widget {
+    background: var(--news-bg3);
+    border: 1px solid var(--news-border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.widget-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--news-border);
+    font-family: var(--ff-head);
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    color: #fff;
+}
+
+.widget-head i { color: var(--news-red); font-size: 13px; }
+
+/* Trending list */
+.trending-list { list-style: none; padding: 8px 0; }
+
+.trending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 18px;
+    transition: background .2s;
+    cursor: pointer;
+}
+
+.trending-item:hover { background: rgba(255,255,255,.03); }
+
+.trending-num {
+    font-family: var(--ff-head);
+    font-size: 22px;
+    color: rgba(255,255,255,.12);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.trending-item:first-child .trending-num { color: var(--news-red); }
+.trending-item:nth-child(2) .trending-num { color: var(--news-gold); }
+
+.trending-title {
+    font-family: var(--ff-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--news-muted2);
+    line-height: 1.45;
+    transition: color .2s;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.trending-title:hover { color: #fff; }
+
+/* Catégories widget */
+.cat-list { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+.cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--news-border);
+    border-radius: 20px;
+    font-family: var(--ff-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--news-muted2);
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.cat-pill:hover {
+    background: rgba(232,39,75,.1);
+    border-color: rgba(232,39,75,.25);
+    color: #fff;
+}
+
+.cat-pill i { font-size: 11px; }
+
+/* Newsletter widget */
+.newsletter-widget { padding: 20px 18px; }
+
+.newsletter-widget p {
+    font-family: var(--ff-body);
+    font-size: 13px;
+    color: var(--news-muted2);
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.newsletter-input {
+    width: 100%;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--news-border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-family: var(--ff-body);
+    font-size: 13px;
+    color: #fff;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.newsletter-input::placeholder { color: var(--news-muted); }
+
+.newsletter-input:focus {
+    border-color: var(--news-red);
+    box-shadow: 0 0 0 3px rgba(232,39,75,.1);
+}
+
+.newsletter-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--news-red);
+    border: none;
+    border-radius: 9px;
+    font-family: var(--ff-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+}
+
+.newsletter-btn:hover { background: #c71f40; transform: translateY(-1px); }
+
+/* ══════════════════════════════════════
+   ÉTAT VIDE / ERREUR
+══════════════════════════════════════ */
+.news-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 20px;
+    background: var(--news-bg3);
+    border: 1px solid var(--news-border);
+    border-radius: 16px;
+}
+
+.news-empty i {
+    font-size: 48px;
+    color: var(--news-muted);
+    margin-bottom: 18px;
+    display: block;
+}
+
+.news-empty h3 {
+    font-family: var(--ff-head);
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: var(--news-muted2);
+    margin-bottom: 8px;
+}
+
+.news-empty p {
+    font-family: var(--ff-body);
+    font-size: 13.5px;
+    color: var(--news-muted);
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 1100px) {
+    .news-layout { grid-template-columns: 1fr; padding: 28px 28px; }
+    .news-sidebar { position: static; flex-direction: row; flex-wrap: wrap; }
+    .sidebar-widget { flex: 1; min-width: 260px; }
+}
+
+@media (max-width: 768px) {
+    .news-hero         { padding: 28px 20px; }
+    .news-hero__stats  { display: none; }
+    .news-tabs         { padding: 0 20px; top: 52px; }
+    .news-layout       { padding: 20px; gap: 24px; }
+    .article-featured  { grid-template-columns: 1fr; }
+    .article-featured__img { min-height: 200px; }
+    .articles-grid     { grid-template-columns: 1fr; }
+    .news-sidebar      { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+    .news-hero         { padding: 20px 16px; }
+    .news-tabs         { padding: 0 14px; }
+    .news-layout       { padding: 16px; }
+    .article-featured__body { padding: 18px; }
+    .article-featured__title { font-size: 20px; }
 }
 </style>
 
+<!-- ══ HERO ══ -->
+<div class="news-hero">
+    <div class="news-hero__inner">
+        <div class="news-hero__left">
+            <div class="news-hero__eyebrow">
+                <i class="fas fa-newspaper"></i> Actualités
+            </div>
+            <h1 class="news-hero__title">DERNIÈRES <em>INFOS</em></h1>
+            <p class="news-hero__sub">
+                Politique, sport, santé, sciences — toute l'actualité en temps réel,
+                sélectionnée pour vous.
+            </p>
+        </div>
+        {% if articles %}
+        <div class="news-hero__stats">
+            <div class="news-stat">
+                <div class="news-stat__num">{{ articles|length }}</div>
+                <div class="news-stat__label">Articles</div>
+            </div>
+            <div class="news-stat">
+                <div class="news-stat__num">LIVE</div>
+                <div class="news-stat__label">Mise à jour</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
-        <h2>📰 Actualités</h2>
-  {% if articles %}
-            <div class="actualites-container">
-            {% for article in articles %}
-                <div class="article-card">
-                     <img src="{{article.image}}" alt="image de l'articles">
-                     <h3><a href="{{article.link}}" target="_blank">{{article.title}}</a></h3>
-                    <div class="suma"><a>{{article.summary|safe}}</a></div>
-                    <h4><a>Date de Publication: {{article.published}}</a></h4>
-                 </div>
-            {% endfor %}
+<!-- ══ TABS ══ -->
+<div class="news-tabs">
+    <a href="/" class="news-tab is-active">
+        <i class="fas fa-border-all"></i> Tout
+    </a>
+    <a href="/sports" class="news-tab">
+        <i class="fas fa-futbol"></i> Sports
+    </a>
+    <a href="/sante" class="news-tab">
+        <i class="fas fa-heart-pulse"></i> Santé
+    </a>
+    <a href="/sciences" class="news-tab">
+        <i class="fas fa-flask"></i> Sciences
+    </a>
+    <a href="/music" class="news-tab">
+        <i class="fas fa-music"></i> Musiques
+    </a>
+    <a href="/meteo" class="news-tab">
+        <i class="fas fa-cloud-sun"></i> Météo
+    </a>
+</div>
+
+<!-- ══ LAYOUT ══ -->
+<div class="news-layout">
+
+    <!-- ══ ARTICLES ══ -->
+    <main>
+        <div class="news-section-head">
+            <div class="news-section-label">
+                <h2>📰 Actuali<span>tés</span></h2>
+            </div>
+            {% if articles %}
+            <span class="news-count-badge">{{ articles|length }} articles</span>
+            {% endif %}
+        </div>
+
+        {% if articles %}
+
+            <!-- Article mis en avant (premier) -->
+            {% set featured = articles[0] %}
+            <div class="article-featured">
+                <div class="article-featured__img">
+                    <img src="{{ featured.image }}" alt="{{ featured.title }}" loading="eager">
+                    <span class="article-featured__tag">À LA UNE</span>
+                </div>
+                <div class="article-featured__body">
+                    <div>
+                        <div class="article-featured__meta">
+                            <time>
+                                <i class="fas fa-clock"></i>
+                                {{ featured.published }}
+                            </time>
+                        </div>
+                        <h2 class="article-featured__title">{{ featured.title }}</h2>
+                        <p class="article-featured__summary">{{ featured.summary | safe }}</p>
+                    </div>
+                    <div class="article-featured__footer">
+                        <a href="{{ featured.link }}" target="_blank" rel="noopener"
+                           class="article-read-btn">
+                            Lire l'article <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-{% else %}
-    <div class="error">
-        <p>Aucune donnée disponible.</p>
-    </div>
-{% endif %}
+            <!-- Grille des autres articles -->
+            <div class="articles-grid">
+                {% for article in articles[1:] %}
+                <article class="article-card">
+                    <div class="article-card__thumb">
+                        <img src="{{ article.image }}" alt="{{ article.title }}" loading="lazy">
+                        <span class="article-card__category">Actualité</span>
+                    </div>
+                    <div class="article-card__body">
+                        <a href="{{ article.link }}" target="_blank" rel="noopener"
+                           class="article-card__title">
+                            {{ article.title }}
+                        </a>
+                        <p class="article-card__summary">{{ article.summary | safe }}</p>
+                        <div class="article-card__footer">
+                            <time class="article-card__date">
+                                <i class="fas fa-clock"></i>
+                                {{ article.published }}
+                            </time>
+                            <a href="{{ article.link }}" target="_blank" rel="noopener"
+                               class="article-card__link">
+                                Lire <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+        <div class="articles-grid">
+            <div class="news-empty">
+                <i class="fas fa-satellite-dish"></i>
+                <h3>Aucune actualité disponible</h3>
+                <p>Vérifiez votre connexion ou réessayez dans quelques instants.</p>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- ══ SIDEBAR DROITE ══ -->
+    <aside class="news-sidebar">
+
+        <!-- Trending -->
+        <div class="sidebar-widget">
+            <div class="widget-head">
+                <i class="fas fa-fire"></i> Tendances
+            </div>
+            <ul class="trending-list">
+                {% if articles %}
+                    {% for article in articles[:5] %}
+                    <li class="trending-item">
+                        <span class="trending-num">{{ loop.index }}</span>
+                        <a href="{{ article.link }}" target="_blank" rel="noopener"
+                           class="trending-title">{{ article.title }}</a>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="trending-item">
+                        <span class="trending-num">—</span>
+                        <span class="trending-title">Aucun article disponible</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Catégories -->
+        <div class="sidebar-widget">
+            <div class="widget-head">
+                <i class="fas fa-tags"></i> Rubriques
+            </div>
+            <div class="cat-list">
+                <a href="/sports"          class="cat-pill"><i class="fas fa-futbol"></i>      Sports</a>
+                <a href="/sante"           class="cat-pill"><i class="fas fa-heart-pulse"></i> Santé</a>
+                <a href="/sciences"        class="cat-pill"><i class="fas fa-flask"></i>       Sciences</a>
+                <a href="/music"           class="cat-pill"><i class="fas fa-music"></i>       Musiques</a>
+                <a href="/meteo"           class="cat-pill"><i class="fas fa-cloud-sun"></i>   Météo</a>
+                <a href="/live-tv"         class="cat-pill"><i class="fas fa-tv"></i>          TV</a>
+                <a href="/stations-radios" class="cat-pill"><i class="fas fa-radio"></i>       Radios</a>
+                <a href="/assistant-ia"    class="cat-pill"><i class="fas fa-robot"></i>       Gemini AI</a>
+            </div>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="sidebar-widget">
+            <div class="widget-head">
+                <i class="fas fa-envelope"></i> Newsletters
+            </div>
+            <div class="newsletter-widget">
+                <p>Recevez les dernières actualités directement dans votre boîte mail.</p>
+                <div class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="votre@email.com">
+                    <button class="newsletter-btn">
+                        <i class="fas fa-paper-plane"></i> S'abonner
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    /* ── Tabs : marquer actif selon l'URL ── */
+    const path = window.location.pathname;
+    document.querySelectorAll('.news-tab').forEach(tab => {
+        const href = tab.getAttribute('href');
+        if (!href) return;
+        const active = href === '/' ? path === '/' : path.startsWith(href);
+        tab.classList.toggle('is-active', active);
+    });
+
+    /* ── Lazy images avec fade-in ── */
+    if ('IntersectionObserver' in window) {
+        const imgs = document.querySelectorAll('img[loading="lazy"]');
+        imgs.forEach(img => {
+            img.style.opacity = '0';
+            img.style.transition = 'opacity .35s';
+        });
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.addEventListener('load', () => {
+                        e.target.style.opacity = '1';
+                    });
+                    if (e.target.complete) e.target.style.opacity = '1';
+                    io.unobserve(e.target);
+                }
+            });
+        }, { rootMargin: '100px' });
+        imgs.forEach(img => io.observe(img));
+    }
+
+    /* ── Cards : ouvrir le lien au clic sur la carte entière ── */
+    document.querySelectorAll('.article-card').forEach(card => {
+        card.addEventListener('click', e => {
+            if (e.target.closest('a')) return; // laisser les vrais liens fonctionner
+            const link = card.querySelector('.article-card__link');
+            if (link) window.open(link.href, '_blank', 'noopener');
+        });
+    });
+
+})();
+</script>
 {% endblock %}

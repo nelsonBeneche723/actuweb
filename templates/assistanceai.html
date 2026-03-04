@@ -1,286 +1,777 @@
 {% extends 'base.html' %}
 
-{% block title %}AI Assistant {% endblock %}
+{% block title %}Gemini AI — Assistant Intelligent{% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/ai_artificial_intelli.ico') }}" type="image/x-icon">
 {% endblock %}
 
-{% block content%}
-
+{% block content %}
 <style>
-    /* ===== VARIABLES CSS ===== */
-    :root {
-        --primary-color: #667eea;
-        --secondary-color: #764ba2;
-        --text-color: #333;
-        --border-color: #e0e0e0;
-        --bg-light: #f8f9fa;
-        --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+    --ai-bg:      #0A0A0F;
+    --ai-bg2:     #111118;
+    --ai-bg3:     #18181F;
+    --ai-bg4:     #1E1E28;
+    --ai-border:  rgba(255,255,255,.07);
+    --ai-red:     #E8274B;
+    --ai-cyan:    #00C4C4;
+    --ai-purple:  #8B5CF6;
+    --ai-blue:    #3B82F6;
+    --ai-text:    #E2E2EE;
+    --ai-muted:   #64748B;
+    --ai-muted2:  #94A3B8;
+    --ff-head:    'Bebas Neue', sans-serif;
+    --ff-body:    'Outfit', sans-serif;
+    --ff-mono:    'Courier New', monospace;
+}
 
-    /* ===== MOBILE (< 600px) ===== */
-    #promptForm {
-        max-width: 1500px;
-        margin: 15px;
-        padding: 15px;
-        /*background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);*/
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+/* ══════════════════════════════════════
+   PAGE
+══════════════════════════════════════ */
+.ai-page {
+    background: var(--ai-bg);
+    font-family: var(--ff-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-    #prompttextarea {
-        width: 100%;
-        height: 220px;
-        padding: 12px;
-        border: 2px solid var(--border-color);
-        border-radius: 6px;
-        font-size: 14px;
-        font-family: inherit;
-        resize: vertical;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
-        background-color: var(--bg-light);
-        margin-bottom: 10px;
-        align-items: center;
-    }
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.ai-hero {
+    background: linear-gradient(135deg, #0A0A14 0%, #0F0A1E 50%, #0A0E18 100%);
+    border-bottom: 1px solid var(--ai-border);
+    padding: 48px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
 
-    #prompttextarea:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
-        background-color: white;
-    }
+.ai-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(0,196,196,.1) 0%, transparent 65%);
+    pointer-events: none;
+}
 
-    #prompttextarea::placeholder {
-        color: #999;
-    }
+.ai-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 10%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(139,92,246,.1) 0%, transparent 65%);
+    pointer-events: none;
+}
 
-    #promptForm button {
-        width: 100%;
-        padding: 12px;
-        background-color: white;
-        color: var(--primary-color);
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+.ai-hero__inner { position: relative; z-index: 1; }
 
-    #promptForm button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
+/* Icône animée */
+.ai-hero__icon {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(0,196,196,.15), rgba(139,92,246,.15));
+    border: 1px solid rgba(0,196,196,.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: var(--ai-cyan);
+    animation: aiPulse 3s ease-in-out infinite;
+    box-shadow: 0 0 40px rgba(0,196,196,.12);
+}
 
-    #promptForm button:active {
-        transform: translateY(0);
-    }
+@keyframes aiPulse {
+    0%,100% { box-shadow: 0 0 20px rgba(0,196,196,.12); }
+    50%      { box-shadow: 0 0 50px rgba(0,196,196,.25); }
+}
 
-    #response {
-        margin: 15px;
-        padding: 15px;
-        background-color: var(--bg-light);
-        border-radius: 8px;
-        border-left: 4px solid var(--primary-color);
-        min-height: 50px;
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--text-color);
-        word-wrap: break-word;
-        white-space: pre-wrap;
-    }
+.ai-hero__eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--ff-head);
+    font-size: 12px; letter-spacing: 3px;
+    color: var(--ai-cyan); text-transform: uppercase;
+    margin-bottom: 12px;
+}
 
-    /* ===== TABLETTE (600px - 1024px) ===== */
-    @media (min-width: 600px) {
-        #promptForm {
-            max-width: 90%;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 10px;
-        }
+.ai-hero__title {
+    font-family: var(--ff-head);
+    font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: 3px; color: #fff; line-height: 1;
+    margin-bottom: 10px;
+}
 
-        #prompttextarea {
-            width:100%;
-            height: 120px;
-            padding: 15px;
-            font-size: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
+.ai-hero__title em { font-style: normal; color: var(--ai-cyan); }
 
-        #promptForm button {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            border-radius: 8px;
-        }
+.ai-hero__sub {
+    font-size: 14px; color: var(--ai-muted2);
+    max-width: 480px; margin: 0 auto 24px;
+    line-height: 1.7;
+}
 
-        #response {
-            max-width: 90%;
-            margin: 20px auto;
-            padding: 20px;
-            font-size: 15px;
-            border-radius: 10px;
-        }
-    }
+/* Badges de capacités */
+.ai-hero__caps {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 8px;
+}
 
-    /* ===== DESKTOP (> 1024px) ===== */
-    @media (min-width: 1024px) {
-        #promptForm {
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 12px;
-        }
+.ai-cap {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--ai-border);
+    border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    color: var(--ai-muted2);
+}
 
-        #prompttextarea {
-            height: 140px;
-            padding: 16px;
-            font-size: 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        #promptForm button {
-            width: 100%;
-            padding: 16px;
-            font-size: 16px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
+.ai-cap i { font-size: 11px; color: var(--ai-cyan); }
 
-        #promptForm button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        }
+/* ══════════════════════════════════════
+   LAYOUT CHAT
+══════════════════════════════════════ */
+.ai-layout {
+    flex: 1;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-        #response {
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 25px;
-            font-size: 16px;
-            border-radius: 12px;
-            line-height: 1.8;
-        }
-    }
+/* ══════════════════════════════════════
+   QUICK PROMPTS
+══════════════════════════════════════ */
+.ai-quick-title {
+    font-family: var(--ff-head);
+    font-size: 14px; letter-spacing: 1.5px;
+    color: var(--ai-muted); text-transform: uppercase;
+    margin-bottom: 10px;
+}
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+.ai-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
 
-    #response {
-        animation: fadeIn 0.3s ease-in-out;
-    }
+.ai-quick-btn {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 14px 16px;
+    background: var(--ai-bg3);
+    border: 1px solid var(--ai-border);
+    border-radius: 12px;
+    font-family: var(--ff-body);
+    font-size: 13px; font-weight: 500;
+    color: var(--ai-muted2);
+    cursor: pointer; text-align: left;
+    transition: background .2s, border-color .2s, color .2s, transform .15s;
+}
 
-    /* ===== LOADING STATE ===== */
-    .loading {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background-color: var(--primary-color);
-        border-radius: 50%;
-        animation: pulse 1.5s infinite;
-        margin-left: 5px;
-    }
+.ai-quick-btn:hover {
+    background: var(--ai-bg4);
+    border-color: rgba(0,196,196,.25);
+    color: var(--ai-text);
+    transform: translateY(-2px);
+}
 
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.5;
-        }
-    }
+.ai-quick-btn i {
+    font-size: 14px; color: var(--ai-cyan);
+    margin-top: 1px; flex-shrink: 0;
+}
 
-    /* ===== SCROLLBAR PERSONNALISÉE ===== */
-    #prompttextarea::-webkit-scrollbar {
-        width: 8px;
-    }
+/* ══════════════════════════════════════
+   ZONE DE RÉPONSE (CHAT)
+══════════════════════════════════════ */
+.ai-chat-area {
+    background: var(--ai-bg3);
+    border: 1px solid var(--ai-border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none; /* caché au départ */
+}
 
-    #prompttextarea::-webkit-scrollbar-track {
-        background: var(--bg-light);
-        border-radius: 10px;
-    }
+.ai-chat-area.is-visible { display: block; }
 
-    #prompttextarea::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 10px;
-    }
+.ai-chat-head {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: var(--ai-bg4);
+    border-bottom: 1px solid var(--ai-border);
+}
 
-    #prompttextarea::-webkit-scrollbar-thumb:hover {
-        background: var(--secondary-color);
-    }
+.ai-chat-head-left {
+    display: flex; align-items: center; gap: 10px;
+}
 
+.ai-chat-head-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ai-cyan);
+    animation: aiPulse2 1.5s ease-in-out infinite;
+}
 
-    @media (min-width: 1024px) {
-    #prompttextarea {
-        width: 500px;      /* ← Modifier cette valeur */
-        height: 220px;     /* ← Modifier cette valeur */
-        /* ... reste du code ... */
-    }
+@keyframes aiPulse2 {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .3; }
+}
+
+.ai-chat-head span {
+    font-family: var(--ff-head);
+    font-size: 14px; letter-spacing: 1.5px;
+    color: var(--ai-text);
+}
+
+.ai-chat-copy {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--ai-border);
+    color: var(--ai-muted2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 12px;
+    transition: all .2s;
+}
+
+.ai-chat-copy:hover {
+    background: rgba(0,196,196,.1);
+    border-color: rgba(0,196,196,.3);
+    color: var(--ai-cyan);
+}
+
+.ai-response {
+    padding: 24px 24px;
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: var(--ai-text);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    min-height: 60px;
+    animation: fadeUp .3s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Code blocks dans la réponse */
+.ai-response code {
+    font-family: var(--ff-mono);
+    background: rgba(0,196,196,.08);
+    border: 1px solid rgba(0,196,196,.15);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 13px;
+    color: var(--ai-cyan);
+}
+
+.ai-response pre {
+    background: var(--ai-bg);
+    border: 1px solid var(--ai-border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--ff-mono);
+    font-size: 13px;
+    color: #A5F3FC;
+    margin: 12px 0;
+}
+
+/* ══════════════════════════════════════
+   LOADING DOTS
+══════════════════════════════════════ */
+.ai-loading {
+    display: none;
+    padding: 24px;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-loading.is-active { display: flex; }
+
+.ai-loading-dots {
+    display: flex; gap: 5px;
+}
+
+.ai-loading-dots span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ai-cyan);
+    animation: dotBounce .9s ease-in-out infinite;
+}
+
+.ai-loading-dots span:nth-child(2) { animation-delay: .15s; }
+.ai-loading-dots span:nth-child(3) { animation-delay: .3s; }
+
+@keyframes dotBounce {
+    0%,80%,100% { transform: scale(.6); opacity: .4; }
+    40%          { transform: scale(1);  opacity: 1; }
+}
+
+.ai-loading-text {
+    font-size: 13px;
+    color: var(--ai-muted2);
+    font-style: italic;
+}
+
+/* ══════════════════════════════════════
+   FORMULAIRE
+══════════════════════════════════════ */
+.ai-form-card {
+    background: var(--ai-bg3);
+    border: 1px solid var(--ai-border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color .25s, box-shadow .25s;
+}
+
+.ai-form-card:focus-within {
+    border-color: rgba(0,196,196,.35);
+    box-shadow: 0 0 0 3px rgba(0,196,196,.07),
+                0 8px 32px rgba(0,0,0,.3);
+}
+
+.ai-form-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px 8px;
+    border-bottom: 1px solid var(--ai-border);
+}
+
+.ai-form-top-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: rgba(0,196,196,.1);
+    border: 1px solid rgba(0,196,196,.2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ai-cyan); font-size: 12px;
+    flex-shrink: 0;
+}
+
+.ai-form-top span {
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--ai-muted);
+}
+
+textarea#prompttextarea {
+    width: 100%;
+    background: transparent;
+    border: none; outline: none;
+    padding: 16px 20px;
+    font-family: var(--ff-body);
+    font-size: 15px;
+    color: var(--ai-text);
+    caret-color: var(--ai-cyan);
+    resize: none;
+    min-height: 120px;
+    line-height: 1.7;
+}
+
+textarea#prompttextarea::placeholder { color: var(--ai-muted); }
+
+textarea#prompttextarea::-webkit-scrollbar { width: 4px; }
+textarea#prompttextarea::-webkit-scrollbar-thumb {
+    background: rgba(0,196,196,.3); border-radius: 4px;
+}
+
+/* Footer formulaire */
+.ai-form-footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-top: 1px solid var(--ai-border);
+    flex-wrap: wrap; gap: 10px;
+}
+
+.ai-form-hints {
+    display: flex; gap: 12px; flex-wrap: wrap;
+}
+
+.ai-form-hint {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11.5px; color: var(--ai-muted);
+}
+
+.ai-form-hint i { font-size: 10px; color: var(--ai-cyan); }
+
+/* Bouton envoyer */
+.ai-send-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 24px;
+    background: linear-gradient(135deg, var(--ai-cyan), #0099A0);
+    border: none; border-radius: 50px;
+    font-family: var(--ff-body);
+    font-size: 13.5px; font-weight: 700;
+    color: #fff; cursor: pointer;
+    transition: opacity .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 16px rgba(0,196,196,.3);
+    white-space: nowrap;
+}
+
+.ai-send-btn:hover {
+    opacity: .92; transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(0,196,196,.4);
+}
+
+.ai-send-btn:active { transform: scale(.97); }
+
+.ai-send-btn:disabled {
+    opacity: .45; cursor: not-allowed; transform: none;
+}
+
+/* Bouton reset */
+.ai-reset-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 16px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--ai-border);
+    border-radius: 50px;
+    font-family: var(--ff-body);
+    font-size: 12.5px; font-weight: 600;
+    color: var(--ai-muted2); cursor: pointer;
+    transition: all .2s;
+}
+
+.ai-reset-btn:hover {
+    background: rgba(255,255,255,.08);
+    color: var(--ai-text);
+    border-color: rgba(255,255,255,.15);
+}
+
+/* ══════════════════════════════════════
+   DISCLAIMER
+══════════════════════════════════════ */
+.ai-disclaimer {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 14px 18px;
+    background: rgba(139,92,246,.06);
+    border: 1px solid rgba(139,92,246,.15);
+    border-radius: 12px;
+    font-size: 12.5px;
+    color: var(--ai-muted2);
+    line-height: 1.6;
+}
+
+.ai-disclaimer i {
+    color: var(--ai-purple); font-size: 14px;
+    margin-top: 1px; flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   ERREUR
+══════════════════════════════════════ */
+.ai-error-msg {
+    display: none;
+    padding: 14px 18px;
+    background: rgba(232,39,75,.08);
+    border: 1px solid rgba(232,39,75,.2);
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: #FCA5A5;
+    align-items: center; gap: 10px;
+}
+
+.ai-error-msg.is-visible { display: flex; }
+.ai-error-msg i { color: var(--ai-red); flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+    .ai-hero     { padding: 32px 20px 28px; }
+    .ai-layout   { padding: 20px; }
+    .ai-quick-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+    .ai-hero     { padding: 24px 16px 22px; }
+    .ai-layout   { padding: 14px; gap: 14px; }
+    .ai-hero__caps { gap: 6px; }
+    .ai-cap      { font-size: 11px; padding: 4px 10px; }
+    .ai-quick-grid { grid-template-columns: 1fr; }
+    .ai-form-hints { display: none; }
+    .ai-form-footer { justify-content: flex-end; }
 }
 </style>
 
+<!-- ══ PAGE ══ -->
+<div class="ai-page">
 
-<!--    <h2>Assistant IA</h2>-->
-
-    <!-- Formulaire de saisi -->
-    <form action="/assistant-ia" method="POST" id="promptForm">
-         <textarea name="prompt" placeholder="Votre question..." id ="prompttextarea" required></textarea>
-<!--        <input type="text" id="prompt" name="prompt" required style="width: 70%; padding: 10px;" placeholder="Entrer votre prompt...">-->
-        <button type="submit">Envoyer</button>
-    </form>
-  <!-- Affichage de la réponse -->
-    <div id="response">
-
+    <!-- ══ HERO ══ -->
+    <div class="ai-hero">
+        <div class="ai-hero__inner">
+            <div class="ai-hero__icon">
+                <i class="fas fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="ai-hero__eyebrow">
+                <i class="fas fa-circle" style="font-size:7px; animation: aiPulse2 1.5s infinite"></i>
+                ActuWebMedia IA
+            </div>
+            <h1 class="ai-hero__title">GEMINI <em>AI</em></h1>
+            <p class="ai-hero__sub">
+                Posez vos questions, rédigez du contenu, obtenez des analyses —
+                propulsé par Google Gemini.
+            </p>
+            <div class="ai-hero__caps">
+                <span class="ai-cap"><i class="fas fa-bolt"></i> Réponses instantanées</span>
+                <span class="ai-cap"><i class="fas fa-globe"></i> Multilingue</span>
+                <span class="ai-cap"><i class="fas fa-code"></i> Code & Debug</span>
+                <span class="ai-cap"><i class="fas fa-pen-nib"></i> Rédaction</span>
+                <span class="ai-cap"><i class="fas fa-magnifying-glass"></i> Analyse</span>
+            </div>
+        </div>
     </div>
 
+    <!-- ══ LAYOUT ══ -->
+    <div class="ai-layout">
 
-<!--        {% for rep in reponses %}-->
-<!--            <h2>Réponse de l'assistant IA :</h2>-->
-<!--            <p>{{rep.reponse}}</p>-->
-<!--        {% endfor %}-->
+        <!-- Quick prompts -->
+        <div>
+            <div class="ai-quick-title">Suggestions</div>
+            <div class="ai-quick-grid">
+                <button class="ai-quick-btn" data-prompt="Quelles sont les dernières actualités politiques en Haïti ?">
+                    <i class="fas fa-newspaper"></i>
+                    Actualités politiques Haïti
+                </button>
+                <button class="ai-quick-btn" data-prompt="Explique-moi le résultat du dernier match de football important.">
+                    <i class="fas fa-futbol"></i>
+                    Résumé match de foot
+                </button>
+                <button class="ai-quick-btn" data-prompt="Donne-moi des conseils santé pour rester en forme.">
+                    <i class="fas fa-heart-pulse"></i>
+                    Conseils santé
+                </button>
+                <button class="ai-quick-btn" data-prompt="Quelles sont les tendances musicales du moment en Haïti ?">
+                    <i class="fas fa-music"></i>
+                    Tendances musicales
+                </button>
+                <button class="ai-quick-btn" data-prompt="Explique-moi les dernières avancées en intelligence artificielle.">
+                    <i class="fas fa-microchip"></i>
+                    Avancées en IA
+                </button>
+                <button class="ai-quick-btn" data-prompt="Donne-moi la météo et des conseils pour cette semaine.">
+                    <i class="fas fa-cloud-sun"></i>
+                    Météo & conseils
+                </button>
+                <button class="ai-quick-btn" data-prompt="Aide-moi à écrire un court article de presse.">
+                    <i class="fas fa-pen-nib"></i>
+                    Rédiger un article
+                </button>
+                <button class="ai-quick-btn" data-prompt="Explique ce code Python et corrige les erreurs.">
+                    <i class="fas fa-code"></i>
+                    Aide code & debug
+                </button>
+            </div>
+        </div>
 
+        <!-- Zone de réponse -->
+        <div class="ai-chat-area" id="aiChatArea">
+            <div class="ai-chat-head">
+                <div class="ai-chat-head-left">
+                    <div class="ai-chat-head-dot"></div>
+                    <span>RÉPONSE GEMINI</span>
+                </div>
+                <button class="ai-chat-copy" id="aiCopyBtn" title="Copier la réponse">
+                    <i class="far fa-copy"></i>
+                </button>
+            </div>
+            <!-- Loading -->
+            <div class="ai-loading" id="aiLoading">
+                <div class="ai-loading-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <span class="ai-loading-text">Gemini réfléchit…</span>
+            </div>
+            <!-- Réponse texte -->
+            <div class="ai-response" id="response"></div>
+        </div>
 
+        <!-- Erreur -->
+        <div class="ai-error-msg" id="aiError">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span id="aiErrorText">Une erreur est survenue. Veuillez réessayer.</span>
+        </div>
 
+        <!-- ══ FORMULAIRE ══ -->
+        <form action="/assistant-ia" method="POST" id="promptForm">
+            <div class="ai-form-card">
+                <div class="ai-form-top">
+                    <div class="ai-form-top-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <span>Votre question</span>
+                </div>
+
+                <textarea
+                    name="prompt"
+                    id="prompttextarea"
+                    placeholder="Posez votre question à Gemini AI… (Entrée + Maj pour sauter une ligne)"
+                    required
+                ></textarea>
+
+                <div class="ai-form-footer">
+                    <div class="ai-form-hints">
+                        <span class="ai-form-hint">
+                            <i class="fas fa-circle-info"></i>
+                            Maj + Entrée pour nouvelle ligne
+                        </span>
+                        <span class="ai-form-hint">
+                            <i class="fas fa-circle-info"></i>
+                            Entrée pour envoyer
+                        </span>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button type="button" class="ai-reset-btn" id="aiResetBtn">
+                            <i class="fas fa-rotate-left"></i> Effacer
+                        </button>
+                        <button type="submit" class="ai-send-btn" id="aiSendBtn">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Disclaimer -->
+        <div class="ai-disclaimer">
+            <i class="fas fa-shield-halved"></i>
+            Gemini AI peut faire des erreurs. Vérifiez les informations importantes.
+            Vos questions ne sont pas enregistrées de façon permanente.
+        </div>
+
+    </div><!-- /ai-layout -->
+</div><!-- /ai-page -->
+
+{% endblock %}
+
+{% block scripts %}
 <script>
-document.getElementById('promptForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+(function () {
 
-    const formData = new FormData(e.target);
+    const form      = document.getElementById('promptForm');
+    const textarea  = document.getElementById('prompttextarea');
     const responseDiv = document.getElementById('response');
-    responseDiv.innerHTML = ''; // Vider les résultats précédents
+    const chatArea  = document.getElementById('aiChatArea');
+    const loading   = document.getElementById('aiLoading');
+    const sendBtn   = document.getElementById('aiSendBtn');
+    const resetBtn  = document.getElementById('aiResetBtn');
+    const copyBtn   = document.getElementById('aiCopyBtn');
+    const errorDiv  = document.getElementById('aiError');
+    const errorText = document.getElementById('aiErrorText');
 
-    try {
-        const response = await fetch('/assistant-ia', {
-            method: 'POST',
-            body: formData
-        });
+    /* ── Auto-resize textarea ── */
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 300) + 'px';
+    });
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const text = decoder.decode(value);
-            responseDiv.innerHTML += text;
+    /* ── Entrée pour envoyer, Maj+Entrée pour ligne ── */
+    textarea.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
         }
-    } catch (error) {
-        responseDiv.innerHTML = `<p>Erreur : ${error.message}</p>`;
-    }
-});
+    });
+
+    /* ── Quick prompts ── */
+    document.querySelectorAll('.ai-quick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const prompt = btn.getAttribute('data-prompt');
+            textarea.value = prompt;
+            textarea.dispatchEvent(new Event('input'));
+            textarea.focus();
+            textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    /* ── Reset ── */
+    resetBtn.addEventListener('click', () => {
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        responseDiv.innerHTML = '';
+        chatArea.classList.remove('is-visible');
+        errorDiv.classList.remove('is-visible');
+        textarea.focus();
+    });
+
+    /* ── Copier réponse ── */
+    copyBtn.addEventListener('click', () => {
+        const text = responseDiv.innerText || responseDiv.textContent;
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            const icon = copyBtn.querySelector('i');
+            icon.className = 'fas fa-check';
+            copyBtn.style.color = 'var(--ai-cyan)';
+            setTimeout(() => {
+                icon.className = 'far fa-copy';
+                copyBtn.style.color = '';
+            }, 2000);
+        });
+    });
+
+    /* ── Soumission ── */
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        const prompt = textarea.value.trim();
+        if (!prompt) return;
+
+        /* Reset état */
+        errorDiv.classList.remove('is-visible');
+        responseDiv.innerHTML = '';
+        chatArea.classList.add('is-visible');
+        loading.classList.add('is-active');
+        sendBtn.disabled = true;
+
+        /* Scroll vers la réponse */
+        chatArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        try {
+            const formData = new FormData(form);
+            const res = await fetch('/assistant-ia', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error(`Erreur serveur (${res.status})`);
+
+            const reader  = res.body.getReader();
+            const decoder = new TextDecoder();
+            let firstChunk = true;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                if (firstChunk) {
+                    loading.classList.remove('is-active');
+                    firstChunk = false;
+                }
+
+                const text = decoder.decode(value, { stream: true });
+                responseDiv.innerHTML += text;
+            }
+
+        } catch (err) {
+            loading.classList.remove('is-active');
+            chatArea.classList.remove('is-visible');
+            errorText.textContent = `Erreur : ${err.message}`;
+            errorDiv.classList.add('is-visible');
+        } finally {
+            loading.classList.remove('is-active');
+            sendBtn.disabled = false;
+        }
+    });
+
+})();
 </script>
 {% endblock %}

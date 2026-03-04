@@ -1,193 +1,755 @@
 {% extends 'base.html' %}
 
-{% block title %} Stations Radios {% endblock %}
+{% block title %}Stations Radios — ActuWebMedia{% endblock %}
 
 {% block link %}
 <link rel="icon" href="{{ url_for('static', filename='images/radio.ico') }}" type="image/x-icon">
 {% endblock %}
 
 {% block content %}
-
 <style>
- nav{background-color: #1e1e2f;;}
- footer{background-color: #1e1e2f;}
-body{background-color:black;}
-
-.stations-container-rech {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    padding: 20px;
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+    --rd-bg:     #0A0A0F;
+    --rd-bg2:    #111118;
+    --rd-bg3:    #18181F;
+    --rd-bg4:    #1E1E28;
+    --rd-border: rgba(255,255,255,.07);
+    --rd-red:    #E8274B;
+    --rd-gold:   #F5A623;
+    --rd-green:  #10B981;
+    --rd-blue:   #3B82F6;
+    --rd-text:   #E2E2EE;
+    --rd-muted:  #64748B;
+    --rd-muted2: #94A3B8;
+    --ff-head:   'Bebas Neue', sans-serif;
+    --ff-body:   'Outfit', sans-serif;
 }
 
-.station-card-rech {
-    background-color: #2a2a2a;
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* ══════════════════════════════════════
+   PAGE
+══════════════════════════════════════ */
+.rd-page {
+    background: var(--rd-bg);
+    font-family: var(--ff-body);
+    min-height: 100vh;
+    /* Espace en bas pour le lecteur sticky */
+    padding-bottom: 110px;
+}
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.rd-hero {
+    background: linear-gradient(135deg, #0A0A14 0%, #0A120F 50%, #0A0A14 100%);
+    border-bottom: 1px solid var(--rd-border);
+    padding: 44px 32px 40px;
     text-align: center;
-    transition: transform 0.3s ease;
-    color:white;
+    position: relative;
+    overflow: hidden;
 }
 
-.station-card-rech:hover {
-    transform: scale(1.03);
+.rd-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(16,185,129,.1) 0%, transparent 65%);
+    pointer-events: none;
 }
 
-.station-card-rech img {
-    height: 70px;
-    width: 70px;
-    object-fit: contain;
-    margin-bottom: 10px;
+.rd-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; right: 8%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(232,39,75,.08) 0%, transparent 65%);
+    pointer-events: none;
 }
 
-.station-card-rech h3 {
-    font-size: 1.1em;
-    color: white;
-    margin-bottom: 10px;
+.rd-hero__inner { position: relative; z-index: 1; }
+
+/* Icône animée */
+.rd-hero__icon {
+    width: 68px; height: 68px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(59,130,246,.12));
+    border: 1px solid rgba(16,185,129,.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 26px; color: var(--rd-green);
+    animation: rdPulse 3s ease-in-out infinite;
+    box-shadow: 0 0 40px rgba(16,185,129,.12);
 }
 
-.station-card-rech audio {
+@keyframes rdPulse {
+    0%,100% { box-shadow: 0 0 20px rgba(16,185,129,.1); }
+    50%      { box-shadow: 0 0 50px rgba(16,185,129,.25); }
+}
+
+.rd-hero__eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--ff-head);
+    font-size: 12px; letter-spacing: 3px;
+    color: var(--rd-green); text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.rd-hero__eyebrow i {
+    font-size: 7px;
+    animation: rdBlink 1.4s ease-in-out infinite;
+}
+
+@keyframes rdBlink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+.rd-hero__title {
+    font-family: var(--ff-head);
+    font-size: clamp(36px, 6vw, 60px);
+    letter-spacing: 3px; color: #fff; line-height: 1;
+    margin-bottom: 8px;
+}
+
+.rd-hero__title em { font-style: normal; color: var(--rd-green); }
+
+.rd-hero__sub {
+    font-size: 14px; color: var(--rd-muted2);
+    max-width: 440px; margin: 0 auto 28px;
+    line-height: 1.7;
+}
+
+/* Barre de recherche */
+.rd-search {
+    display: flex; align-items: center; gap: 10px;
+    max-width: 520px; margin: 0 auto;
+}
+
+.rd-search-wrap {
+    flex: 1; position: relative;
+    display: flex; align-items: center;
+}
+
+.rd-search-wrap i {
+    position: absolute; left: 16px;
+    color: var(--rd-muted); font-size: 14px;
+    pointer-events: none;
+}
+
+.rd-search-wrap input {
     width: 100%;
-    margin: 10px 0;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 50px;
+    padding: 12px 20px 12px 44px;
+    font-family: var(--ff-body); font-size: 14px;
+    color: #fff; outline: none; caret-color: var(--rd-green);
+    transition: border-color .2s, background .2s, box-shadow .2s;
 }
 
-.station-card-rech a {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 6px 12px;
-    background-color: #007BFF;
-    color: white;
-    border-radius: 6px;
+.rd-search-wrap input::placeholder { color: var(--rd-muted); }
+
+.rd-search-wrap input:focus {
+    background: rgba(255,255,255,.1);
+    border-color: var(--rd-green);
+    box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+}
+
+.rd-search-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--rd-green), #059669);
+    border: none; border-radius: 50px;
+    font-family: var(--ff-body); font-size: 13.5px; font-weight: 700;
+    color: #fff; cursor: pointer; white-space: nowrap;
+    transition: opacity .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 16px rgba(16,185,129,.3);
+}
+
+.rd-search-btn:hover {
+    opacity: .9; transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(16,185,129,.4);
+}
+
+/* ══════════════════════════════════════
+   CONTENU
+══════════════════════════════════════ */
+.rd-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+/* ── Section titre ── */
+.rd-section-head {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px; gap: 12px;
+}
+
+.rd-section-label {
+    display: flex; align-items: center; gap: 10px;
+}
+
+.rd-section-label::before {
+    content: '';
+    width: 3px; height: 22px;
+    background: var(--rd-green); border-radius: 2px;
+}
+
+.rd-section-label h2 {
+    font-family: var(--ff-head);
+    font-size: 24px; letter-spacing: 1.5px; color: #fff;
+}
+
+.rd-count-badge {
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.22);
+    color: var(--rd-green);
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+}
+
+/* ══════════════════════════════════════
+   GRILLE STATIONS
+══════════════════════════════════════ */
+.rd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+.rd-card {
+    background: var(--rd-bg3);
+    border: 1px solid var(--rd-border);
+    border-radius: 14px;
+    padding: 20px 16px 16px;
+    text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+    cursor: pointer;
+    position: relative;
+}
+
+.rd-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    border-color: rgba(16,185,129,.25);
+}
+
+/* Indicateur "en lecture" */
+.rd-card.is-playing {
+    border-color: var(--rd-green);
+    background: rgba(16,185,129,.06);
+}
+
+.rd-card.is-playing::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rd-green), #34D399);
+    border-radius: 14px 14px 0 0;
+}
+
+/* Logo station */
+.rd-card__logo {
+    width: 70px; height: 70px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: rgba(255,255,255,.05);
+    padding: 6px;
+    border: 1px solid var(--rd-border);
+    transition: transform .22s;
+}
+
+.rd-card:hover .rd-card__logo { transform: scale(1.06); }
+
+/* Nom */
+.rd-card__name {
+    font-size: 13px; font-weight: 600;
+    color: var(--rd-text);
+    line-height: 1.35;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Bouton écouter */
+.rd-play-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.2);
+    border-radius: 50px;
+    font-family: var(--ff-body);
+    font-size: 12.5px; font-weight: 700;
+    color: var(--rd-green); cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s;
     text-decoration: none;
 }
 
-.station-card-rech a:hover {
-    background-color: #0056b3;
+.rd-play-btn:hover {
+    background: var(--rd-green);
+    border-color: var(--rd-green);
+    color: #fff;
 }
 
-
-.error {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            text-align:center;
-        }
-
-.error p {
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-    #global-player {
-    position: sticky;
-    bottom: 0;
-    background: #1e1e1e;
-    padding: 10px;
-    color: white;
-    z-index: 999;
+.rd-card.is-playing .rd-play-btn {
+    background: var(--rd-green);
+    border-color: var(--rd-green);
+    color: #fff;
 }
 
+/* Equalizer animé quand en lecture */
+.rd-equalizer {
+    display: none;
+    align-items: flex-end; gap: 2px;
+    height: 14px;
+}
 
+.rd-card.is-playing .rd-equalizer { display: flex; }
 
+.rd-equalizer span {
+    display: block;
+    width: 3px; border-radius: 2px;
+    background: var(--rd-green);
+    animation: rdEq .8s ease-in-out infinite alternate;
+}
 
+.rd-equalizer span:nth-child(1) { height: 6px;  animation-delay: 0s; }
+.rd-equalizer span:nth-child(2) { height: 14px; animation-delay: .15s; }
+.rd-equalizer span:nth-child(3) { height: 9px;  animation-delay: .3s; }
+.rd-equalizer span:nth-child(4) { height: 12px; animation-delay: .1s; }
+
+@keyframes rdEq {
+    from { transform: scaleY(.4); }
+    to   { transform: scaleY(1); }
+}
+
+/* ══════════════════════════════════════
+   ERREUR / VIDE
+══════════════════════════════════════ */
+.rd-empty {
+    grid-column: 1 / -1;
+    text-align: center; padding: 48px 20px;
+    background: var(--rd-bg3);
+    border: 1px dashed rgba(255,255,255,.08);
+    border-radius: 16px;
+}
+
+.rd-empty i {
+    font-size: 44px; color: var(--rd-muted);
+    margin-bottom: 14px; display: block; opacity: .5;
+}
+
+.rd-empty h3 {
+    font-family: var(--ff-head);
+    font-size: 20px; letter-spacing: 1px;
+    color: var(--rd-muted2); margin-bottom: 6px;
+}
+
+.rd-empty p { font-size: 13.5px; color: var(--rd-muted); }
+
+/* ══════════════════════════════════════
+   LECTEUR GLOBAL STICKY
+══════════════════════════════════════ */
+.rd-player {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 200;
+    background: rgba(14,14,20,.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--rd-border);
+    padding: 12px 28px;
+    display: flex; align-items: center; gap: 16px;
+    transform: translateY(100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.45);
+}
+
+.rd-player.is-visible { transform: translateY(0); }
+
+/* Indicateur live */
+.rd-player__live {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+}
+
+.rd-player__live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rd-green);
+    animation: rdBlink 1.1s ease-in-out infinite;
+}
+
+.rd-player__live span {
+    font-family: var(--ff-head);
+    font-size: 13px; letter-spacing: 2px;
+    color: var(--rd-green);
+}
+
+/* Info station en lecture */
+.rd-player__info {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 12px;
+}
+
+.rd-player__logo {
+    width: 40px; height: 40px;
+    border-radius: 8px; object-fit: contain;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--rd-border);
+    flex-shrink: 0;
+    display: none;
+}
+
+.rd-player__logo.is-visible { display: block; }
+
+.rd-player__name {
+    font-family: var(--ff-body);
+    font-size: 13.5px; font-weight: 600;
+    color: var(--rd-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.rd-player__status {
+    font-size: 11.5px; color: var(--rd-muted2);
+    margin-top: 1px;
+}
+
+/* Audio natif stylisé */
+#main-audio {
+    flex: 1;
+    min-width: 0;
+    max-width: 420px;
+    height: 36px;
+    accent-color: var(--rd-green);
+    border-radius: 20px;
+}
+
+/* Bouton fermer lecteur */
+.rd-player__close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--rd-border);
+    color: var(--rd-muted2); font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: all .2s;
+}
+
+.rd-player__close:hover {
+    background: var(--rd-red); border-color: var(--rd-red); color: #fff;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 900px) {
+    .rd-hero    { padding: 28px 20px; }
+    .rd-content { padding: 20px; }
+    .rd-grid    { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+}
+
+@media (max-width: 600px) {
+    .rd-hero    { padding: 20px 16px; }
+    .rd-search  { flex-direction: column; }
+    .rd-search-btn { width: 100%; text-align: center; }
+    .rd-content { padding: 14px; gap: 24px; }
+    .rd-grid    { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .rd-player  { padding: 10px 14px; gap: 10px; flex-wrap: wrap; }
+    #main-audio { max-width: 100%; flex-basis: 100%; }
+    .rd-player__live span { display: none; }
+}
+
+@media (max-width: 380px) {
+    .rd-grid { grid-template-columns: 1fr; }
+}
 </style>
 
+<!-- ══ PAGE ══ -->
+<div class="rd-page">
 
-<div class="radio-page">
-<!--    <h2>Radios en ligne</h2>-->
+    <!-- ══ HERO ══ -->
+    <div class="rd-hero">
+        <div class="rd-hero__inner">
+            <div class="rd-hero__icon">
+                <i class="fas fa-radio"></i>
+            </div>
+            <div class="rd-hero__eyebrow">
+                <i class="fas fa-circle"></i> En direct
+            </div>
+            <h1 class="rd-hero__title">RADIOS <em>EN LIGNE</em></h1>
+            <p class="rd-hero__sub">
+                Écoutez vos stations préférées en streaming — locales et internationales,
+                disponibles 24h/24.
+            </p>
 
-    <!-- 🔍 Barre de recherche -->
-    <form action="/stations-radios" method="GET" style="text-align: center; margin-bottom: 20px;">
-        <input type="text" id="stationradio" name="stationradio" class="champ" placeholder="Rechercher une station..." >
-        <button type="submit" style="padding: 10px 15px; border-radius: 8px; background-color: #007BFF; color: white; border: none;">Rechercher</button>
-    </form>
-
-    {% if 'recherchestat' in sections %}
-    <h2>Résultats de la recherche</h2>
-    {% if nomstations %}
-<div class="stations-container-rech">
-    {% for station in nomstations %}
-    <div class="station-card-rech">
-        <img src="{{ station.icon }}" alt="Logo de {{ station.name }}"  style="height:70px;width:70px;">
-        <h3>{{ station.name }}</h3>
-        <a href="#" class="play-station" data-url="{{ station.url }}" data-nom="{{ station.nom }}">Écouter</a>
-
+            <form class="rd-search" action="/stations-radios" method="GET">
+                <div class="rd-search-wrap">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input
+                        type="text"
+                        id="stationradio"
+                        name="stationradio"
+                        placeholder="Rechercher une station radio…"
+                        autocomplete="off"
+                        enterkeyhint="search"
+                    >
+                </div>
+                <button type="submit" class="rd-search-btn">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+            </form>
+        </div>
     </div>
-    {% endfor %}
-</div>
 
-{% else %}
-<div class="error">
-    <p>Aucune station trouvée pour cette recherche.</p>
-</div>
-{% endif %}
-{% endif %}
+    <!-- ══ CONTENU ══ -->
+    <div class="rd-content">
 
-{% if 'statdefaut' in sections %}
-<!--<h2>Stations locales</h2>-->
-<div class="stations-container">
-    {% for station in stat %}
-    <div class="station-card">
-        <img src="{{ url_for('static', filename=station.images) }}" alt="Logo de {{ station.nom }}"  style="height:70px;width:70px;">
-        <h3>{{ station.nom }}</h3>
-<!--        <audio controls>-->
-<!--            <source src="{{ station.url }}" type="audio/mp3">-->
-<!--            Votre navigateur ne supporte pas l'audio HTML5.-->
-<!--        </audio>-->
-        <a href="#" class="play-station" data-url="{{ station.url }}" data-nom="{{ station.nom }}">Écouter</a>
+        <!-- ── RÉSULTATS DE RECHERCHE ── -->
+        {% if 'recherchestat' in sections %}
+        <section>
+            <div class="rd-section-head">
+                <div class="rd-section-label">
+                    <h2>🔍 Résultats</h2>
+                </div>
+                {% if nomstations %}
+                <span class="rd-count-badge">{{ nomstations|length }} station{{ 's' if nomstations|length > 1 }}</span>
+                {% endif %}
+            </div>
+
+            {% if nomstations %}
+            <div class="rd-grid">
+                {% for station in nomstations %}
+                <div class="rd-card" id="card-rech-{{ loop.index }}">
+                    <img
+                        class="rd-card__logo"
+                        src="{{ station.icon }}"
+                        alt="{{ station.name }}"
+                        loading="lazy"
+                        onerror="this.src='https://placehold.co/70x70/18181F/64748B?text=Radio'"
+                    >
+                    <div class="rd-card__name">{{ station.name }}</div>
+                    <div class="rd-equalizer">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <a href="#"
+                       class="rd-play-btn play-station"
+                       data-url="{{ station.url }}"
+                       data-nom="{{ station.name }}"
+                       data-logo="{{ station.icon }}"
+                       data-card="card-rech-{{ loop.index }}">
+                        <i class="fas fa-play"></i> Écouter
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="rd-grid">
+                <div class="rd-empty">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <h3>Aucune station trouvée</h3>
+                    <p>Essayez un autre nom ou parcourez les stations locales.</p>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <!-- ── STATIONS LOCALES ── -->
+        {% if 'statdefaut' in sections %}
+        <section>
+            <div class="rd-section-head">
+                <div class="rd-section-label">
+                    <h2>📡 Stations locales</h2>
+                </div>
+                {% if stat %}
+                <span class="rd-count-badge">{{ stat|length }} station{{ 's' if stat|length > 1 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="rd-grid">
+                {% if stat %}
+                    {% for station in stat %}
+                    <div class="rd-card" id="card-loc-{{ loop.index }}">
+                        <img
+                            class="rd-card__logo"
+                            src="{{ url_for('static', filename=station.images) }}"
+                            alt="{{ station.nom }}"
+                            loading="lazy"
+                            onerror="this.src='https://placehold.co/70x70/18181F/64748B?text=Radio'"
+                        >
+                        <div class="rd-card__name">{{ station.nom }}</div>
+                        <div class="rd-equalizer">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                        <a href="#"
+                           class="rd-play-btn play-station"
+                           data-url="{{ station.url }}"
+                           data-nom="{{ station.nom }}"
+                           data-logo="{{ url_for('static', filename=station.images) }}"
+                           data-card="card-loc-{{ loop.index }}">
+                            <i class="fas fa-play"></i> Écouter
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="rd-empty">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h3>Aucune station disponible</h3>
+                    <p>Vérifiez votre connexion internet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+
+    </div><!-- /rd-content -->
+</div><!-- /rd-page -->
+
+<!-- ══ LECTEUR GLOBAL STICKY ══ -->
+<div class="rd-player" id="rdPlayer">
+    <div class="rd-player__live">
+        <div class="rd-player__live-dot"></div>
+        <span>LIVE</span>
     </div>
-    {% endfor %}
-</div>
-{% endif %}
+
+    <div class="rd-player__info">
+        <img class="rd-player__logo" id="playerLogo" src="" alt="">
+        <div>
+            <div class="rd-player__name" id="now-playing">Sélectionnez une station</div>
+            <div class="rd-player__status">
+                <i class="fas fa-headphones" style="font-size:10px; color:var(--rd-green)"></i>
+                Streaming en direct
+            </div>
+        </div>
+    </div>
+
+    <audio id="main-audio" controls></audio>
+
+    <button class="rd-player__close" id="rdPlayerClose" aria-label="Fermer le lecteur">
+        <i class="fas fa-xmark"></i>
+    </button>
 </div>
 
-<!-- Lecteur audio global -->
-<div id="global-player">
-  <p id="now-playing"></p>
-  <audio id="main-audio" controls style="width: 100%;"></audio>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const player = document.getElementById('main-audio');
-    const nowPlaying = document.getElementById('now-playing');
-    const stationLinks = document.querySelectorAll('.play-station');
+(function () {
 
-    stationLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault(); // empêche d'ouvrir le lien
+    const player      = document.getElementById('main-audio');
+    const playerBar   = document.getElementById('rdPlayer');
+    const nowPlaying  = document.getElementById('now-playing');
+    const playerLogo  = document.getElementById('playerLogo');
+    const closeBtn    = document.getElementById('rdPlayerClose');
 
-            const streamUrl = this.dataset.url;
-            const stationName = this.dataset.nom;
+    let activeCardId  = null;
 
-            player.src = streamUrl;
-            nowPlaying.textContent = "🎧 En lecture : " + stationName;
-            player.play();
+    /* ── Jouer une station ── */
+    function playStation(url, nom, logo, cardId) {
+        /* Retirer état actif de l'ancienne carte */
+        if (activeCardId) {
+            const prev = document.getElementById(activeCardId);
+            if (prev) {
+                prev.classList.remove('is-playing');
+                const btn = prev.querySelector('.rd-play-btn');
+                if (btn) btn.innerHTML = '<i class="fas fa-play"></i> Écouter';
+            }
+        }
+
+        /* Activer nouvelle carte */
+        activeCardId = cardId;
+        const card = document.getElementById(cardId);
+        if (card) {
+            card.classList.add('is-playing');
+            const btn = card.querySelector('.rd-play-btn');
+            if (btn) btn.innerHTML = '<i class="fas fa-pause"></i> En cours';
+        }
+
+        /* Lecteur */
+        player.src = url;
+        player.play().catch(() => {});
+
+        /* Info */
+        nowPlaying.textContent = nom;
+
+        if (logo) {
+            playerLogo.src = logo;
+            playerLogo.classList.add('is-visible');
+        }
+
+        /* Afficher la barre */
+        playerBar.classList.add('is-visible');
+    }
+
+    /* ── Boutons écouter ── */
+    document.querySelectorAll('.play-station').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const url    = btn.dataset.url;
+            const nom    = btn.dataset.nom;
+            const logo   = btn.dataset.logo || '';
+            const cardId = btn.dataset.card;
+
+            /* Si la même station est déjà en lecture → pause */
+            if (activeCardId === cardId && !player.paused) {
+                player.pause();
+                btn.innerHTML = '<i class="fas fa-play"></i> Écouter';
+                const card = document.getElementById(cardId);
+                if (card) card.classList.remove('is-playing');
+                activeCardId = null;
+                return;
+            }
+
+            playStation(url, nom, logo, cardId);
         });
     });
-});
 
+    /* ── Fermer le lecteur ── */
+    closeBtn.addEventListener('click', () => {
+        player.pause();
+        player.src = '';
+        playerBar.classList.remove('is-visible');
+        playerLogo.classList.remove('is-visible');
+        nowPlaying.textContent = 'Sélectionnez une station';
 
-<!--    document.addEventListener('DOMContentLoaded', function () {-->
-<!--    const player = document.getElementById('main-audio-search');-->
-<!--    const nowPlaying = document.getElementById('now-playing-search');-->
-<!--    const stationLinks = document.querySelectorAll('.play-station-search');-->
+        if (activeCardId) {
+            const card = document.getElementById(activeCardId);
+            if (card) {
+                card.classList.remove('is-playing');
+                const btn = card.querySelector('.rd-play-btn');
+                if (btn) btn.innerHTML = '<i class="fas fa-play"></i> Écouter';
+            }
+            activeCardId = null;
+        }
+    });
 
-<!--    stationLinks.forEach(link => {-->
-<!--        link.addEventListener('click', function (e) {-->
-<!--            e.preventDefault(); // empêche d'ouvrir le lien-->
+    /* ── Lazy images fade-in ── */
+    if ('IntersectionObserver' in window) {
+        document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+            img.style.opacity    = '0';
+            img.style.transition = 'opacity .3s';
+            const io = new IntersectionObserver(([e]) => {
+                if (!e.isIntersecting) return;
+                img.addEventListener('load', () => img.style.opacity = '1');
+                if (img.complete) img.style.opacity = '1';
+                io.disconnect();
+            }, { rootMargin: '60px' });
+            io.observe(img);
+        });
+    }
 
-<!--            const streamUrl = this.dataset.url;-->
-<!--            const stationName = this.dataset.nom;-->
-
-<!--            player.src = streamUrl;-->
-<!--            nowPlaying.textContent = "🎧 En lecture : " + stationName;-->
-<!--            player.play();-->
-<!--        });-->
-<!--    });-->
-<!--});-->
+})();
 </script>
-
-{% endblock%}
+{% endblock %}
